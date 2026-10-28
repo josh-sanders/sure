@@ -19,8 +19,8 @@ class Ai::Transport::Base
   end
   ToolCall = Data.define(:id, :name, :arguments)
   ToolSpec = Data.define(:name, :description, :schema)
-  ConverseRequest = Data.define(:model, :instructions, :messages, :tools, :max_tokens, :reasoning_effort, :metadata) do
-    def initialize(tools: [], max_tokens: nil, reasoning_effort: nil, metadata: {}, **rest) = super
+  ConverseRequest = Data.define(:model, :instructions, :messages, :tools, :tool_choice, :max_tokens, :reasoning_effort, :metadata) do
+    def initialize(tools: [], tool_choice: nil, max_tokens: nil, reasoning_effort: nil, metadata: {}, **rest) = super
   end
   # provider_state is opaque: whatever the transport needs back on the next
   # round (Gemini's reasoning_details, Anthropic's thinking signatures).

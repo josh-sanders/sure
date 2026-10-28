@@ -1,0 +1,86 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        are a finance assistant. Use tools to look up the user''s data. Be brief."},{"role":"user","content":"How
+        many accounts do I have? Look them up."}],"stream":true,"max_completion_tokens":4096,"tools":[{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}}],"tool_choice":"none","stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Type:
+      - text/event-stream
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      X-Accel-Buffering:
+      - 'no'
+      Date:
+      - Wed, 28 Oct 2026 11:34:47 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"<tool_call>"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"<"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"function"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"=get"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"_accounts"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":">"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"</"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"function"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":">"}}],"created":1793187293,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\n"}}],"created":1793187294,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"</tool_call>"}}],"created":1793187294,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":"stop","index":0,"delta":{}}],"created":1793187294,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[],"created":1793187294,"id":"chatcmpl-4cSW4MDv3GP3wVqpSAfJf3ElrdFf7Iir","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk","usage":{"completion_tokens":14,"prompt_tokens":476,"total_tokens":490,"prompt_tokens_details":{"cached_tokens":0}},"timings":{"cache_n":0,"prompt_n":476,"prompt_ms":5475.487,"prompt_per_token_ms":11.503123949579832,"prompt_per_second":86.93290660721138,"predicted_n":14,"predicted_ms":867.944,"predicted_per_token_ms":66.76492307692307,"predicted_per_second":14.977924843077433,"draft_n":7,"draft_n_accepted":7}}
+
+        data: [DONE]
+
+  recorded_at: Wed, 28 Oct 2026 11:34:54 GMT
+recorded_with: VCR 6.3.1
+...

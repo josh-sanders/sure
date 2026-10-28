@@ -76,6 +76,7 @@ module Ai::Transport::RubyLlmAdapter
     def converse_with(chat, request, &on_chunk)
       chat.with_instructions(request.instructions)
       chat.with_tools(*ruby_llm_tools(request.tools)) if request.tools.any?
+      chat.with_tool_options(choice: request.tool_choice) if request.tool_choice
       chat.with_max_output_tokens(request.max_tokens) if request.max_tokens
       chat.with_provider_options(endpoint.extra_body) if endpoint.respond_to?(:extra_body) && endpoint.extra_body.present?
       ruby_llm_messages(request.messages).each { chat.add_message(_1) }
