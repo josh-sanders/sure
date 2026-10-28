@@ -32,8 +32,9 @@ class Ai::Transport::HandWritten::Anthropic < Ai::Transport::Base
   end
 
   private
-    # The anthropic gem opens Net::HTTP itself and takes no proxy: it reads
-    # https_proxy from ENV on its own and never sees Ai::Transport::Http's.
+    # The anthropic gem opens Net::HTTP itself and takes no proxy option.
+    # Net::HTTP reads http_proxy/HTTP_PROXY even for TLS and ignores
+    # HTTPS_PROXY, so an HTTPS_PROXY-only install goes direct (spike proxy check).
     def client
       @client ||= ::Anthropic::Client.new(api_key: endpoint.api_key, base_url: endpoint.base_url,
                                           timeout: endpoint.timeout_seconds, max_retries: endpoint.max_retries)
