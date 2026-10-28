@@ -24,7 +24,7 @@ class Ai::HttpTest < ActiveSupport::TestCase
         Ai::Spike::Presets.openrouter(api_key: "k") => "http://proxy:3128",
         Ai::Spike::Presets.llama_cpp => nil }.each do |endpoint, proxy|
         context = Ai::Transport.for(endpoint).send(:ruby_llm_context)
-        assert_equal proxy, context.config.http_proxy, endpoint.name
+        proxy ? assert_equal(proxy, context.config.http_proxy, endpoint.name) : assert_nil(context.config.http_proxy, endpoint.name)
       end
     end
   end
