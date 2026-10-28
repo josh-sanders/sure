@@ -21,6 +21,8 @@ module AiSpikeHelper
 
   CHARGES = (1..6).map { |i| { date: (Date.new(2026, 4, 15) + i.months).iso8601, amount: "15.49", name: "NETFLIX.COM AUTOPAY" } }.freeze
   CATEGORIES = %w[Entertainment Utilities Groceries].freeze
+  NETFLIX_JSON = { name: "Netflix", amount: 15.49, frequency: "monthly", day_of_month: 15, weekday: nil, month_of_year: nil,
+                   category_name: "Entertainment", bill_type: "subscription", autopay: true, confidence: 0.9, rationale: "Monthly." }.to_json.freeze
 
   def recording? = ENV["SPIKE_RECORD"] == "1"
 
