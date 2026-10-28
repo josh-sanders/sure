@@ -44,7 +44,7 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 | `<think>` blocks are stripped | Small fix: Sure's parser strips them; RubyLLM only separates `reasoning_content` | `generate_llama_cpp_test` "an inline think block is stripped…" (live, `reasoning_format: none`, `enable_thinking: true`; the cassette's content holds `</think>`). For chat, inline `<think>` in a stream would reach the user; servers that split reasoning (llama.cpp's default) don't send it inline |
 | Tool calls stream on Ollama, llama.cpp and LM Studio | Pass, live on all three | `converse_tool_round` cassettes under `llama_cpp/`, `ollama/` and `lmstudio/`: `get_accounts` is called on round one, Sure runs it, and the answer streams on round two (`ollama_live_test`, `lmstudio_live_test`, through the shared `local_server_live_tests.rb`). On llama.cpp the call arrives as `{` then `}` deltas and is reassembled. `converse_stubbed_test`: Ollama style (whole calls, no `index`) and LM Studio style (fragments keyed by `index`), accumulated by `lib/ruby_llm/protocol/stream_accumulator.rb:125-165` |
 | Gemini thought signatures survive gateways | Pass, live through Gemini's OpenAI-compatible API; OpenRouter stubbed (no credits) | `gemini_live_test` (live, `gemini/converse_two_rounds`, `gemini-3.5-flash-lite`, effort `low`): three rounds. Round 2 sends one tool call's `extra_content.google.thought_signature` back and round 3 sends both (`protocols/chat_completions/tools.rb:59-61, 117`). Without them Gemini answers 400 "Function call is missing a thought_signature" (`gemini/round_two_without_signatures`). On OpenRouter, `converse_stubbed_test` "OpenRouter Gemini…" sends `reasoning_details` back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
-| Every client honours the resolved proxy | Pass | `test/models/ai/live/proxy_check.rb` through a logging forward proxy: RubyLLM's compatible, embed, Anthropic and OpenRouter clients go through it with `HTTPS_PROXY` only and with `HTTP_PROXY` only, and skip it for `NO_PROXY` hosts. The hand-written Anthropic transport (the `anthropic` gem) ignores `HTTPS_PROXY`: Net::HTTP reads only `http_proxy` even for TLS, and the gem takes no proxy option |
+| Every client honours the resolved proxy | Pass | `test/models/ai/live/proxy_check.rb` through a logging forward proxy: RubyLLM's compatible, embed, Anthropic and OpenRouter clients go through it with `HTTPS_PROXY` only and with `HTTP_PROXY` only, and skip it for `NO_PROXY` hosts. The hand-written Anthropic transport (the `anthropic` gem) ignores `HTTPS_PROXY`: Net::HTTP reads only `http_proxy` even for TLS, and the gem takes no proxy option. Also live on Ollama, LM Studio and OpenClaw (see "The proxy with local servers"), where Sure proxies loopback addresses that Ruby's own lookup would not |
 | Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
 | The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`; not tested live (no OpenAI key) | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
 | Lines removed for `bill_setup` against the hand-written version | Reported below | RubyLLM's `generate` is 26 lines longer than the hand-written one |
@@ -88,7 +88,8 @@ live against OpenClaw 2026.10.8, whose default agent ran on the llama.cpp server
   shares one agent session, keyed by `user`. OpenClaw's docs advise against account-level `user`
   values for that reason. This is in today's client on `main`, not something RubyLLM changes.
 - **Speed:** the first request to a new OpenClaw install took four minutes (its first agent run
-  on a large system prompt); later ones took about three seconds. Today's client times out after
+  on a large system prompt); later ones took about three seconds. A second fresh install, for the
+  proxy run, took 27 seconds, so four minutes isn't typical. Today's client times out after
   120 seconds.
 - **`Assistant::External::ModelCatalog`** (63 lines, `GET /models`) is deleted by the plan
   (section 8.4), so it wasn't ported.
@@ -113,6 +114,37 @@ networking and the server bound to 127.0.0.1, and was removed afterwards.
   come from env through OpenClaw's secret references, not the config file.
 - **VCR:** Sure's setup ignores localhost, so `with_spike_cassette` records it inside its block.
   Addresses and tokens are filtered like the others.
+- **A one-off LM Studio failure:** during the proxy run, two of 36 requests failed in 0.2 seconds
+  with LM Studio's own "Channel Error … Engine protocol predict request failed: fetch failed",
+  each the request straight after a streamed reply. Sure mapped them to `Refused`, so
+  they weren't retried. Twelve stream-then-request pairs straight afterwards all succeeded, and
+  the cause wasn't found.
+
+### The proxy with local servers
+
+`test/models/ai/live/container_proxy_check.rb` ran every client against each container through
+the logging forward proxy, with the server addressed as `127.0.0.1` and as `localhost`:
+generate (RubyLLM and hand-written), a streamed converse, embeddings on Ollama, and on OpenClaw
+both the spike's agent converse and `Assistant::External::Client` from `main`.
+
+- **Every call worked through the proxy, and streaming isn't buffered:** 39 chunks over the same
+  two to three seconds direct and proxied. All the spike's clients agree on every scenario, since
+  they share `Ai::Transport::Http.proxy_for`.
+- **Sure proxies loopback.** With `HTTPS_PROXY` or `HTTP_PROXY` set and no `NO_PROXY`, requests
+  to `127.0.0.1` and `localhost` went to the proxy. Ruby's own lookup (`URI#find_proxy`, which
+  Net::HTTP and Faraday use when given no explicit proxy) returns no proxy for loopback, but
+  `proxy_for` hands Faraday an explicit one. Through the local test proxy that worked; through a
+  proxy on another host, `127.0.0.1` would be that host's loopback, and an egress proxy that
+  refuses private addresses would refuse it. The plan's resolver (section 7) should skip loopback
+  as Ruby does.
+- **`NO_PROXY` matches the host as written.** `127.0.0.1` and `127.0.0.0/8` bypass the proxy for
+  `http://127.0.0.1:…` but not for `http://localhost:…`, and `localhost` only for `localhost`.
+  The settings page should say so.
+- **`main`'s `Assistant::External::Client` resolves the proxy differently.** It reads only the
+  URL scheme's own variable, so with only `HTTPS_PROXY` set it goes direct to an `http://`
+  gateway where the spike's clients go through the proxy. It matches `NO_PROXY` by name or suffix
+  only: with `HTTP_PROXY` and `NO_PROXY=127.0.0.0/8` it still sent `127.0.0.1` to the proxy.
+  Moving the agent onto the shared transport gives it the same rules as every other client.
 
 ### `judge` (Jev's protocol), outside the criteria
 
@@ -250,5 +282,4 @@ measurement.
   no key, and OpenRouter's chat models, which need credits.
 - The `auto` fallback chain against a live server that rejects strict schemas: none of the three
   local servers does any more.
-- The proxy with the containers: the proxy rows were proved on llama.cpp and with stubs.
 - Gemini thought signatures through other gateways, such as LiteLLM.
