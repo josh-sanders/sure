@@ -20,7 +20,7 @@ module Ai::Transport::Http
   # Ollama, LM Studio); a URL with a path is kept as given, because not every
   # API version is /v1 (Gemini's is /v1beta/openai). Trailing slashes go.
   def compatible_base(base_url)
-    url = base_url.to_s.strip.chomp("/")
+    url = base_url.to_s.strip.chomp("/").delete_suffix("/chat/completions")   # agent URLs are stored whole
     URI(url).path.blank? ? "#{url}/v1" : url
   end
 

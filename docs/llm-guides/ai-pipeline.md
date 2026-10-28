@@ -55,6 +55,29 @@ judgement of RubyLLM: Chatwoot still embeds through `RubyLLM.embed`
 `embed` over RubyLLM passes here: `embed_test` (live, `embed`) returns two 384-dimension vectors
 and one `embed.ai` event.
 
+### The external assistant (agent mode), outside the criteria
+
+Today's `Assistant::External::Client` (141 code lines) speaks plain OpenAI chat completions over
+SSE. Its extras are the `X-Agent-Id` and `X-Session-Key` headers, `user: "sure-family-<id>"` in
+the body, the history with no tools, and a full `…/chat/completions` URL. Over RubyLLM that's 10
+adapter lines on `Compatible`: `agent_test` (stubbed; no agent was running during the spike).
+
+- **Headers:** `Chat#with_headers`, from the endpoint's `agent_settings`.
+- **The family as `user`:** through `with_provider_options`. RubyLLM's `with_end_user` sends
+  `safety_identifier` to the `:openai` provider (`protocols/chat_completions/chat.rb:395-399`),
+  which an agent wouldn't read.
+- **The URL:** the normaliser strips a trailing `/chat/completions`.
+- **Errors and retries:**
+  - **Errors:** a refused connection is `Unreachable` and a 502 is `Upstream`.
+  - **Retries:** with `max_retries` set on the endpoint, a failed connection is retried before
+    the stream starts and never after it, which is what today's client does by hand.
+  - **Usage:** none is reported, so it comes back as zero tokens.
+- **A risk to check live:** RubyLLM always adds `stream_options: {include_usage: true}` to a
+  streamed request, and today's client doesn't. An agent that rejects unknown parameters would
+  answer 400. `with_provider_options` can add fields but not remove them.
+- **`Assistant::External::ModelCatalog`** (63 lines, `GET /models`) is deleted by the plan
+  (section 8.4), so it wasn't ported.
+
 ### `judge` (Jev's protocol), outside the criteria
 
 The plan keeps the Jev transport hand-written. RubyLLM 2.1.1 has a `judge` API, so the spike

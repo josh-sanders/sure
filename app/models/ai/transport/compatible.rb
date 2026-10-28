@@ -15,7 +15,8 @@ class Ai::Transport::Compatible < Ai::Transport::Base
   def converse(request, &on_chunk)
     instrument("converse", model: request.model, request: request.to_h.except(:model), tools: request.tools.map(&:name)) do
       chat = chat_for(request.model)
-      chat.with_thinking(effort: request.reasoning_effort) if request.reasoning_effort   # Anthropic ignores it (section 7)
+      chat.with_thinking(effort: request.reasoning_effort) if request.reasoning_effort && !endpoint.agent   # Anthropic ignores it (section 7)
+      chat.with_headers(Ai::Transport::Http.headers(endpoint).merge(agent_headers)) if endpoint.agent
       converse_with(chat, request, &on_chunk)
     end
   end
@@ -42,6 +43,11 @@ class Ai::Transport::Compatible < Ai::Transport::Base
 
       message = mapping_errors { chat.generate }
       [ message.content, usage_of(message), raw_id(message) ]
+    end
+
+    # The external assistant (section 5.6): its routing headers from agent_settings.
+    def agent_headers
+      { "X-Agent-Id" => endpoint.agent_settings[:agent_id], "X-Session-Key" => endpoint.agent_settings[:session_key] }.compact
     end
 
     def chat_for(model) = ruby_llm_chat(model, provider: ruby_llm_provider, protocol: endpoint.responses_api ? :responses : :chat_completions)

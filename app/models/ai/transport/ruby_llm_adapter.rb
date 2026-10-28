@@ -78,7 +78,10 @@ module Ai::Transport::RubyLlmAdapter
       chat.with_tools(*ruby_llm_tools(request.tools)) if request.tools.any?
       chat.with_tool_options(choice: request.tool_choice) if request.tool_choice
       chat.with_max_output_tokens(request.max_tokens) if request.max_tokens
-      chat.with_provider_options(endpoint.extra_body) if endpoint.respond_to?(:extra_body) && endpoint.extra_body.present?
+      # OpenAI's `user` field (an agent keys its sessions on it). RubyLLM's
+      # with_end_user sends safety_identifier to the :openai provider instead.
+      options = endpoint.extra_body.merge(request.metadata[:end_user] ? { user: request.metadata[:end_user] } : {})
+      chat.with_provider_options(options) if options.present?
       ruby_llm_messages(request.messages).each { chat.add_message(_1) }
 
       message = mapping_errors do
