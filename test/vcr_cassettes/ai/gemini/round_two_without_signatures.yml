@@ -1,0 +1,78 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        are a finance assistant. Follow the user''s steps exactly, one tool call per
+        step."},{"role":"user","content":"Step 1: call get_accounts. Step 2: after
+        you see the result, call get_accounts again with include_balance_series true.
+        Step 3: tell me how many accounts I have."},{"role":"assistant","content":"","tool_calls":[{"id":"call_4424343","type":"function","function":{"name":"get_accounts","arguments":"{}"}}]},{"role":"tool","content":"{\"as_of_date\":\"2026-10-28\",\"accounts\":[{\"id\":\"20e51c3e-939a-59cd-998f-b3650207b9d5\",\"name\":\"123
+        Maybe Court\",\"balance\":\"550000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550,000.00\",\"classification\":\"asset\",\"type\":\"Property\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"11dfb81d-1a81-52ef-a94f-2fffd93f8e25\",\"name\":\"Plaid
+        Depository Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-27\",\"is_linked\":true,\"provider\":\"plaid\",\"status\":\"active\"},{\"id\":\"aad48ae3-4b2b-5230-92ff-6d00f8b5daff\",\"name\":\"Robinhood
+        Brokerage Account\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Investment\",\"start_date\":\"2026-10-26\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"31c59c3c-28bf-5aad-8fd6-6f8e79e846c7\",\"name\":\"Mortgage
+        Loan\",\"balance\":\"500000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$500,000.00\",\"classification\":\"liability\",\"type\":\"Loan\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"d39209a6-df5b-5a21-aab2-21641a771c60\",\"name\":\"Credit
+        Card\",\"balance\":\"1000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$1,000.00\",\"classification\":\"liability\",\"type\":\"CreditCard\",\"start_date\":\"2026-10-24\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"c3c1ddc8-35d1-5226-9b75-d5f9aa2aa089\",\"name\":\"Bitcoin\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Crypto\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"b599e848-533e-5b48-a342-2385ebc4e4e4\",\"name\":\"Honda
+        Accord\",\"balance\":\"18000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$18,000.00\",\"classification\":\"asset\",\"type\":\"Vehicle\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"720db67d-edd7-5941-9160-d7f03e14fdac\",\"name\":\"Checking
+        Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-23\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"799e13c1-4593-5fa9-8a04-8968add3691d\",\"name\":\"IOU
+        (personal debt to friend)\",\"balance\":\"200.0\",\"currency\":\"USD\",\"balance_formatted\":\"$200.00\",\"classification\":\"liability\",\"type\":\"OtherLiability\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"49f71985-8465-574b-a018-7af0abc5345c\",\"name\":\"Collectable
+        Account\",\"balance\":\"550.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550.00\",\"classification\":\"asset\",\"type\":\"OtherAsset\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"}]}","tool_call_id":"call_4424343"}],"stream":false,"max_completion_tokens":4096,"tools":[{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}}],"reasoning_effort":"low"}'
+    headers:
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      User-Agent:
+      - Faraday v2.14.3
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 28 Oct 2026 12:50:47 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=344
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [{
+          "error": {
+            "code": 400,
+            "message": "Function call is missing a thought_signature in functionCall parts. This is required for tools to work correctly, and missing thought_signature may lead to degraded model performance. Additional data, function call `default_api:get_accounts` , position 2. Please refer to https://ai.google.dev/gemini-api/docs/thought-signatures for more details.",
+            "status": "INVALID_ARGUMENT"
+          }
+        }
+        ]
+  recorded_at: Wed, 28 Oct 2026 12:50:47 GMT
+recorded_with: VCR 6.3.1

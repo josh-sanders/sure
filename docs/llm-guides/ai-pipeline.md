@@ -4,10 +4,12 @@
 
 **Decision: adopted, pinned to `ruby_llm` 2.1.1** (released 2026-10-11, the latest at the start
 of the spike). Every criterion in section 19 of the plan passes or has a small fix. None fails.
-Four providers had no server or key during the spike: LM Studio, Ollama, Anthropic, OpenRouter
-and OpenAI direct. Their rows are judged from RubyLLM's source and from WebMock stubs in each
-provider's documented shapes, and are marked "not tested live". PR 2 should record live cassettes
-for them before it relies on them.
+Live runs: llama.cpp on venus, Gemini through Google's OpenAI-compatible API
+(`gemini-3.5-flash-lite`), and Jev's protocol on OpenCode Zen and OpenRouter's decisions gateway.
+LM Studio, Ollama, Anthropic and OpenAI direct had no server or key, and the OpenRouter key has no
+credits for chat models. Their rows are judged from RubyLLM's source and from WebMock stubs in
+each provider's documented shapes, and are marked "not tested live". PR 2 should record live
+cassettes for them before it relies on them.
 
 RubyLLM doesn't save lines in `generate`; its adapter is longer than the hand-written one. The
 case for it is everything else:
@@ -32,7 +34,7 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 | Criterion | Result | Evidence |
 |---|---|---|
 | Models missing from RubyLLM's registry still work (`assume_model_exists`) | Pass | Every live call used unregistered models. `generate_stubbed_test` "OpenRouter strict mode, model missing from the registry" asserts `ModelNotFoundError` from the registry, then a working call. With `assume_model_exists` the lookup failure falls back to `Model.default` (`lib/ruby_llm/models.rb:198-212`) |
-| One URL normaliser handles `/v1` for every compatible server | Small fix: Sure's `Ai::Transport::Http.compatible_base` feeds `openai_api_base` (or `openrouter_api_base`) | `generate_llama_cpp_test` "base URLs with or without /v1…" (live, cassettes `generate_base_url_{0,1,2}`); Ollama without `/v1` in `generate_stubbed_test`; `http_test` |
+| One URL normaliser handles `/v1` for every compatible server | Small fix: Sure's `Ai::Transport::Http.compatible_base` feeds `openai_api_base` (or `openrouter_api_base`). It adds `/v1` only to a bare host and keeps a URL with a path, because Gemini's compatible base is `/v1beta/openai` | `generate_llama_cpp_test` "base URLs with or without /v1…" (live, `generate_base_url_{0,1,2}`); `gemini_live_test` (live, posts to `/v1beta/openai/chat/completions`); Ollama without `/v1` in `generate_stubbed_test`; `http_test` |
 | Prompts, outputs and each tool-loop step reach Langfuse | Pass, through Sure's own `.ai` events, not RubyLLM's | `test/models/ai/live/langfuse_check.rb` against the Langfuse v4 pod: one generation for `generate.ai`, then one `converse.ai` per round (round 1: `user`; round 2: `user>assistant>tool`), with prompt, output and usage, grouped by the correlation id as the session. The pod runs in `events_only` mode, so the check reads `/api/public/v2/observations` |
 | Tool loops stay under `Ai::Conversation`'s bounds, not the gem's own loop | Pass | `Chat#generate` makes one completion and doesn't run tools (`lib/ruby_llm/chat.rb:196-209`); `#ask`/`#complete` are the gem's loop and aren't used. `converse_test` "llama.cpp streams a tool call…" (live, `converse_tool_round`) expects `RubyLLM::Tool#call` never to run; the last-round and turn-deadline tests cover both bounds |
 | The default retries and timeout are overridden by the endpoint's settings | Pass | `errors_test`: 429, 500, 503 and a read timeout give one request with the endpoint's `max_retries: 0`, and four with RubyLLM's defaults (`max_retries = 3`, `request_timeout = 300`, so one call can wait 1,200 s plus backoff). Live: a 2 s timeout against a slow llama.cpp request raises `Ai::Error::Timeout` with one attempt per transport |
@@ -40,7 +42,7 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 | Anthropic models that reject a forced tool still return structured output (#4513) | Pass; not tested live | `generate_stubbed_test` "Anthropic forces the tool…" and "Anthropic auto model…": `tool_choice` `tool` vs `auto`, one retry with the reminder, and both attempts billed. Uses `Provider::Anthropic.forced_tool_choice_supported?` |
 | `<think>` blocks are stripped | Small fix: Sure's parser strips them; RubyLLM only separates `reasoning_content` | `generate_llama_cpp_test` "an inline think block is stripped…" (live, `reasoning_format: none`, `enable_thinking: true`; the cassette's content holds `</think>`). For chat, inline `<think>` in a stream would reach the user; servers that split reasoning (llama.cpp's default) don't send it inline |
 | Tool calls stream on Ollama, llama.cpp and LM Studio | Pass on llama.cpp (live); Ollama and LM Studio not tested live | `converse_tool_round` cassette: the call arrives as `{` then `}` deltas and is reassembled. `converse_stubbed_test`: Ollama style (whole calls, no `index`) and LM Studio style (fragments keyed by `index`), accumulated by `lib/ruby_llm/protocol/stream_accumulator.rb:125-165` |
-| Gemini thought signatures survive gateways | Pass for OpenRouter; not tested live; other gateways not judged | `converse_stubbed_test` "OpenRouter Gemini…": `reasoning_details` from round 1 and round 2 are sent back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
+| Gemini thought signatures survive gateways | Pass, live through Gemini's OpenAI-compatible API; OpenRouter stubbed (no credits) | `gemini_live_test` (live, `gemini/converse_two_rounds`, `gemini-3.5-flash-lite`, effort `low`): three rounds. Round 2 sends one tool call's `extra_content.google.thought_signature` back and round 3 sends both (`protocols/chat_completions/tools.rb:59-61, 117`). Without them Gemini answers 400 "Function call is missing a thought_signature" (`gemini/round_two_without_signatures`). On OpenRouter, `converse_stubbed_test` "OpenRouter Gemini…" sends `reasoning_details` back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
 | Every client honours the resolved proxy | Pass | `test/models/ai/live/proxy_check.rb` through a logging forward proxy: RubyLLM's compatible, embed, Anthropic and OpenRouter clients go through it with `HTTPS_PROXY` only and with `HTTP_PROXY` only, and skip it for `NO_PROXY` hosts. The hand-written Anthropic transport (the `anthropic` gem) ignores `HTTPS_PROXY`: Net::HTTP reads only `http_proxy` even for TLS, and the gem takes no proxy option |
 | Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
 | The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`; not tested live (no OpenAI key) | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
@@ -138,7 +140,7 @@ measurement.
 
 ### Not judged in the spike
 
-- Live runs against LM Studio, Ollama, Anthropic, OpenRouter (Gemini over two tool rounds) and
-  OpenAI direct (the Responses API and vector stores). None had a server or key.
-- Gemini thought signatures through gateways other than OpenRouter, such as LiteLLM.
+- Live runs against LM Studio, Ollama, Anthropic and OpenAI direct (the Responses API and vector
+  stores), which had no server or key, and OpenRouter's chat models, which need credits.
+- Gemini thought signatures through other gateways, such as LiteLLM.
 - Langfuse from RubyLLM's own OpenTelemetry support. Sure's subscriber was enough.

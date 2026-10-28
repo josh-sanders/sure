@@ -14,7 +14,9 @@ class Ai::Transport::Compatible < Ai::Transport::Base
 
   def converse(request, &on_chunk)
     instrument("converse", model: request.model, request: request.to_h.except(:model), tools: request.tools.map(&:name)) do
-      converse_with(chat_for(request.model), request, &on_chunk)
+      chat = chat_for(request.model)
+      chat.with_thinking(effort: request.reasoning_effort) if request.reasoning_effort   # Anthropic ignores it (section 7)
+      converse_with(chat, request, &on_chunk)
     end
   end
 

@@ -1,0 +1,263 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        are a finance assistant. Follow the user''s steps exactly, one tool call per
+        step."},{"role":"user","content":"Step 1: call get_accounts. Step 2: after
+        you see the result, call get_accounts again with include_balance_series true.
+        Step 3: tell me how many accounts I have."}],"stream":true,"max_completion_tokens":4096,"tools":[{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}}],"reasoning_effort":"low","stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/event-stream
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Wed, 28 Oct 2026 12:50:11 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=4137
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9AglyGtpffvGE_n3z_XDiPmQM9v6ADL4tuswLVK4_PmBftoRjpBb3DEGagGPeMe-zmcAUzWgm7grSBSrnGHAG9s5lcRVAPEEqd-9OJH5AbSWjcRQ-tOHdjQhheO42a_7YYEKyojS8FLvE5V4O1ZC_TgWdur44D9F6t1k6GEpq5Vp-YQSJ6-SrLeISgBMkUBcEpCz0aY9NHkWStXuzHOafqxlrgeNnUAK53Jvsw1Z7M35GcIDZIdiJqHWNe_nTN9HgVRW3gFsfeRn7ww8ZPSO_1jxgg;
+        expires=Thu, 29-Apr-2027 12:50:07 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Wed, 28 Oct 2026 12:50:11 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |+
+        data: {"choices":[{"delta":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"Et8DCtwDAWkUfRMxzYI/2p8wsjh+VT+AO+zlrOEdW2DZOphzttATTLdm9jdHQ1OWVXbge3ZfKqVBOw61oHL5Ud3HYkKtQam4LlIO7MXiP0LrC70Zo9BdkbsvJ0ii5iKWed1saHaj8XvmZpI5Zf2yXvw/v7P81sL/vkP1Vr8Pe07ft8CeKVv5cIvIEecFe3F0G9yHHF7txGzs1DD2HXAOCHpBA5dvLyHdsmelZw/n93ZftNM3GMXTkrLtYEDW2+1hBks6IKyg5/E8garDL0LkNYBGcwt2ASSHLu1+SSnKt3hTY438LTtXy5aZb1r4d1SlIfsTKXy+zkxSEsAEHcfx5bi7h8fQjRQwbvyVNKm2dofU/pPek/VUAeOjUzH92oI/Xpf7rmlmszDfuTtLKdsOOistVkFjoorv4u0RVc+u/vLC/4uCtvdf0tWA26x8lgrTHpoMIIJuODIo//hZCG+TD2HT4rdXDBQltXzN0O8METC4l+o7XIe+gpxopfqZE8Efm/GlOd0NBG1hyOQphFQMIxniYKscXOl489t4llQFJLYH+RWB/vjZVqvs2h1hPZ4jGbhFpGdNd+BcayTJD37axHwO88zoICJZkRq3I/y49iA/WSTKfEWGfAEdwnXNTbXOL1I="}},"function":{"arguments":"{}","name":"get_accounts"},"id":"call_4424343","type":"function"}]},"index":0}],"created":1793191811,"id":"f-_harOKLMiivr0P6KmToAQ","model":"gemini-3.5-flash-lite","object":"chat.completion.chunk","usage":{"completion_tokens":10,"prompt_tokens":309,"total_tokens":407}}
+
+        data: {"choices":[{"delta":{"role":"assistant"},"finish_reason":"stop","index":0}],"created":1793191811,"id":"f-_harOKLMiivr0P6KmToAQ","model":"gemini-3.5-flash-lite","object":"chat.completion.chunk","usage":{"completion_tokens":10,"prompt_tokens":309,"total_tokens":407}}
+
+        data: [DONE]
+
+  recorded_at: Wed, 28 Oct 2026 12:50:11 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        are a finance assistant. Follow the user''s steps exactly, one tool call per
+        step."},{"role":"user","content":"Step 1: call get_accounts. Step 2: after
+        you see the result, call get_accounts again with include_balance_series true.
+        Step 3: tell me how many accounts I have."},{"role":"assistant","content":"","tool_calls":[{"id":"call_4424343","type":"function","function":{"name":"get_accounts","arguments":"{}"},"extra_content":{"google":{"thought_signature":"Et8DCtwDAWkUfRMxzYI/2p8wsjh+VT+AO+zlrOEdW2DZOphzttATTLdm9jdHQ1OWVXbge3ZfKqVBOw61oHL5Ud3HYkKtQam4LlIO7MXiP0LrC70Zo9BdkbsvJ0ii5iKWed1saHaj8XvmZpI5Zf2yXvw/v7P81sL/vkP1Vr8Pe07ft8CeKVv5cIvIEecFe3F0G9yHHF7txGzs1DD2HXAOCHpBA5dvLyHdsmelZw/n93ZftNM3GMXTkrLtYEDW2+1hBks6IKyg5/E8garDL0LkNYBGcwt2ASSHLu1+SSnKt3hTY438LTtXy5aZb1r4d1SlIfsTKXy+zkxSEsAEHcfx5bi7h8fQjRQwbvyVNKm2dofU/pPek/VUAeOjUzH92oI/Xpf7rmlmszDfuTtLKdsOOistVkFjoorv4u0RVc+u/vLC/4uCtvdf0tWA26x8lgrTHpoMIIJuODIo//hZCG+TD2HT4rdXDBQltXzN0O8METC4l+o7XIe+gpxopfqZE8Efm/GlOd0NBG1hyOQphFQMIxniYKscXOl489t4llQFJLYH+RWB/vjZVqvs2h1hPZ4jGbhFpGdNd+BcayTJD37axHwO88zoICJZkRq3I/y49iA/WSTKfEWGfAEdwnXNTbXOL1I="}}}]},{"role":"tool","content":"{\"as_of_date\":\"2026-10-28\",\"accounts\":[{\"id\":\"20e51c3e-939a-59cd-998f-b3650207b9d5\",\"name\":\"123
+        Maybe Court\",\"balance\":\"550000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550,000.00\",\"classification\":\"asset\",\"type\":\"Property\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"11dfb81d-1a81-52ef-a94f-2fffd93f8e25\",\"name\":\"Plaid
+        Depository Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-27\",\"is_linked\":true,\"provider\":\"plaid\",\"status\":\"active\"},{\"id\":\"aad48ae3-4b2b-5230-92ff-6d00f8b5daff\",\"name\":\"Robinhood
+        Brokerage Account\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Investment\",\"start_date\":\"2026-10-26\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"31c59c3c-28bf-5aad-8fd6-6f8e79e846c7\",\"name\":\"Mortgage
+        Loan\",\"balance\":\"500000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$500,000.00\",\"classification\":\"liability\",\"type\":\"Loan\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"d39209a6-df5b-5a21-aab2-21641a771c60\",\"name\":\"Credit
+        Card\",\"balance\":\"1000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$1,000.00\",\"classification\":\"liability\",\"type\":\"CreditCard\",\"start_date\":\"2026-10-24\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"c3c1ddc8-35d1-5226-9b75-d5f9aa2aa089\",\"name\":\"Bitcoin\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Crypto\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"b599e848-533e-5b48-a342-2385ebc4e4e4\",\"name\":\"Honda
+        Accord\",\"balance\":\"18000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$18,000.00\",\"classification\":\"asset\",\"type\":\"Vehicle\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"720db67d-edd7-5941-9160-d7f03e14fdac\",\"name\":\"Checking
+        Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-23\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"799e13c1-4593-5fa9-8a04-8968add3691d\",\"name\":\"IOU
+        (personal debt to friend)\",\"balance\":\"200.0\",\"currency\":\"USD\",\"balance_formatted\":\"$200.00\",\"classification\":\"liability\",\"type\":\"OtherLiability\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"49f71985-8465-574b-a018-7af0abc5345c\",\"name\":\"Collectable
+        Account\",\"balance\":\"550.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550.00\",\"classification\":\"asset\",\"type\":\"OtherAsset\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"}]}","tool_call_id":"call_4424343"}],"stream":true,"max_completion_tokens":4096,"tools":[{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}}],"reasoning_effort":"low","stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/event-stream
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Wed, 28 Oct 2026 12:50:15 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=3679
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9AglyHNao-dB0UT0bAYZ0EwjJnEsT0Rq09KEhrLUnFwskfjHg8KWs4WpYCWmQNGFdAdLxX_KVv3u5VtMBSGiJ42y4B1O39nMAeTW8Sz15WJuSCC4Tp-nE8WLPMiTjtJ_7d1RizSsb3if1E7j_g5ZnfP2eA0kflYLUZ-xtpNqg7yQGcS9kPFL93-KAEyRQFwSkLPFEetNIpPhjgJhzAMYLt9x8xdnxgepMRdtAERUa5CVeq9XWIzNR6nQ3Uf7Ios1Akqdz4GcYic1Ra6nsrg9qHwBQ;
+        expires=Thu, 29-Apr-2027 12:50:12 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Wed, 28 Oct 2026 12:50:15 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |+
+        data: {"choices":[{"delta":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EuEBCt4BAWkUfRPB1tNr04dLeQwBCNXtPiZhRjwOYkvvpH6zkXadW4icm8R0sAOCvlYQZ+IeIKDdBAKEu5wjfku/mUl13mmavsRMyr4Zhk67QdMf+R7wiG6S/uQD3ka8+0yrM3ga+1vioIRFKLSTL1gPLEiJvdRfV+dheY72b2sxovJcORS2n/zpKdgyd5aG4L5TgdfiMUgDMgyLDB3hiP6GDcVN4jYfS3drcBk9HHhf5y2eQVMI3VCIhJjEnoa+pyxjfXdIJ4xLy8c/uIt/X9yOHN3HOUhjFxTF5uINaHDWT9AY"}},"function":{"arguments":"{\"include_balance_series\":true}","name":"get_accounts"},"id":"call_4053322","type":"function"}]},"index":0}],"created":1793191815,"id":"hO_haq_EEZrKrfcPnPKYuQc","model":"gemini-3.5-flash-lite","object":"chat.completion.chunk","usage":{"completion_tokens":18,"prompt_tokens":1431,"total_tokens":1477}}
+
+        data: {"choices":[{"delta":{"role":"assistant"},"finish_reason":"stop","index":0}],"created":1793191815,"id":"hO_haq_EEZrKrfcPnPKYuQc","model":"gemini-3.5-flash-lite","object":"chat.completion.chunk","usage":{"completion_tokens":18,"prompt_tokens":1519,"total_tokens":1565}}
+
+        data: [DONE]
+
+  recorded_at: Wed, 28 Oct 2026 12:50:15 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        are a finance assistant. Follow the user''s steps exactly, one tool call per
+        step."},{"role":"user","content":"Step 1: call get_accounts. Step 2: after
+        you see the result, call get_accounts again with include_balance_series true.
+        Step 3: tell me how many accounts I have."},{"role":"assistant","content":"","tool_calls":[{"id":"call_4424343","type":"function","function":{"name":"get_accounts","arguments":"{}"},"extra_content":{"google":{"thought_signature":"Et8DCtwDAWkUfRMxzYI/2p8wsjh+VT+AO+zlrOEdW2DZOphzttATTLdm9jdHQ1OWVXbge3ZfKqVBOw61oHL5Ud3HYkKtQam4LlIO7MXiP0LrC70Zo9BdkbsvJ0ii5iKWed1saHaj8XvmZpI5Zf2yXvw/v7P81sL/vkP1Vr8Pe07ft8CeKVv5cIvIEecFe3F0G9yHHF7txGzs1DD2HXAOCHpBA5dvLyHdsmelZw/n93ZftNM3GMXTkrLtYEDW2+1hBks6IKyg5/E8garDL0LkNYBGcwt2ASSHLu1+SSnKt3hTY438LTtXy5aZb1r4d1SlIfsTKXy+zkxSEsAEHcfx5bi7h8fQjRQwbvyVNKm2dofU/pPek/VUAeOjUzH92oI/Xpf7rmlmszDfuTtLKdsOOistVkFjoorv4u0RVc+u/vLC/4uCtvdf0tWA26x8lgrTHpoMIIJuODIo//hZCG+TD2HT4rdXDBQltXzN0O8METC4l+o7XIe+gpxopfqZE8Efm/GlOd0NBG1hyOQphFQMIxniYKscXOl489t4llQFJLYH+RWB/vjZVqvs2h1hPZ4jGbhFpGdNd+BcayTJD37axHwO88zoICJZkRq3I/y49iA/WSTKfEWGfAEdwnXNTbXOL1I="}}}]},{"role":"tool","content":"{\"as_of_date\":\"2026-10-28\",\"accounts\":[{\"id\":\"20e51c3e-939a-59cd-998f-b3650207b9d5\",\"name\":\"123
+        Maybe Court\",\"balance\":\"550000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550,000.00\",\"classification\":\"asset\",\"type\":\"Property\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"11dfb81d-1a81-52ef-a94f-2fffd93f8e25\",\"name\":\"Plaid
+        Depository Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-27\",\"is_linked\":true,\"provider\":\"plaid\",\"status\":\"active\"},{\"id\":\"aad48ae3-4b2b-5230-92ff-6d00f8b5daff\",\"name\":\"Robinhood
+        Brokerage Account\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Investment\",\"start_date\":\"2026-10-26\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"31c59c3c-28bf-5aad-8fd6-6f8e79e846c7\",\"name\":\"Mortgage
+        Loan\",\"balance\":\"500000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$500,000.00\",\"classification\":\"liability\",\"type\":\"Loan\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"d39209a6-df5b-5a21-aab2-21641a771c60\",\"name\":\"Credit
+        Card\",\"balance\":\"1000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$1,000.00\",\"classification\":\"liability\",\"type\":\"CreditCard\",\"start_date\":\"2026-10-24\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"c3c1ddc8-35d1-5226-9b75-d5f9aa2aa089\",\"name\":\"Bitcoin\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Crypto\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"b599e848-533e-5b48-a342-2385ebc4e4e4\",\"name\":\"Honda
+        Accord\",\"balance\":\"18000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$18,000.00\",\"classification\":\"asset\",\"type\":\"Vehicle\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"720db67d-edd7-5941-9160-d7f03e14fdac\",\"name\":\"Checking
+        Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-23\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"799e13c1-4593-5fa9-8a04-8968add3691d\",\"name\":\"IOU
+        (personal debt to friend)\",\"balance\":\"200.0\",\"currency\":\"USD\",\"balance_formatted\":\"$200.00\",\"classification\":\"liability\",\"type\":\"OtherLiability\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"49f71985-8465-574b-a018-7af0abc5345c\",\"name\":\"Collectable
+        Account\",\"balance\":\"550.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550.00\",\"classification\":\"asset\",\"type\":\"OtherAsset\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"}]}","tool_call_id":"call_4424343"},{"role":"assistant","content":"","tool_calls":[{"id":"call_4053322","type":"function","function":{"name":"get_accounts","arguments":"{\"include_balance_series\":true}"},"extra_content":{"google":{"thought_signature":"EuEBCt4BAWkUfRPB1tNr04dLeQwBCNXtPiZhRjwOYkvvpH6zkXadW4icm8R0sAOCvlYQZ+IeIKDdBAKEu5wjfku/mUl13mmavsRMyr4Zhk67QdMf+R7wiG6S/uQD3ka8+0yrM3ga+1vioIRFKLSTL1gPLEiJvdRfV+dheY72b2sxovJcORS2n/zpKdgyd5aG4L5TgdfiMUgDMgyLDB3hiP6GDcVN4jYfS3drcBk9HHhf5y2eQVMI3VCIhJjEnoa+pyxjfXdIJ4xLy8c/uIt/X9yOHN3HOUhjFxTF5uINaHDWT9AY"}}}]},{"role":"tool","content":"{\"as_of_date\":\"2026-10-28\",\"accounts\":[{\"id\":\"20e51c3e-939a-59cd-998f-b3650207b9d5\",\"name\":\"123
+        Maybe Court\",\"balance\":\"550000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550,000.00\",\"classification\":\"asset\",\"type\":\"Property\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-27\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0]}},{\"id\":\"11dfb81d-1a81-52ef-a94f-2fffd93f8e25\",\"name\":\"Plaid
+        Depository Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-27\",\"is_linked\":true,\"provider\":\"plaid\",\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-27\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0]}},{\"id\":\"aad48ae3-4b2b-5230-92ff-6d00f8b5daff\",\"name\":\"Robinhood
+        Brokerage Account\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Investment\",\"start_date\":\"2026-10-26\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-26\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0,0.0]}},{\"id\":\"31c59c3c-28bf-5aad-8fd6-6f8e79e846c7\",\"name\":\"Mortgage
+        Loan\",\"balance\":\"500000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$500,000.00\",\"classification\":\"liability\",\"type\":\"Loan\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-27\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0]}},{\"id\":\"d39209a6-df5b-5a21-aab2-21641a771c60\",\"name\":\"Credit
+        Card\",\"balance\":\"1000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$1,000.00\",\"classification\":\"liability\",\"type\":\"CreditCard\",\"start_date\":\"2026-10-24\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-24\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0,0.0,0.0,0.0]}},{\"id\":\"c3c1ddc8-35d1-5226-9b75-d5f9aa2aa089\",\"name\":\"Bitcoin\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Crypto\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-27\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0]}},{\"id\":\"b599e848-533e-5b48-a342-2385ebc4e4e4\",\"name\":\"Honda
+        Accord\",\"balance\":\"18000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$18,000.00\",\"classification\":\"asset\",\"type\":\"Vehicle\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-27\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0]}},{\"id\":\"720db67d-edd7-5941-9160-d7f03e14fdac\",\"name\":\"Checking
+        Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-23\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-23\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0,0.0,0.0,0.0,0.0]}},{\"id\":\"799e13c1-4593-5fa9-8a04-8968add3691d\",\"name\":\"IOU
+        (personal debt to friend)\",\"balance\":\"200.0\",\"currency\":\"USD\",\"balance_formatted\":\"$200.00\",\"classification\":\"liability\",\"type\":\"OtherLiability\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-27\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0]}},{\"id\":\"49f71985-8465-574b-a018-7af0abc5345c\",\"name\":\"Collectable
+        Account\",\"balance\":\"550.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550.00\",\"classification\":\"asset\",\"type\":\"OtherAsset\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\",\"historical_balances\":{\"start_date\":\"2026-10-27\",\"end_date\":\"2026-10-28\",\"interval\":\"1
+        day\",\"currency\":\"USD\",\"values\":[0.0,0.0]}}]}","tool_call_id":"call_4053322"}],"stream":true,"max_completion_tokens":4096,"tools":[{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}}],"reasoning_effort":"low","stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/event-stream
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Wed, 28 Oct 2026 12:50:20 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=4710
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl6hTqyAEsmqk2fuKcn8GfYWkxb7Z_cS2A487aEDQ_8iQLHuLv9qEX8uNgNQpL_q5KbBUZmkEhhv_vujZDh1zb0t-ITFItSEGqSWToAz6GXyClQIbROE1LPlvM7oh2HXUM8j5us04IFBATqRksyRbbjNx68Rir-3JUk2mIzlUXns02MqjHbdyiSgBMkUBcEpCz6c8gj4Yov_c9HU9XNbQ3ksbu1O1DiQwUlobKKVd9s0mzHDSlrxC6BT1Q8tfsF3UR4ClRndSlWvX5kN9pQHdSgQ;
+        expires=Thu, 29-Apr-2027 12:50:16 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Wed, 28 Oct 2026 12:50:20 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |+
+        data: {"choices":[{"delta":{"content":"You have 10 accounts in total.","role":"assistant"},"index":0}],"created":1793191820,"id":"iO_hatqgGpaZ0-kP27uP6QE","model":"gemini-3.5-flash-lite","object":"chat.completion.chunk","usage":{"completion_tokens":9,"prompt_tokens":3142,"total_tokens":3186}}
+
+        data: {"choices":[{"delta":{"extra_content":{"google":{"thought_signature":"Eo0CCooCAWkUfRMEjYLEhhEuX+dSORkdiQOYA8atCpxnr02RNjh9NKryNj2ieVrzWEyE357sxy5LAYFhRUIDgoiLdlmhG1YPKywIEtPMEImhjCYS9baipwcoYNljdpzJMu1gTfyWz5tyaMewWBi4IyIlRmUC/nB8tgoo77gQi+6T9qOGdWyZNsRQFnwDLnDY5JTlDXhlWHGMlUBonS4HgBvuqDUMo1sXcFlX3PAJ2IRw5XKRbBblckxDsmTOZslFVz7/Zffekylbak/wvYtNo//8Px35SnwX4UyOhOTS7k+ojzlxCZqEZpzeKML6u+WJd1oQZfdR9PgpBxirgYyyLDD8wDXmOSeVkDpQmMrOszw="}},"role":"assistant"},"finish_reason":"stop","index":0}],"created":1793191820,"id":"iO_hatqgGpaZ0-kP27uP6QE","model":"gemini-3.5-flash-lite","object":"chat.completion.chunk","usage":{"completion_tokens":9,"prompt_tokens":3258,"total_tokens":3302}}
+
+        data: [DONE]
+
+  recorded_at: Wed, 28 Oct 2026 12:50:20 GMT
+recorded_with: VCR 6.3.1
+...
