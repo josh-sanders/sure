@@ -1,0 +1,54 @@
+# The spike's endpoints, from its own ENV only. Missing values mean the
+# server isn't set up; tests then replay cassettes against the placeholder URL.
+module Ai::Spike::Presets
+  PLACEHOLDERS = {
+    llama_cpp: "http://llama-cpp.test/v1",
+    llama_cpp_embed: "http://llama-cpp-embed.test/v1",
+    ollama: "http://ollama.test",
+    lmstudio: "http://lmstudio.test",
+    openrouter: "https://openrouter.ai/api/v1",
+    anthropic: "https://api.anthropic.com"
+  }.freeze
+
+  module_function
+
+  def url(key, env) = ENV[env].presence || PLACEHOLDERS.fetch(key)
+
+  def llama_cpp(**overrides)
+    Ai::Spike::Endpoint.new(
+      name: "llama.cpp", protocol: :compatible, preset: :llama_cpp,
+      base_url: url(:llama_cpp, "SPIKE_LLAMA_CPP_URL"), api_key: ENV["SPIKE_LLAMA_CPP_API_KEY"],
+      timeout_seconds: 300, json_mode: "auto", **overrides
+    )
+  end
+
+  def llama_cpp_embed(**overrides)
+    Ai::Spike::Endpoint.new(
+      name: "llama.cpp embeddings", protocol: :compatible, preset: :llama_cpp,
+      base_url: url(:llama_cpp_embed, "SPIKE_LLAMA_CPP_EMBED_URL"), api_key: ENV["SPIKE_LLAMA_CPP_API_KEY"],
+      timeout_seconds: 60, **overrides
+    )
+  end
+
+  def ollama(**overrides)
+    Ai::Spike::Endpoint.new(name: "Ollama", protocol: :compatible, preset: :ollama,
+                            base_url: url(:ollama, "SPIKE_OLLAMA_URL"), api_key: nil, **overrides)
+  end
+
+  def lmstudio(**overrides)
+    Ai::Spike::Endpoint.new(name: "LM Studio", protocol: :compatible, preset: :lmstudio,
+                            base_url: url(:lmstudio, "SPIKE_LMSTUDIO_URL"), api_key: nil, **overrides)
+  end
+
+  def openrouter(**overrides)
+    Ai::Spike::Endpoint.new(name: "OpenRouter", protocol: :compatible, preset: :openrouter,
+                            base_url: PLACEHOLDERS[:openrouter], api_key: ENV["SPIKE_OPENROUTER_API_KEY"],
+                            json_mode: "strict", timeout_seconds: 120, **overrides)
+  end
+
+  def anthropic(**overrides)
+    Ai::Spike::Endpoint.new(name: "Anthropic", protocol: :anthropic, preset: :anthropic,
+                            base_url: PLACEHOLDERS[:anthropic], api_key: ENV["SPIKE_ANTHROPIC_API_KEY"],
+                            json_mode: "strict", timeout_seconds: 120, **overrides)
+  end
+end
