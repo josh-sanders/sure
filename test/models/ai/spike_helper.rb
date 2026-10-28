@@ -5,12 +5,12 @@ require "test_helper"
 # Keys are filtered, and each server's real address is swapped for the
 # placeholder URL Ai::Spike::Presets falls back to without ENV.
 VCR.configure do |config|
-  %w[SPIKE_LLAMA_CPP_API_KEY SPIKE_ANTHROPIC_API_KEY SPIKE_OPENROUTER_API_KEY SPIKE_GEMINI_API_KEY LANGFUSE_PUBLIC_KEY LANGFUSE_SECRET_KEY].each do |key|
+  %w[SPIKE_LLAMA_CPP_API_KEY SPIKE_ANTHROPIC_API_KEY SPIKE_OPENROUTER_API_KEY SPIKE_GEMINI_API_KEY SPIKE_OPENCLAW_TOKEN LANGFUSE_PUBLIC_KEY LANGFUSE_SECRET_KEY].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key].presence }
   end
   {
     "SPIKE_LLAMA_CPP_URL" => :llama_cpp, "SPIKE_LLAMA_CPP_EMBED_URL" => :llama_cpp_embed,
-    "SPIKE_OLLAMA_URL" => :ollama, "SPIKE_LMSTUDIO_URL" => :lmstudio
+    "SPIKE_OLLAMA_URL" => :ollama, "SPIKE_LMSTUDIO_URL" => :lmstudio, "SPIKE_OPENCLAW_URL" => :openclaw
   }.each do |env, key|
     config.filter_sensitive_data(Ai::Spike::Presets::PLACEHOLDERS[key]) { ENV[env].presence&.chomp("/") }
   end

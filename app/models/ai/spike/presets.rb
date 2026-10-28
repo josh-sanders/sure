@@ -8,7 +8,8 @@ module Ai::Spike::Presets
     lmstudio: "http://lmstudio.test",
     openrouter: "https://openrouter.ai/api/v1",
     gemini: "https://generativelanguage.googleapis.com/v1beta/openai",
-    anthropic: "https://api.anthropic.com"
+    anthropic: "https://api.anthropic.com",
+    openclaw: "http://openclaw.test:18789/v1/chat/completions"
   }.freeze
 
   module_function
@@ -39,6 +40,14 @@ module Ai::Spike::Presets
   def lmstudio(**overrides)
     Ai::Spike::Endpoint.new(name: "LM Studio", protocol: :compatible, preset: :lmstudio,
                             base_url: url(:lmstudio, "SPIKE_LMSTUDIO_URL"), api_key: nil, **overrides)
+  end
+
+  # The external assistant (section 5.6): an agent gateway such as OpenClaw.
+  def openclaw(**overrides)
+    Ai::Spike::Endpoint.new(name: "OpenClaw", protocol: :compatible, preset: :agent,
+                            base_url: url(:openclaw, "SPIKE_OPENCLAW_URL"), api_key: ENV["SPIKE_OPENCLAW_TOKEN"] || "spike-token",
+                            agent: true, agent_settings: { agent_id: "main", session_key: "agent:main:main" },
+                            timeout_seconds: 600, **overrides)
   end
 
   def openrouter(**overrides)
