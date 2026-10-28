@@ -35,7 +35,7 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 |---|---|---|
 | Models missing from RubyLLM's registry still work (`assume_model_exists`) | Pass | Every live call used unregistered models. `generate_stubbed_test` "OpenRouter strict mode, model missing from the registry" asserts `ModelNotFoundError` from the registry, then a working call. With `assume_model_exists` the lookup failure falls back to `Model.default` (`lib/ruby_llm/models.rb:198-212`) |
 | One URL normaliser handles `/v1` for every compatible server | Small fix: Sure's `Ai::Transport::Http.compatible_base` feeds `openai_api_base` (or `openrouter_api_base`). It adds `/v1` only to a bare host and keeps a URL with a path, because Gemini's compatible base is `/v1beta/openai` | `generate_llama_cpp_test` "base URLs with or without /v1…" (live, `generate_base_url_{0,1,2}`); `gemini_live_test` (live, posts to `/v1beta/openai/chat/completions`); Ollama without `/v1` in `generate_stubbed_test`; `http_test` |
-| Prompts, outputs and each tool-loop step reach Langfuse | Pass, through Sure's own `.ai` events, not RubyLLM's | `test/models/ai/live/langfuse_check.rb` against the Langfuse v4 pod: one generation for `generate.ai`, then one `converse.ai` per round (round 1: `user`; round 2: `user>assistant>tool`), with prompt, output and usage, grouped by the correlation id as the session. The pod runs in `events_only` mode, so the check reads `/api/public/v2/observations` |
+| Prompts, outputs and each tool-loop step reach Langfuse | Pass, through Sure's own `.ai` events, not RubyLLM's | `test/models/ai/live/langfuse_check.rb` against the Langfuse v4 pod: one generation for `generate.ai`, then one `converse.ai` per round (round 1: `user`; round 2: `user>assistant>tool`), with prompt, output and usage, grouped by the correlation id as the session. The pod runs in `events_only` mode, so the check reads `/api/public/v2/observations`. RubyLLM's own OpenTelemetry tracing sends no prompts or outputs; see below |
 | Tool loops stay under `Ai::Conversation`'s bounds, not the gem's own loop | Pass | `Chat#generate` makes one completion and doesn't run tools (`lib/ruby_llm/chat.rb:196-209`); `#ask`/`#complete` are the gem's loop and aren't used. `converse_test` "llama.cpp streams a tool call…" (live, `converse_tool_round`) expects `RubyLLM::Tool#call` never to run; the last-round and turn-deadline tests cover both bounds |
 | The default retries and timeout are overridden by the endpoint's settings | Pass | `errors_test`: 429, 500, 503 and a read timeout give one request with the endpoint's `max_retries: 0`, and four with RubyLLM's defaults (`max_retries = 3`, `request_timeout = 300`, so one call can wait 1,200 s plus backoff). Live: a 2 s timeout against a slow llama.cpp request raises `Ai::Error::Timeout` with one attempt per transport |
 | LM Studio's rejection of strict schemas and the `auto` fallback still work | Pass; LM Studio not tested live | `generate_stubbed_test` "LM Studio rejects strict and json_object…": strict → 400 → `json_object` without effort → 400 → `none` with the schema example, parsed from a fenced block. A mostly-null answer moves on and keeps the effort |
@@ -105,6 +105,29 @@ checked it against two gateways.
 - **A 402 maps to `Ai::Error::Refused`** (`RubyLLM::PaymentRequiredError`). Section 9 doesn't
   name it, but an empty balance is a key's state, like a 401, not a refusal of one request.
 
+### Langfuse through RubyLLM's own tracing, outside the criteria
+
+RubyLLM 2.1.1 has no Langfuse integration. It has `RubyLLM::OpenTelemetry.enable`, which turns
+its events into spans on the global OpenTelemetry tracer, using the GenAI semantic conventions.
+Those spans carry no prompt and no output. `lib/ruby_llm/open_telemetry/attributes.rb` sets only
+the operation, provider, model, temperature, max tokens, stream flag, finish reason and token
+counts, and nothing in the gem sets `gen_ai.input.messages`, `gen_ai.output.messages` or
+Langfuse's `langfuse.observation.input` and `output`.
+
+`test/models/ai/live/langfuse_otel_check.rb` proves it live: it points the global tracer at the
+Langfuse pod's OTLP endpoint, turns on RubyLLM's tracing without Sure's subscriber, and runs the
+same generate and two-round chat turn on llama.cpp. Langfuse stores three generations named
+`chat qwen3.6-35b-a3b-mtp`. Each has the model, parameters, latency and usage, including cached
+tokens, but its input and output are empty. The spans also have no session id: Langfuse v4 doesn't
+copy a parent's `langfuse.session.id` to child spans, and RubyLLM can't be told to set it.
+`RubyLLM.workflow` adds a parent span named after the workflow, but nothing more.
+
+The content is in RubyLLM's events: the `chat.ruby_llm` notification carries `input_messages` and
+the `response`. Feeding Langfuse from those events would still need a Sure subscriber the size of
+the current one, which also loses the route and Sure's error class. So Sure keeps its own `.ai`
+events and `Ai::Instrumentation::LangfuseSubscriber`, and doesn't turn on RubyLLM's tracing.
+Turning it on as well would put duplicate generations, without content, in Langfuse.
+
 ### Lines of code for bill setup
 
 Code lines only: blank and comment-only lines aren't counted.
@@ -166,4 +189,3 @@ measurement.
 - Live runs against LM Studio, Ollama, Anthropic and OpenAI direct (the Responses API and vector
   stores), which had no server or key, and OpenRouter's chat models, which need credits.
 - Gemini thought signatures through other gateways, such as LiteLLM.
-- Langfuse from RubyLLM's own OpenTelemetry support. Sure's subscriber was enough.
