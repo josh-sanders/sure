@@ -50,6 +50,8 @@ class Ai::Transport::Compatible < Ai::Transport::Base
       if ruby_llm_provider == :openrouter
         config.openrouter_api_key = endpoint.api_key
         config.openrouter_api_base = base
+        config.openrouter_app_name = "Sure"   # RubyLLM otherwise sends "RubyLLM" and https://rubyllm.com
+        config.openrouter_app_url = "https://sure.am"
       else
         config.openai_api_key = endpoint.api_key.presence || "none"   # RubyLLM requires a key; local servers ignore it
         config.openai_api_base = base
