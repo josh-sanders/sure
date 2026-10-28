@@ -47,7 +47,9 @@ class Ai::Transport::HandWritten::Compatible < Ai::Transport::Base
     rescue Faraday::Error => e
       raise e unless e.response_status
 
-      message = e.response_body.is_a?(Hash) ? e.response_body.dig("error", "message") : e.response_body.to_s
+      # LM Studio sends {"error": "<message>"}, not {"error": {"message": ...}}.
+      error = e.response_body.is_a?(Hash) ? e.response_body["error"] : e.response_body
+      message = error.is_a?(Hash) ? error["message"] : error.to_s
       raise Ai::Error.from_status(e.response_status, message.presence || e.message)
     end
 end

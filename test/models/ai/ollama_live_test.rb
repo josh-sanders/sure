@@ -9,7 +9,11 @@ class Ai::OllamaLiveTest < ActiveSupport::TestCase
 
   local_server_tests preset: :ollama, chat_model: "qwen3-30b-a3b-instruct"
 
-  def unknown_model_status = 404
+  def assert_unknown_model(outcome)
+    assert_kind_of Ai::Error::Refused, outcome
+    assert_equal 404, outcome.status
+    assert_match(/model 'no-such-model' not found/, outcome.message)
+  end
 
   # Ollama 0.40 refuses rather than truncating, in llama.cpp's wording.
   def assert_oversized_prompt(outcome)

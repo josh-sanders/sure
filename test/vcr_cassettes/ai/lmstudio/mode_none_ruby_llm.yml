@@ -1,0 +1,91 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://lmstudio.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3-30b-a3b-instruct","messages":[{"role":"system","content":"You
+        configure recurring-bill records for a personal finance app. Given the dated\ncharge
+        history for one obligation, propose the bill''s configuration.\n\nRules:\n-
+        Infer the cadence from the gaps between the dates, never from the row count.\n  frequency
+        is one of: monthly, weekly, biweekly, semimonthly, quarterly, semiannual,
+        annual.\n- amount is the typical recent charge as a positive number; when
+        amounts drift,\n  prefer the most recent ones.\n- day_of_month is the modal
+        charge day (monthly-style cadences only); weekday\n  (0=Sunday) only for weekly/biweekly;
+        month_of_year only for annual.\n- category_name must EXACTLY match one of
+        the provided categories, or null.\n- bill_type: \"subscription\" for digital
+        services and memberships, \"installment\"\n  for finite payment plans, otherwise
+        \"bill\".\n- autopay true only when the history shows automatic-payment markers
+        (ACH, AUTOPAY).\n- Set any field the history cannot support to null. Never
+        guess.\n- confidence is 0 to 1 for the proposal overall; rationale is one
+        short sentence.\n\nRespond with JSON only, no markdown, in exactly this shape:\n{\"name\":\"string\",\"amount\":\"number\",\"frequency\":\"string\",\"day_of_month\":\"integer\",\"weekday\":\"integer\",\"month_of_year\":\"integer\",\"category_name\":\"string\",\"bill_type\":\"string\",\"autopay\":\"boolean\",\"confidence\":\"number\",\"rationale\":\"string\"}"},{"role":"user","content":"CHARGE
+        HISTORY (date amount description):\n- 2026-05-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-06-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-07-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-08-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-09-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-10-15 15.49 NETFLIX.COM AUTOPAY\n\nAVAILABLE CATEGORIES: Entertainment,
+        Utilities, Groceries\n\n"}],"stream":false,"max_completion_tokens":2048,"reasoning_effort":"low"}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer none
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Powered-By:
+      - Express
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '920'
+      Etag:
+      - W/"398-aJZCybkARKz7wveecVB8KG7e9SA"
+      Date:
+      - Wed, 28 Oct 2026 22:02:02 GMT
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - timeout=5
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "id": "chatcmpl-h40c9ytmdpvnl1ad3144u9",
+          "object": "chat.completion",
+          "created": 1793224917,
+          "model": "qwen3-30b-a3b-instruct",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "{\"name\":\"Netflix\",\"amount\":15.49,\"frequency\":\"monthly\",\"day_of_month\":15,\"weekday\":null,\"month_of_year\":null,\"category_name\":\"Entertainment\",\"bill_type\":\"subscription\",\"autopay\":true,\"confidence\":0.95,\"rationale\":\"Consistent monthly charges on the 15th with autopay markers.\"}",
+                "reasoning_content": "",
+                "tool_calls": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 484,
+            "completion_tokens": 77,
+            "total_tokens": 561,
+            "completion_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          "stats": {},
+          "system_fingerprint": "qwen3-30b-a3b-instruct"
+        }
+  recorded_at: Wed, 28 Oct 2026 22:02:02 GMT
+recorded_with: VCR 6.3.1

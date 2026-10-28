@@ -10,10 +10,10 @@ module LocalServerLiveTests
   QUESTION = "How many accounts do I have? Look them up.".freeze
 
   class_methods do
-    attr_reader :preset, :chat_model
+    attr_reader :preset, :chat_model, :oversized_json_mode
 
-    def local_server_tests(preset:, chat_model:)
-      @preset, @chat_model = preset, chat_model
+    def local_server_tests(preset:, chat_model:, oversized_json_mode: "json_object")
+      @preset, @chat_model, @oversized_json_mode = preset, chat_model, oversized_json_mode
       label = Ai::Spike::Presets.public_send(preset).name
 
       { "ruby_llm" => false, "hand-written" => true }.each do |transport, hand_written|
@@ -30,12 +30,15 @@ module LocalServerLiveTests
         end
       end
 
-      test "#{label}: a model the server doesn't have is a clean Ai::Error (live)" do
+      test "#{label}: a model the server doesn't have (live)" do
         with_spike_cassette("#{preset}/error_unknown_model") do
-          @error = assert_raises(Ai::Error::Refused) { bill_setup.call(route: local_route(name: "no-such-model")) }
+          @outcome = begin
+            bill_setup.call(route: local_route(name: "no-such-model"))
+          rescue Ai::Error::Base => e
+            e
+          end
         end
-        assert_equal unknown_model_status, @error.status
-        assert_match(/no-such-model/, @error.message)
+        assert_unknown_model @outcome
       end
 
       test "#{label}: an oversized prompt (live)" do
@@ -43,7 +46,7 @@ module LocalServerLiveTests
         generation = Ai::Generations::SuggestBillSetup.new(charges:, categories: CATEGORIES)
         with_spike_cassette("#{preset}/oversized_prompt") do
           @outcome = begin
-            generation.call(route: local_route(endpoint: endpoint(json_mode: "json_object")))
+            generation.call(route: local_route(endpoint: endpoint(json_mode: self.class.oversized_json_mode)))
           rescue Ai::Error::Base => e
             e
           end
