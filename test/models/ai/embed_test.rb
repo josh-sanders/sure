@@ -28,4 +28,14 @@ class Ai::EmbedTest < ActiveSupport::TestCase
       assert_equal [ 384 ], Ai::Transport::Compatible.new(endpoint).embed([ "rent" ], model:)[:vectors].map(&:size)
     end
   end
+
+  test "a gateway that returns fewer vectors than texts is InvalidOutput (RubyLLM 2.1.1 doesn't check, #1269)" do
+    stub_request(:post, "http://llama-cpp-embed.test/v1/embeddings").to_return(
+      status: 200, headers: { "Content-Type" => "application/json" },
+      body: { data: [ { index: 0, embedding: Array.new(384, 0.1) } ], usage: { prompt_tokens: 4 } }.to_json
+    )
+    endpoint = Ai::Spike::Presets.llama_cpp_embed(base_url: "http://llama-cpp-embed.test/v1")
+    model = Ai::Spike::Model.new(endpoint:, name: "granite-embedding-small-english-r2")
+    assert_raises(Ai::Error::InvalidOutput) { Ai::Transport::Compatible.new(endpoint).embed(%w[a b c], model:) }
+  end
 end

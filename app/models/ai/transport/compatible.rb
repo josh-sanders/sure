@@ -1,13 +1,14 @@
 # The OpenAI-compatible transport over RubyLLM: llama.cpp, Ollama, LM Studio,
-# OpenRouter and OpenAI. Chat completions only; the Responses API stays
-# outside the spike.
+# OpenRouter and OpenAI. An endpoint with responses_api uses RubyLLM's
+# Responses protocol, which is stateless (store: false): no previous_response_id.
 class Ai::Transport::Compatible < Ai::Transport::Base
   include Ai::Transport::JsonMode
   include Ai::Transport::RubyLlmAdapter
 
   def generate(request)
     instrument("generate", model: request.model, request: request.to_h.except(:model)) do
-      generate_with_json_mode(request, json_mode: request.json_mode || endpoint.json_mode)
+      # The Responses API always takes a strict schema (section 7).
+      generate_with_json_mode(request, json_mode: endpoint.responses_api ? "strict" : request.json_mode || endpoint.json_mode)
     end
   end
 
@@ -21,6 +22,8 @@ class Ai::Transport::Compatible < Ai::Transport::Base
     instrument("embed", model:, request: { count: texts.size }) do
       embedding = mapping_errors { ruby_llm_context.embed(texts, model: model.name, provider: ruby_llm_provider, assume_model_exists: true) }
       vectors = texts.one? && embedding.vectors.first.is_a?(Numeric) ? [ embedding.vectors ] : embedding.vectors
+      # 2.1.1 doesn't check the row count (fixed upstream after it, #1269).
+      raise Ai::Error::InvalidOutput, "expected #{texts.size} vectors, got #{vectors.size}" unless vectors.size == texts.size
       { vectors:, usage: usage_from(input: embedding.tokens.input, output: 0) }
     end
   end
@@ -39,7 +42,7 @@ class Ai::Transport::Compatible < Ai::Transport::Base
       [ message.content, usage_of(message), raw_id(message) ]
     end
 
-    def chat_for(model) = ruby_llm_chat(model, provider: ruby_llm_provider, protocol: :chat_completions)
+    def chat_for(model) = ruby_llm_chat(model, provider: ruby_llm_provider, protocol: endpoint.responses_api ? :responses : :chat_completions)
 
     # OpenRouter keeps its own provider: only it round-trips reasoning_details
     # (Gemini's thought signatures). Every other compatible server is :openai.

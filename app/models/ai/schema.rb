@@ -15,17 +15,20 @@ module Ai::Schema
     value = nil if value.is_a?(String) && (value.strip.empty? || value.strip.casecmp?("null"))
     return nil if value.nil?
 
-    types = Array(spec[:type]).map(&:to_s)
-    value = if types.include?("integer") then integer(value)
-            elsif types.include?("number") then number(value)
-            elsif types.include?("boolean") then [ true, false ].include?(value) ? value : nil
-            elsif types.include?("string") then value.is_a?(String) ? value.strip : nil
-            else value
-            end
+    value = typed(value, Array(spec[:type]).map(&:to_s))
     return nil if value.nil?
     return nil if spec[:enum] && !spec[:enum].include?(value)
     return nil if spec[:minimum] && value < spec[:minimum]
     return nil if spec[:maximum] && value > spec[:maximum]
+
+    value
+  end
+
+  def typed(value, types)
+    return integer(value) if types.include?("integer")
+    return number(value) if types.include?("number")
+    return [ true, false ].include?(value) ? value : nil if types.include?("boolean")
+    return value.is_a?(String) ? value.strip : nil if types.include?("string")
 
     value
   end

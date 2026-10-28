@@ -122,4 +122,26 @@ class Ai::GenerateStubbedTest < ActiveSupport::TestCase
       assert_match "You did not call the bill_setup tool", retried["messages"].last.to_json
     end
   end
+
+  test "ruby_llm: an endpoint with responses_api sends text.format and reasoning.effort, stateless (not live: no OpenAI key)" do
+    stub = stub_request(:post, "https://api.openai.com/v1/responses").to_return(
+      status: 200, headers: { "Content-Type" => "application/json" }, body: {
+        id: "resp_1", object: "response", model: "gpt-5.4-mini", status: "completed",
+        output: [ { type: "message", id: "msg_1", role: "assistant", status: "completed",
+                    content: [ { type: "output_text", text: NETFLIX.to_json, annotations: [] } ] } ],
+        usage: { input_tokens: 400, output_tokens: 90, total_tokens: 490 }
+      }.to_json
+    )
+    endpoint = Ai::Spike::Endpoint.new(name: "OpenAI", protocol: :compatible, preset: :openai, base_url: "https://api.openai.com/v1",
+                                       api_key: "sk", responses_api: true, json_mode: "auto")
+
+    assert_netflix bill_setup.call(route: route_for(endpoint, name: "gpt-5.4-mini", reasoning_effort: "low")).value
+    assert_requested stub, times: 1
+    body = request_bodies(%r{api.openai.com}).first
+    assert_equal "json_schema", body.dig("text", "format", "type")
+    assert_equal true, body.dig("text", "format", "strict")
+    assert_equal({ "effort" => "low" }, body["reasoning"])
+    assert_equal false, body["store"]
+    refute body.key?("previous_response_id")
+  end
 end
