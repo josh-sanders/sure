@@ -1,0 +1,49 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":{"description":"NETFLIX.COM AUTOPAY","amount":"15.49","classification":"expense"},"questions":{"category":{"type":"choice","instructions":"Which
+        spending category fits this transaction?","criteria":{"Entertainment":"Streaming,
+        games, events","Utilities":"Power, water, internet","Groceries":null}}}}'
+    headers:
+      Authorization:
+      - Bearer public
+      Accept:
+      - application/json
+      User-Agent:
+      - Faraday v2.14.3
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 28 Oct 2026 12:44:20 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a1828a-3c5f-7287-ba84-4acdeeaf8a8d
+      X-Zen-Model:
+      - jev-1.13-free
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51a08003fbdca84-PDX
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"jev-1.13-free","answers":{"category":{"type":"choice","choice":"Entertainment","confidence":1,"probabilities":{"Entertainment":1,"Utilities":0,"Groceries":0}}},"usage":{"input_tokens":359,"output_tokens":46,"cost":0,"opencode":{"billing_source":"free","list_cost":0,"tokens":{"input":359,"output":46,"reasoning":0,"cache_read":0,"cache_write_5m":0,"cache_write_1h":0}}}}'
+  recorded_at: Wed, 28 Oct 2026 12:44:20 GMT
+recorded_with: VCR 6.3.1

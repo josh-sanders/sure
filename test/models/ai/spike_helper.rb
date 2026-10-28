@@ -5,7 +5,7 @@ require "test_helper"
 # Keys are filtered, and each server's real address is swapped for the
 # placeholder URL Ai::Spike::Presets falls back to without ENV.
 VCR.configure do |config|
-  %w[SPIKE_LLAMA_CPP_API_KEY SPIKE_ANTHROPIC_API_KEY SPIKE_OPENROUTER_API_KEY LANGFUSE_PUBLIC_KEY LANGFUSE_SECRET_KEY].each do |key|
+  %w[SPIKE_LLAMA_CPP_API_KEY SPIKE_ANTHROPIC_API_KEY SPIKE_OPENROUTER_API_KEY SPIKE_GEMINI_API_KEY LANGFUSE_PUBLIC_KEY LANGFUSE_SECRET_KEY].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key].presence }
   end
   {
@@ -26,7 +26,10 @@ module AiSpikeHelper
 
   def recording? = ENV["SPIKE_RECORD"] == "1"
 
+  # Recording starts from an empty cassette: VCR's :all keeps old interactions
+  # beside the new ones, and these share one URI, so replay would pick stale ones.
   def with_spike_cassette(name, &)
+    FileUtils.rm_f(Rails.root.join("test/vcr_cassettes/ai/#{name}.yml")) if recording?
     VCR.use_cassette("ai/#{name}", record: recording? ? :all : :none, match_requests_on: %i[method uri], &)
   end
 

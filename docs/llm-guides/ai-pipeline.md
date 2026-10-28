@@ -53,6 +53,33 @@ judgement of RubyLLM: Chatwoot still embeds through `RubyLLM.embed`
 `embed` over RubyLLM passes here: `embed_test` (live, `embed`) returns two 384-dimension vectors
 and one `embed.ai` event.
 
+### `judge` (Jev's protocol), outside the criteria
+
+The plan keeps the Jev transport hand-written. RubyLLM 2.1.1 has a `judge` API, so the spike
+checked it against two gateways.
+
+- **OpenCode Zen works** (`https://opencode.ai/zen/v1/systemone`, `jev-1.13-free`, anonymous key
+  `public`). RubyLLM's `typesafe` provider sends Jev's System One payload: `state` (Jev's
+  transaction object, unchanged) and a hash of `noul`/`choice`/`score` questions. It parses all
+  three answers: `judge_jev_live_test` (live, `jev/judge_ruby_llm`). Sure's `Provider::Jev` gets
+  the same `choice` from the same endpoint (`jev/judge_provider_jev`). A made-up key gets 401
+  "Invalid credential", which RubyLLM maps to `UnauthorizedError`.
+- **OpenRouter doesn't.** RubyLLM's System One path is fixed to `<base>/v1/systemone`
+  (`protocols/system_one/judgments.rb`), and OpenRouter serves decisions at
+  `/api/alpha/decisions`, so the request gets a 404. RubyLLM's OpenAI Decisions protocol does
+  reach that path, but OpenRouter rejects its payload (`input` plus an array of questions) with a
+  400. Both are recorded in `openrouter/judge_ruby_llm`. Sure's `JEV_ENDPOINT` is a full URL and
+  reaches either gateway.
+- **Respan `span-01-lite` on OpenRouter:** the `:free` variant answers `noul` on a string state,
+  and rejects Jev's transaction object with a 400 ("state must be a string or…"). The paid
+  variant takes `noul`, `choice` and `score`, but returned 402 "Insufficient credits" for this
+  key, so it wasn't run.
+- **So a `judge` over RubyLLM would serve TypeSafe and OpenCode Zen, but not OpenRouter.** Jev's
+  fan-out over `parallel_requests` stays Sure's either way, since RubyLLM makes one request per
+  `judge`. Keeping Jev hand-written, as planned, costs nothing and keeps every gateway.
+- **A 402 maps to `Ai::Error::Refused`** (`RubyLLM::PaymentRequiredError`). Section 9 doesn't
+  name it, but an empty balance is a key's state, like a 401, not a refusal of one request.
+
 ### Lines of code for bill setup
 
 Code lines only: blank and comment-only lines aren't counted.

@@ -7,6 +7,7 @@ module Ai::Spike::Presets
     ollama: "http://ollama.test",
     lmstudio: "http://lmstudio.test",
     openrouter: "https://openrouter.ai/api/v1",
+    gemini: "https://generativelanguage.googleapis.com/v1beta/openai",
     anthropic: "https://api.anthropic.com"
   }.freeze
 
@@ -44,6 +45,13 @@ module Ai::Spike::Presets
     Ai::Spike::Endpoint.new(name: "OpenRouter", protocol: :compatible, preset: :openrouter,
                             base_url: PLACEHOLDERS[:openrouter], api_key: ENV["SPIKE_OPENROUTER_API_KEY"],
                             json_mode: "strict", timeout_seconds: 120, **overrides)
+  end
+
+  # Gemini through Google's OpenAI-compatible API (section 4.2).
+  def gemini(**overrides)
+    Ai::Spike::Endpoint.new(name: "Gemini", protocol: :compatible, preset: :gemini,
+                            base_url: PLACEHOLDERS[:gemini], api_key: ENV["SPIKE_GEMINI_API_KEY"],
+                            json_mode: "auto", timeout_seconds: 120, **overrides)
   end
 
   def anthropic(**overrides)

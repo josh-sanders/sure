@@ -1,0 +1,120 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://openrouter.ai/api/alpha/decisions
+    body:
+      encoding: UTF-8
+      string: '{"state":"NETFLIX.COM AUTOPAY 15.49 on the 15th of each month","questions":{"subscription":{"type":"noul","instructions":"Is
+        this a recurring subscription?"}},"model":"respan/span-01-lite:free"}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 28 Oct 2026 12:46:17 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      X-Generation-Id:
+      - gen-dec-1793191577-EODItkXxmkI6yHP0xw6e
+      X-Provider-Name:
+      - Respan
+      Set-Cookie:
+      - __cf_bm=VBZNHflVgnBSAcFPDQJdyQJz12Fh9TnBo6EfLdZiJ1E-1793191577.1987367-1.0.1.1-NgzobVYMW6nTGjnQOgsh3qDRw9ZEUKCTlvE.n_Bfw_fK5DAZPZHcKcYZ1HM4cz3IJw6ZPo2t9oBgRL0QjHlzUaeMtyokkGzpGlj70bEkZaTUxgmevFthy03pt6gl0OB6;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Wed,
+        28 Oct 2026 13:16:17 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51a0add7c33d72f-BNE
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"respan/span-01-lite-20260925","answers":{"subscription":{"type":"noul","noul":0.99713933}},"usage":{"input_tokens":138,"output_tokens":0,"cost":0},"id":"gen-dec-1793191577-EODItkXxmkI6yHP0xw6e","provider":"Respan"}'
+  recorded_at: Wed, 28 Oct 2026 12:46:17 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/alpha/decisions
+    body:
+      encoding: UTF-8
+      string: '{"state":{"description":"NETFLIX.COM AUTOPAY","amount":"15.49"},"questions":{"subscription":{"type":"noul","instructions":"Is
+        this a recurring subscription?"}},"model":"respan/span-01-lite:free"}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Date:
+      - Wed, 28 Oct 2026 12:46:17 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      X-Generation-Id:
+      - gen-dec-1793191577-OoQ5GMDb5Ukocmt356QJ
+      Set-Cookie:
+      - __cf_bm=Ohthuc20_NICXJ4g2PJX45v73oA99F1G2ifnUFcWF08-1793191577.7942448-1.0.1.1-u1MpvFnoOObUM34Wxjd_ZIEtuSHh4I6S6G01AHVRW19pyhd_T8O.iydMWA0wsSVcRRn6iRo4UQuaJiyrqswJe4pq5SRKDV1a1OtLtCwnXYbo1evEM.3FS75lFwdfLtKo;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Wed,
+        28 Oct 2026 13:16:17 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51a0ae13b00d71d-BNE
+    body:
+      encoding: UTF-8
+      string: '{"error":{"message":"Respan state must be a string or an object with
+        only input (a message array) and output (a message), where each message has
+        a string content and a role of system, user, assistant or tool, and the output
+        role is assistant","code":400}}'
+  recorded_at: Wed, 28 Oct 2026 12:46:17 GMT
+recorded_with: VCR 6.3.1

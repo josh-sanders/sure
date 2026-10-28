@@ -1,0 +1,53 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":{"description":"NETFLIX.COM AUTOPAY","amount":"15.49","classification":"expense"},"questions":{"subscription":{"type":"noul","instructions":"Is
+        this a recurring subscription?"},"category":{"type":"choice","instructions":"Which
+        spending category fits this transaction?","criteria":{"Entertainment":"Streaming,
+        games, events","Utilities":"Power, water, internet","Groceries":null}},"recurring":{"type":"score","instructions":"How
+        clearly is this a recurring charge?","criteria":["Clearly one-off","Unclear","Clearly
+        recurring"]}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer public
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 28 Oct 2026 12:44:19 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a1828a-3954-7053-9063-8e9aff26fc05
+      X-Zen-Model:
+      - jev-1.13-free
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51a07fb786575e0-SEA
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"jev-1.13-free","answers":{"subscription":{"type":"noul","noul":0.96},"category":{"type":"choice","choice":"Entertainment","confidence":1,"probabilities":{"Entertainment":1,"Utilities":0,"Groceries":0}},"recurring":{"type":"score","score":1.99,"confidence":0.98,"legend":{"0":"Clearly
+        one-off","1":"Unclear","2":"Clearly recurring"},"probabilities":{"0":0,"1":0.01,"2":0.99}}},"usage":{"input_tokens":416,"output_tokens":78,"cost":0,"opencode":{"billing_source":"free","list_cost":0,"tokens":{"input":416,"output":78,"reasoning":0,"cache_read":0,"cache_write_5m":0,"cache_write_1h":0}}}}'
+  recorded_at: Wed, 28 Oct 2026 12:44:19 GMT
+recorded_with: VCR 6.3.1

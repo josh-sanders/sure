@@ -1,0 +1,234 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://openrouter.ai/api/alpha/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"respan/span-01-lite:free","state":"NETFLIX 15.49","questions":{"subscription":{"type":"noul","instructions":"Is
+        this a recurring subscription?"}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Date:
+      - Wed, 28 Oct 2026 12:03:32 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Headers:
+      - Authorization, User-Agent, X-Api-Key, X-CSRF-Token, X-Requested-With, Accept,
+        Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version,
+        HTTP-Referer, X-Windowai-Title, X-Openrouter-Title, X-Title, X-Openrouter-Categories,
+        X-Openrouter-App-Visibility, X-Stainless-Lang, X-Stainless-Package-Version,
+        X-Stainless-OS, X-Stainless-Arch, X-Stainless-Runtime, X-Stainless-Runtime-Version,
+        X-Stainless-Retry-Count, X-Stainless-Timeout, X-Stainless-Helper-Method, Protection-Key,
+        traceparent, tracestate, b3
+      Access-Control-Allow-Methods:
+      - GET,OPTIONS,PATCH,DELETE,POST,PUT
+      Access-Control-Allow-Origin:
+      - "*"
+      Cache-Control:
+      - private, no-store
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - 'default-src ''self''; base-uri ''self''; object-src ''none''; script-src
+        ''self'' ''unsafe-eval'' ''unsafe-inline'' https://clerk.openrouter.ai https://*.protect.clerk.com
+        https://*.client.protect.clerk.com https://challenges.cloudflare.com https://checkout.stripe.com
+        https://connect-js.stripe.com https://js.stripe.com https://maps.googleapis.com
+        https://www.googletagmanager.com https://*.googletagmanager.com ''wasm-unsafe-eval''
+        https://unpkg.com https://esm.sh https://static.cloudflareinsights.com https://cdn.jsdelivr.net
+        https://*.algolia.net https://*.algolianet.com https://app.buildwithfern.com
+        https://prod.ferndocs.com https://cdn.segment.com https://jobs.ashbyhq.com
+        https://*.posthog.com https://cdn.tldraw.com; connect-src ''self'' blob: https://model-assets.openrouter.ai
+        https://clerk.openrouter.ai https://*.protect.clerk.com https://*.client.protect.clerk.com
+        https://*.protect.clerk.com:* https://clerk-telemetry.com https://checkout.stripe.com
+        https://api.stripe.com https://m.stripe.com https://maps.googleapis.com *.google-analytics.com
+        https://www.googletagmanager.com https://www.google.com https://*.analytics.google.com
+        https://analytics.google.com https://*.google-analytics.com https://*.googletagmanager.com
+        https://*.g.doubleclick.net https://fonts.googleapis.com https://raw.githubusercontent.com
+        wss://www.walletlink.org/rpc https://static.cloudflareinsights.com https://esm.sh
+        https://*.browser-intake-datadoghq.com https://browser-intake-us5-datadoghq.com
+        https://rum.browser-intake-us5-datadoghq.com https://api-na2.hsforms.com https://*.algolia.net
+        https://*.algolianet.com https://app.buildwithfern.com https://prod.ferndocs.com
+        https://api.segment.io https://cdn.segment.com https://www.openrouter.ai https://openrouter.ai
+        https://jobs.ashbyhq.com https://api.ashbyhq.com/ https://*.posthog.com https://cdn.tldraw.com
+        https://wrapped.openrouter.ai https://storage.googleapis.com; frame-src ''self''
+        https://model-assets.openrouter.ai https://*.protect.clerk.com https://*.client.protect.clerk.com
+        https://challenges.cloudflare.com https://checkout.stripe.com https://connect-js.stripe.com
+        https://js.stripe.com https://hooks.stripe.com https://m.stripe.network https://us5.datadoghq.com
+        https://share-na2.hsforms.com https://www.youtube.com https://app.buildwithfern.com
+        https://prod.ferndocs.com https://jobs.ashbyhq.com; img-src ''self'' data:
+        blob: https://*.github.io https://model-assets.openrouter.ai https://img.clerk.com
+        https://*.stripe.com https://www.googletagmanager.com www.google.com https://*.google-analytics.com
+        https://*.googletagmanager.com https://analytics.google.com https://*.analytics.google.com
+        https://*.g.doubleclick.net https://source.unsplash.com https://t0.gstatic.com
+        https://imagedelivery.net https://raw.githubusercontent.com https://*.algolia.io
+        https://files.buildwithfern.com https://icons.ferndocs.com https://cdn.tldraw.com
+        https://wrapped.openrouter.ai; media-src ''self'' data: blob: https://model-assets.openrouter.ai
+        https://vgi-bench-mirror.openrouter.ai; worker-src ''self'' blob: data:; style-src
+        ''self'' ''unsafe-inline'' sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=
+        https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net https://app.buildwithfern.com
+        https://prod.ferndocs.com https://jobs.ashbyhq.com https://*.posthog.com https://cdn.tldraw.com;
+        frame-ancestors ''self''; font-src ''self'' https://fonts.gstatic.com https://cdn.jsdelivr.net
+        https://cdn.tldraw.com; upgrade-insecure-requests'
+      Content-Security-Policy-Report-Only:
+      - 'default-src ''self''; base-uri ''self''; object-src ''none''; script-src
+        ''self'' ''unsafe-inline'' https://clerk.openrouter.ai https://*.protect.clerk.com
+        https://*.client.protect.clerk.com https://challenges.cloudflare.com https://checkout.stripe.com
+        https://connect-js.stripe.com https://js.stripe.com https://maps.googleapis.com
+        https://www.googletagmanager.com https://*.googletagmanager.com ''wasm-unsafe-eval''
+        https://unpkg.com https://esm.sh https://static.cloudflareinsights.com https://cdn.jsdelivr.net
+        https://*.algolia.net https://*.algolianet.com https://app.buildwithfern.com
+        https://prod.ferndocs.com https://cdn.segment.com https://jobs.ashbyhq.com
+        https://*.posthog.com https://cdn.tldraw.com; connect-src ''self'' blob: https://model-assets.openrouter.ai
+        https://clerk.openrouter.ai https://*.protect.clerk.com https://*.client.protect.clerk.com
+        https://*.protect.clerk.com:* https://clerk-telemetry.com https://checkout.stripe.com
+        https://api.stripe.com https://m.stripe.com https://maps.googleapis.com *.google-analytics.com
+        https://www.googletagmanager.com https://www.google.com https://*.analytics.google.com
+        https://analytics.google.com https://*.google-analytics.com https://*.googletagmanager.com
+        https://*.g.doubleclick.net https://fonts.googleapis.com https://raw.githubusercontent.com
+        wss://www.walletlink.org/rpc https://static.cloudflareinsights.com https://esm.sh
+        https://*.browser-intake-datadoghq.com https://browser-intake-us5-datadoghq.com
+        https://rum.browser-intake-us5-datadoghq.com https://api-na2.hsforms.com https://*.algolia.net
+        https://*.algolianet.com https://app.buildwithfern.com https://prod.ferndocs.com
+        https://api.segment.io https://cdn.segment.com https://www.openrouter.ai https://openrouter.ai
+        https://jobs.ashbyhq.com https://api.ashbyhq.com/ https://*.posthog.com https://cdn.tldraw.com
+        https://wrapped.openrouter.ai https://storage.googleapis.com; frame-src ''self''
+        https://model-assets.openrouter.ai https://*.protect.clerk.com https://*.client.protect.clerk.com
+        https://challenges.cloudflare.com https://checkout.stripe.com https://connect-js.stripe.com
+        https://js.stripe.com https://hooks.stripe.com https://m.stripe.network https://us5.datadoghq.com
+        https://share-na2.hsforms.com https://www.youtube.com https://app.buildwithfern.com
+        https://prod.ferndocs.com https://jobs.ashbyhq.com; img-src ''self'' data:
+        blob: https://*.github.io https://model-assets.openrouter.ai https://img.clerk.com
+        https://*.stripe.com https://www.googletagmanager.com www.google.com https://*.google-analytics.com
+        https://*.googletagmanager.com https://analytics.google.com https://*.analytics.google.com
+        https://*.g.doubleclick.net https://source.unsplash.com https://t0.gstatic.com
+        https://imagedelivery.net https://raw.githubusercontent.com https://*.algolia.io
+        https://files.buildwithfern.com https://icons.ferndocs.com https://cdn.tldraw.com
+        https://wrapped.openrouter.ai; media-src ''self'' data: blob: https://model-assets.openrouter.ai
+        https://vgi-bench-mirror.openrouter.ai; worker-src ''self'' blob: data:; style-src
+        ''self'' ''unsafe-inline'' sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=
+        https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net https://app.buildwithfern.com
+        https://prod.ferndocs.com https://jobs.ashbyhq.com https://*.posthog.com https://cdn.tldraw.com;
+        frame-ancestors ''self''; font-src ''self'' https://fonts.gstatic.com https://cdn.jsdelivr.net
+        https://cdn.tldraw.com; script-src-attr ''none'''
+      Server:
+      - cloudflare
+      X-Content-Type-Options:
+      - nosniff
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - User-Agent, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+      - accept-encoding
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Matched-Path:
+      - "/api/[[...slug]]"
+      X-Vercel-Cache:
+      - MISS
+      X-Vercel-Id:
+      - syd1::sin1::gcnjt-1793189012189-2e380401586b
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - __cf_bm=KhSD5hpbDiyd2teNU5Ki6Exz9gdGWIIUcWgzaIkSVMM-1793189012.1795106-1.0.1.1-54dDvCe4qc6qAvm2W9ErfFRlN2UjxJjJ.EWgK5JPnvot2egbz6R0HfozQL06j2h2v0Jm0EcF5Meg6fPDxqUbcMELwaffNDMcOyE2BxYRap5dtnasKkbkM8NHlENIkP07;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Wed,
+        28 Oct 2026 12:33:32 GMT
+      - or_consent_region=opt_out; Path=/; Expires=Thu, 28 Oct 2027 12:03:32 GMT;
+        Max-Age=31536000; Secure; SameSite=lax
+      - or_nav_arm=control; Path=/; Expires=Thu, 28 Oct 2027 12:03:32 GMT; Max-Age=31536000;
+        Secure; SameSite=lax
+      - or_statsig_stable_id=5d3e0f88-a8ac-4630-86de-611d4e9a81b0; Path=/; Expires=Thu,
+        28 Oct 2027 12:03:32 GMT; Max-Age=31536000; Secure; HttpOnly; SameSite=lax
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Cf-Ray:
+      - a519cc3e1f4fd734-BNE
+    body:
+      encoding: ASCII-8BIT
+      string: '{"error":{"message":"Not Found","code":404}}'
+  recorded_at: Wed, 28 Oct 2026 12:03:32 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/alpha/decisions
+    body:
+      encoding: UTF-8
+      string: '{"model":"respan/span-01-lite:free","input":"NETFLIX 15.49","questions":[{"type":"predicate","name":"subscription","instructions":"Is
+        this a recurring subscription?"}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Date:
+      - Wed, 28 Oct 2026 12:03:32 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      Set-Cookie:
+      - __cf_bm=cOH15Zbvtz53mR55EP4Hphw52KsMuvbgk.eiNFQzoAA-1793189012.5127769-1.0.1.1-Jm0rz6rwVTg3ykwudJzJeyXojnGN5kEwCEZMrwT2GGoJHPkgj_WGYgiaZuLUBHKi2OcTkms4Tk1qGThxQPEJdxnlQBH4LgrxcqRaH2gh_VVifrGziXWsRr05LWDgDi1B;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Wed,
+        28 Oct 2026 12:33:32 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a519cc403dd6d724-BNE
+    body:
+      encoding: UTF-8
+      string: '{"error":{"message":"[\n  {\n    \"code\": \"invalid_union\",\n    \"errors\":
+        [\n      [\n        {\n          \"expected\": \"string\",\n          \"code\":
+        \"invalid_type\",\n          \"path\": [],\n          \"message\": \"Invalid
+        input: expected string, received undefined\"\n        }\n      ],\n      [\n        {\n          \"expected\":
+        \"record\",\n          \"code\": \"invalid_type\",\n          \"path\": [],\n          \"message\":
+        \"Invalid input: expected record, received undefined\"\n        }\n      ],\n      [\n        {\n          \"expected\":
+        \"array\",\n          \"code\": \"invalid_type\",\n          \"path\": [],\n          \"message\":
+        \"Invalid input: expected array, received undefined\"\n        }\n      ]\n    ],\n    \"path\":
+        [\n      \"state\"\n    ],\n    \"message\": \"Invalid input\"\n  },\n  {\n    \"expected\":
+        \"record\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"questions\"\n    ],\n    \"message\":
+        \"Invalid input: expected record, received array\"\n  }\n]","code":400},"user_id":"user_3LJz8oh5nYhE0LAbV6dHMOi7G6x"}'
+  recorded_at: Wed, 28 Oct 2026 12:03:32 GMT
+recorded_with: VCR 6.3.1

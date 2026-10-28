@@ -16,11 +16,12 @@ module Ai::Transport::Http
     proxy
   end
 
-  # One normaliser for every compatible server: with or without /v1, with or
-  # without a trailing slash, the result ends in exactly one /v1.
+  # One normaliser for every compatible server. A bare host gets /v1 (llama.cpp,
+  # Ollama, LM Studio); a URL with a path is kept as given, because not every
+  # API version is /v1 (Gemini's is /v1beta/openai). Trailing slashes go.
   def compatible_base(base_url)
     url = base_url.to_s.strip.chomp("/")
-    url.end_with?("/v1") ? url : "#{url}/v1"
+    URI(url).path.blank? ? "#{url}/v1" : url
   end
 
   def headers(endpoint) = endpoint.extra_headers.to_h

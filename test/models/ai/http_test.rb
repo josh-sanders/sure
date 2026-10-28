@@ -15,11 +15,13 @@ class Ai::HttpTest < ActiveSupport::TestCase
     %w[http://h:1 http://h:1/ http://h:1/v1 http://h:1/v1/].each do |url|
       assert_equal "http://h:1/v1", Ai::Transport::Http.compatible_base(url)
     end
-    assert_equal "https://openrouter.ai/api/v1", Ai::Transport::Http.compatible_base("https://openrouter.ai/api")
+    assert_equal "https://openrouter.ai/api/v1", Ai::Transport::Http.compatible_base("https://openrouter.ai/api/v1/")
+    assert_equal "https://generativelanguage.googleapis.com/v1beta/openai",
+                 Ai::Transport::Http.compatible_base("https://generativelanguage.googleapis.com/v1beta/openai/")
   end
 
   test "every RubyLLM transport hands the resolved proxy to its context" do
-    ClimateControl.modify(HTTPS_PROXY: "http://proxy:3128", NO_PROXY: "llama-cpp.test") do
+    ClimateControl.modify(HTTPS_PROXY: "http://proxy:3128", NO_PROXY: URI(Ai::Spike::Presets.llama_cpp.base_url).host) do
       { Ai::Spike::Presets.anthropic(api_key: "k") => "http://proxy:3128",
         Ai::Spike::Presets.openrouter(api_key: "k") => "http://proxy:3128",
         Ai::Spike::Presets.llama_cpp => nil }.each do |endpoint, proxy|
