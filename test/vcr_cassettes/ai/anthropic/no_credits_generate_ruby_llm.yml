@@ -1,0 +1,87 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-haiku-5-5","messages":[{"role":"user","content":[{"type":"text","text":"CHARGE
+        HISTORY (date amount description):\n- 2026-05-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-06-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-07-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-08-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-09-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-10-15 15.49 NETFLIX.COM AUTOPAY\n\nAVAILABLE CATEGORIES: Entertainment,
+        Utilities, Groceries\n\n"}]}],"stream":false,"max_tokens":1024,"tools":[{"name":"bill_setup","description":"Report
+        the result.","input_schema":{"type":"object","properties":{"name":{"type":["string","null"]},"amount":{"type":["number","null"]},"frequency":{"type":["string","null"],"enum":["monthly","weekly","biweekly","semimonthly","quarterly","semiannual","annual",null]},"day_of_month":{"type":["integer","null"],"minimum":1,"maximum":31},"weekday":{"type":["integer","null"],"minimum":0,"maximum":6},"month_of_year":{"type":["integer","null"],"minimum":1,"maximum":12},"category_name":{"type":["string","null"]},"bill_type":{"type":["string","null"],"enum":["bill","subscription","installment",null]},"autopay":{"type":["boolean","null"]},"confidence":{"type":["number","null"],"minimum":0,"maximum":1},"rationale":{"type":["string","null"]}},"required":["name","amount","frequency","day_of_month","weekday","month_of_year","category_name","bill_type","autopay","confidence","rationale"],"additionalProperties":false}}],"tool_choice":{"type":"tool","name":"bill_setup","disable_parallel_tool_use":true},"system":[{"type":"text","text":"You
+        configure recurring-bill records for a personal finance app. Given the dated\ncharge
+        history for one obligation, propose the bill''s configuration.\n\nRules:\n-
+        Infer the cadence from the gaps between the dates, never from the row count.\n  frequency
+        is one of: monthly, weekly, biweekly, semimonthly, quarterly, semiannual,
+        annual.\n- amount is the typical recent charge as a positive number; when
+        amounts drift,\n  prefer the most recent ones.\n- day_of_month is the modal
+        charge day (monthly-style cadences only); weekday\n  (0=Sunday) only for weekly/biweekly;
+        month_of_year only for annual.\n- category_name must EXACTLY match one of
+        the provided categories, or null.\n- bill_type: \"subscription\" for digital
+        services and memberships, \"installment\"\n  for finite payment plans, otherwise
+        \"bill\".\n- autopay true only when the history shows automatic-payment markers
+        (ACH, AUTOPAY).\n- Set any field the history cannot support to null. Never
+        guess.\n- confidence is 0 to 1 for the proposal overall; rationale is one
+        short sentence."}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      X-Api-Key:
+      - "<SPIKE_ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 10:43:38 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Should-Retry:
+      - 'false'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Request-Id:
+      - req_011CgWPcWbyegNUVCDKHqfiG
+      Traceresponse:
+      - 00-5bb909baf45e479f6c208a7279a60f46-99092d3c90c8ea77-01
+      Anthropic-Organization-Id:
+      - 15a12875-a051-4f0e-90d6-1cbb39ad07a6
+      Anthropic-Workspace-Id:
+      - wrkspc_01YVCsQDpWhq3v7ThfidLmfZ
+      Vary:
+      - Accept-Encoding
+      Server:
+      - cloudflare
+      Server-Timing:
+      - x-originResponse;dur=54
+      X-Robots-Tag:
+      - none
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Ray:
+      - a5219495ce9fd71b-BNE
+    body:
+      encoding: UTF-8
+      string: '{"type":"error","error":{"type":"invalid_request_error","message":"Your
+        credit balance is too low to access the Anthropic API. Please go to Plans
+        & Billing to upgrade or purchase credits."},"request_id":"req_011CgWPcWbyegNUVCDKHqfiG"}'
+  recorded_at: Thu, 29 Oct 2026 10:43:38 GMT
+recorded_with: VCR 6.3.1

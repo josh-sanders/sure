@@ -1,0 +1,75 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-haiku-5-5","messages":[{"role":"user","content":[{"type":"text","text":"How
+        many accounts do I have?"}]}],"stream":true,"max_tokens":1024,"tools":[{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","input_schema":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}],"system":[{"type":"text","text":"Be
+        brief."}]}'
+    headers:
+      Accept-Encoding:
+      - identity
+      User-Agent:
+      - Faraday v2.14.3
+      X-Api-Key:
+      - "<SPIKE_ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 10:43:38 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Should-Retry:
+      - 'false'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Request-Id:
+      - req_011CgWPcVDdQRLt3h7NqCJRA
+      Traceresponse:
+      - 00-de21514e51c5400a3239a0b0529205d0-80f6184b07ccafe4-01
+      Anthropic-Organization-Id:
+      - 15a12875-a051-4f0e-90d6-1cbb39ad07a6
+      Anthropic-Workspace-Id:
+      - wrkspc_01YVCsQDpWhq3v7ThfidLmfZ
+      Vary:
+      - Accept-Encoding
+      Server:
+      - cloudflare
+      Server-Timing:
+      - x-originResponse;dur=46
+      X-Robots-Tag:
+      - none
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Ray:
+      - a5219493c87d781e-BNE
+    body:
+      encoding: UTF-8
+      string: '{"type":"error","error":{"type":"invalid_request_error","message":"Your
+        credit balance is too low to access the Anthropic API. Please go to Plans
+        & Billing to upgrade or purchase credits."},"request_id":"req_011CgWPcVDdQRLt3h7NqCJRA"}'
+  recorded_at: Thu, 29 Oct 2026 10:43:38 GMT
+recorded_with: VCR 6.3.1

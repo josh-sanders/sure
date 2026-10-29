@@ -8,7 +8,8 @@ Live runs: llama.cpp on venus; Ollama, LM Studio and OpenClaw in temporary conta
 "Local servers in containers"); Gemini through Google's OpenAI-compatible API
 (`gemini-3.5-flash-lite`); OpenRouter's chat completions with free models (see "OpenRouter chat
 on free models"); and Jev's protocol on OpenCode Zen and OpenRouter's decisions gateway.
-Anthropic and OpenAI direct had no key.
+OpenAI direct had no key. Anthropic's key has no credits, so only its error paths ran live (see
+"Anthropic on a key without credits").
 Their rows are judged from RubyLLM's source and from WebMock stubs in each provider's documented
 shapes, and are marked "not tested live". PR 2 should record live cassettes for them before it
 relies on them.
@@ -26,7 +27,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf` (194 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf` (200 runs, 1 skip:
 the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -47,7 +48,7 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 | Tool calls stream on Ollama, llama.cpp and LM Studio | Pass, live on all three | `converse_tool_round` cassettes under `llama_cpp/`, `ollama/` and `lmstudio/`: `get_accounts` is called on round one, Sure runs it, and the answer streams on round two (`ollama_live_test`, `lmstudio_live_test`, through the shared `local_server_live_tests.rb`). On llama.cpp the call arrives as `{` then `}` deltas and is reassembled. `converse_stubbed_test`: Ollama style (whole calls, no `index`) and LM Studio style (fragments keyed by `index`), accumulated by `lib/ruby_llm/protocol/stream_accumulator.rb:125-165` |
 | Gemini thought signatures survive gateways | Pass, live through Gemini's OpenAI-compatible API; OpenRouter's `reasoning_details` round trip live with Nemotron, Gemini on OpenRouter stubbed (paid) | `gemini_live_test` (live, `gemini/converse_two_rounds`, `gemini-3.5-flash-lite`, effort `low`): three rounds. Round 2 sends one tool call's `extra_content.google.thought_signature` back and round 3 sends both (`protocols/chat_completions/tools.rb:59-61, 117`). Without them Gemini answers 400 "Function call is missing a thought_signature" (`gemini/round_two_without_signatures`). On OpenRouter, `converse_stubbed_test` "OpenRouter Gemini…" sends `reasoning_details` back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
 | Every client honours the resolved proxy | Pass | `test/models/ai/live/proxy_check.rb` through a logging forward proxy: RubyLLM's compatible, embed, Anthropic and OpenRouter clients go through it with `HTTPS_PROXY` only and with `HTTP_PROXY` only, and skip it for `NO_PROXY` hosts. The hand-written Anthropic transport (the `anthropic` gem) ignores `HTTPS_PROXY`: Net::HTTP reads only `http_proxy` even for TLS, and the gem takes no proxy option. Also live on Ollama, LM Studio and OpenClaw (see "The proxy with local servers"), where Sure proxies loopback addresses that Ruby's own lookup would not |
-| Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. Live on OpenRouter: a wrong key → 401 → `Unauthorized`; a paid model on a key without credits → 402 → `Refused`, after one request; a free model's shared upstream limit → 429 → `RateLimited` (seen three times, not recorded). WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
+| Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. Live on Anthropic, both transports: no credits → 400 → `Refused`, and a wrong key → 401 → `Unauthorized`, each after one request. Live on OpenRouter: a wrong key → 401 → `Unauthorized`; a paid model on a key without credits → 402 → `Refused`, after one request; a free model's shared upstream limit → 429 → `RateLimited` (seen three times, not recorded). WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
 | The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`; not tested live (no OpenAI key) | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
 | Lines removed for `bill_setup` against the hand-written version | Reported below | RubyLLM's `generate` is 26 lines longer than the hand-written one |
 
@@ -214,6 +215,28 @@ reasoning tokens.
   per preset (llama.cpp to those fields) rather than send `reasoning_effort` everywhere.
 - **gpt-oss can't stop reasoning** but reasons briefly anyway. At effort `low` it lost a field
   in each run: one left the category null ("no category matches Netflix"), the other the name.
+
+### Anthropic on a key without credits
+
+`anthropic_live_test`, cassettes under `anthropic/`, model `claude-haiku-5-5`.
+
+- **What answers.** `GET /v1/models` answers 200 with the model list. Every request that
+  reaches a model gets a 400 `invalid_request_error`, "Your credit balance is too low to access
+  the Anthropic API", not a 402. That includes `/v1/messages/count_tokens`, which is otherwise
+  free, so the spike couldn't use it to check the request bodies RubyLLM builds.
+- **The balance is checked first.** An unknown model name gets the same 400, so a health check
+  on such a key can't tell a bad model name from an empty balance. Nor do these runs validate
+  the bodies: the forced tool, the streamed tool round and the PDF document block are still
+  judged from stubs.
+- **Both transports map it to `Refused`, after one request,** with `max_retries: 2`. RubyLLM
+  recognises the message and raises `PaymentRequiredError`
+  (`transport/error_middleware.rb:98`); the `anthropic` gem raises a plain `BadRequestError`.
+  Sure's adapter then flattens both to `Refused`. This is the case where section 9 should give
+  an empty balance its own error: RubyLLM already tells it apart, the hand-written transport
+  would have to match the message, and a 400 alone looks like a refusal of the request.
+- **A wrong key** is a 401 → `Unauthorized` after one request on both transports.
+- **The streamed chat turn** sends `stream: true` and the `get_accounts` tool, and gets the
+  same 400 before any chunk.
 
 ### Jev: hand-written, RubyLLM or a Jev gem, outside the criteria
 
@@ -590,8 +613,9 @@ measurement.
 
 ### Not judged in the spike
 
-- Live runs against Anthropic and OpenAI direct (the Responses API and vector stores), which had
-  no key, and OpenRouter's paid chat models, such as Gemini, which need credits.
+- Anthropic's successful paths live (its key has no credits), OpenAI direct (the Responses API
+  and vector stores), which had no key, and OpenRouter's paid chat models, such as Gemini, which
+  need credits.
 - The `auto` fallback chain against a live server that rejects strict schemas: none of the three
   local servers does any more.
 - Gemini thought signatures through other gateways, such as LiteLLM.
