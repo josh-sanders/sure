@@ -26,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (109 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (117 runs, 1 skip:
 the live-only timeout test). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
@@ -167,8 +167,21 @@ through RubyLLM's `:openrouter` provider, with Sure's app headers.
   `xingchen-agi/xing4.0-29b-a4b:free` answered 429 "temporarily rate-limited upstream" three
   times in a row, which maps to `RateLimited`; it recovered before a cassette could catch it.
   Free models share an upstream pool, so a route that relies on one needs a fallback.
-- **Free models reason at length:** Nemotron spent 1,633 completion tokens on a bill setup, and
-  Flint 830. Their routes need a `max_output_tokens` well above the answer's size.
+- **Free models reason at length, and effort `low` barely helps.** One bill setup, reasoning
+  tokens, one run each:
+
+  | Model | Default | `low` (RubyLLM, hand-written) | `none` |
+  |---|---|---|---|
+  | Nemotron 3.5 Lightning | 1,517 | 1,449, 1,809 | 0 (112–116 tokens in all, answer correct) |
+  | Flint 1.0 | 519–1,077 | 572, 778 | 400 "Reasoning is mandatory for this endpoint and cannot be disabled." |
+
+  Both transports' forms reach the model: RubyLLM sends `reasoning: {effort:}` and the
+  hand-written one a top-level `reasoning_effort`. So `none` is the setting that saves tokens, on
+  the models that allow it. Where a model refuses it, a strict route gets `Refused` with that
+  message; an `auto` route would read the 400 as a JSON-mode rejection, drop the effort with
+  `response_format` and retry (`JsonMode`, not run live), which works but blames the wrong thing.
+  Section 7 should let a route's effort be checked like its JSON mode, and the routes need a
+  `max_output_tokens` well above the answer's size.
 
 ### `judge` (Jev's protocol), outside the criteria
 

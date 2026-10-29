@@ -1,0 +1,147 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"recursive/flint-v1.0:free","messages":[{"role":"system","content":"You
+        configure recurring-bill records for a personal finance app. Given the dated\ncharge
+        history for one obligation, propose the bill''s configuration.\n\nRules:\n-
+        Infer the cadence from the gaps between the dates, never from the row count.\n  frequency
+        is one of: monthly, weekly, biweekly, semimonthly, quarterly, semiannual,
+        annual.\n- amount is the typical recent charge as a positive number; when
+        amounts drift,\n  prefer the most recent ones.\n- day_of_month is the modal
+        charge day (monthly-style cadences only); weekday\n  (0=Sunday) only for weekly/biweekly;
+        month_of_year only for annual.\n- category_name must EXACTLY match one of
+        the provided categories, or null.\n- bill_type: \"subscription\" for digital
+        services and memberships, \"installment\"\n  for finite payment plans, otherwise
+        \"bill\".\n- autopay true only when the history shows automatic-payment markers
+        (ACH, AUTOPAY).\n- Set any field the history cannot support to null. Never
+        guess.\n- confidence is 0 to 1 for the proposal overall; rationale is one
+        short sentence."},{"role":"user","content":"CHARGE HISTORY (date amount description):\n-
+        2026-05-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-06-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-07-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-08-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-09-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-10-15 15.49 NETFLIX.COM AUTOPAY\n\nAVAILABLE
+        CATEGORIES: Entertainment, Utilities, Groceries\n\n"}],"stream":false,"max_tokens":4096,"response_format":{"type":"json_schema","json_schema":{"name":"bill_setup","schema":{"type":"object","properties":{"name":{"type":["string","null"]},"amount":{"type":["number","null"]},"frequency":{"type":["string","null"],"enum":["monthly","weekly","biweekly","semimonthly","quarterly","semiannual","annual",null]},"day_of_month":{"type":["integer","null"],"minimum":1,"maximum":31},"weekday":{"type":["integer","null"],"minimum":0,"maximum":6},"month_of_year":{"type":["integer","null"],"minimum":1,"maximum":12},"category_name":{"type":["string","null"]},"bill_type":{"type":["string","null"],"enum":["bill","subscription","installment",null]},"autopay":{"type":["boolean","null"]},"confidence":{"type":["number","null"],"minimum":0,"maximum":1},"rationale":{"type":["string","null"]}},"required":["name","amount","frequency","day_of_month","weekday","month_of_year","category_name","bill_type","autopay","confidence","rationale"],"additionalProperties":false},"strict":true}},"reasoning":{"effort":"low"}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Http-Referer:
+      - https://sure.am
+      X-Openrouter-Title:
+      - Sure
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 03:12:33 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Generation-Id:
+      - gen-1793243553-MsPDZK2T1Sq0eBbbGwDW
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      Set-Cookie:
+      - __cf_bm=Cl86kuvISia6Jwgt78bmyaaZl8v9VZNLBfjje4XJMuQ-1793243553.0371563-1.0.1.1-7wD5WWlNgRek1PgM40CXHkDTb0XIIvf6uF5IKY8ioaMDG6B49YOyZPpURpm_zP__qsecnbr4zy78b4trHBkGIZxVVE20IGDt0J_g2.EpFtXTwOdp4EYhV0nkMCx0yRR1;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu,
+        29 Oct 2026 03:42:33 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51effce7e3ad728-BNE
+    body:
+      encoding: ASCII-8BIT
+      string: "\n         \n\n         \n{\"id\":\"gen-1793243553-MsPDZK2T1Sq0eBbbGwDW\",\"object\":\"chat.completion\",\"created\":1793243553,\"model\":\"recursive/flint-v1.0:free\",\"provider\":\"Recursive\",\"system_fingerprint\":null,\"service_tier\":null,\"choices\":[{\"index\":0,\"logprobs\":null,\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"name\\\":
+        null, \\\"amount\\\": 15.49, \\\"frequency\\\": \\\"monthly\\\", \\\"day_of_month\\\":
+        15, \\\"weekday\\\": null, \\\"month_of_year\\\": null, \\\"category_name\\\":
+        \\\"Entertainment\\\", \\\"bill_type\\\": \\\"subscription\\\", \\\"autopay\\\":
+        true, \\\"confidence\\\": 1, \\\"rationale\\\": \\\"Consistent monthly $15.49
+        Netflix charges on the 15th with AUTOPAY support.\\\"}\",\"refusal\":null,\"reasoning\":\"We
+        need answer. Need parse. We need produce bill config. We need be careful.\\n\\nWe
+        have charge history one obligation Netflix recurring. Dates monthly on 15th.
+        Amount 15.49. Autopay true due AUTOPAY. category_name must exactly match provided
+        categories or null. Options Entertainment, Utilities, Groceries. Netflix likely
+        Entertainment. bill_type subscription for digital services/memberships. frequency
+        monthly. day_of_month modal charge day = 15. amount typical recent charge
+        positive 15.49. confidence maybe 1? rationale one short sentence.\\n\\nNeed
+        maybe fields: frequency monthly, amount 15.49, day_of_month 15, category_name
+        Entertainment, bill_type subscription, autopay true. month_of_year null, weekday
+        null maybe for monthly-style cadences only day_of_month; any unsupported null.\\n\\nCheck
+        rules: day_of_month is modal charge day (monthly-style cadences only); weekday
+        only weekly/biweekly; month_of_year only annual. For monthly set day_of_month
+        15. category exactly match one provided. \\\"Entertainment\\\" exact. bill_type
+        subscription. autopay true only when history shows automatic-payment markers
+        (ACH, AUTOPAY). Shows AUTOPAY, true.\\n\\nConfidence 0 to 1. Could be 1 because
+        all consistent. rationale: Monthly $15.49 Netflix charge on the 15th with
+        autopay, categorized as Entertainment.\\n\\nNeed maybe final in structured
+        format. Since user asks propose configuration. Should we include null fields?
+        Could format JSON-ish. Ensure no unsupported fields? Maybe:\\n\\n{\\n  \\\"frequency\\\":
+        \\\"monthly\\\",\\n  \\\"amount\\\": 15.49,\\n  \\\"day_of_month\\\": 15,\\n
+        \ \\\"weekday\\\": null,\\n  \\\"month_of_year\\\": null,\\n  \\\"category_name\\\":
+        \\\"Entertainment\\\",\\n  \\\"bill_type\\\": \\\"subscription\\\",\\n  \\\"autopay\\\":
+        true\\n}\\n\\nconfidence: 1\\nrationale: \\\"Consistent monthly $15.49 Netflix
+        charges on the 15th with AUTOPAY, fitting a subscription.\\\"\\n\\nNeed maybe
+        not overdo.\\n\\nLet's consider if amount typical recent charge positive.
+        All same 15.49, yes.\\n\\nCadence from gaps: all ~30 days? From May 15 to
+        Jun 15 = 31? Jun to Jul =30, etc. Monthly.\\n\\nday_of_month modal charge
+        day = 15. Good.\\n\\nAutopay true.\\n\\nCategory: available Entertainment
+        likely. Must EXACTLY match. Use Entertainment.\\n\\nBill type: subscription.\\n\\nConfidence:
+        maybe 1.0. Rationale one short sentence.\\n\\nFinal answer should likely just
+        config. No extra.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"We
+        need answer. Need parse. We need produce bill config. We need be careful.\\n\\nWe
+        have charge history one obligation Netflix recurring. Dates monthly on 15th.
+        Amount 15.49. Autopay true due AUTOPAY. category_name must exactly match provided
+        categories or null. Options Entertainment, Utilities, Groceries. Netflix likely
+        Entertainment. bill_type subscription for digital services/memberships. frequency
+        monthly. day_of_month modal charge day = 15. amount typical recent charge
+        positive 15.49. confidence maybe 1? rationale one short sentence.\\n\\nNeed
+        maybe fields: frequency monthly, amount 15.49, day_of_month 15, category_name
+        Entertainment, bill_type subscription, autopay true. month_of_year null, weekday
+        null maybe for monthly-style cadences only day_of_month; any unsupported null.\\n\\nCheck
+        rules: day_of_month is modal charge day (monthly-style cadences only); weekday
+        only weekly/biweekly; month_of_year only annual. For monthly set day_of_month
+        15. category exactly match one provided. \\\"Entertainment\\\" exact. bill_type
+        subscription. autopay true only when history shows automatic-payment markers
+        (ACH, AUTOPAY). Shows AUTOPAY, true.\\n\\nConfidence 0 to 1. Could be 1 because
+        all consistent. rationale: Monthly $15.49 Netflix charge on the 15th with
+        autopay, categorized as Entertainment.\\n\\nNeed maybe final in structured
+        format. Since user asks propose configuration. Should we include null fields?
+        Could format JSON-ish. Ensure no unsupported fields? Maybe:\\n\\n{\\n  \\\"frequency\\\":
+        \\\"monthly\\\",\\n  \\\"amount\\\": 15.49,\\n  \\\"day_of_month\\\": 15,\\n
+        \ \\\"weekday\\\": null,\\n  \\\"month_of_year\\\": null,\\n  \\\"category_name\\\":
+        \\\"Entertainment\\\",\\n  \\\"bill_type\\\": \\\"subscription\\\",\\n  \\\"autopay\\\":
+        true\\n}\\n\\nconfidence: 1\\nrationale: \\\"Consistent monthly $15.49 Netflix
+        charges on the 15th with AUTOPAY, fitting a subscription.\\\"\\n\\nNeed maybe
+        not overdo.\\n\\nLet's consider if amount typical recent charge positive.
+        All same 15.49, yes.\\n\\nCadence from gaps: all ~30 days? From May 15 to
+        Jun 15 = 31? Jun to Jul =30, etc. Monthly.\\n\\nday_of_month modal charge
+        day = 15. Good.\\n\\nAutopay true.\\n\\nCategory: available Entertainment
+        likely. Must EXACTLY match. Use Entertainment.\\n\\nBill type: subscription.\\n\\nConfidence:
+        maybe 1.0. Rationale one short sentence.\\n\\nFinal answer should likely just
+        config. No extra.\",\"format\":\"unknown\",\"index\":0}]}}],\"usage\":{\"prompt_tokens\":371,\"completion_tokens\":617,\"total_tokens\":988,\"cost\":0,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0,\"upstream_inference_prompt_cost\":0,\"upstream_inference_completions_cost\":0},\"completion_tokens_details\":{\"reasoning_tokens\":572,\"image_tokens\":0,\"audio_tokens\":0}}}"
+  recorded_at: Thu, 29 Oct 2026 03:12:38 GMT
+recorded_with: VCR 6.3.1
