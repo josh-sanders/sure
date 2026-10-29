@@ -58,6 +58,7 @@ class Ai::Transport::Compatible < Ai::Transport::Base
 
     def configure_provider(config)
       base = Ai::Transport::Http.compatible_base(endpoint.base_url)
+      config.openai_use_system_role = true   # both providers send system prompts as "developer" otherwise
       if ruby_llm_provider == :openrouter
         config.openrouter_api_key = endpoint.api_key
         config.openrouter_api_base = base
@@ -66,7 +67,6 @@ class Ai::Transport::Compatible < Ai::Transport::Base
       else
         config.openai_api_key = endpoint.api_key.presence || "none"   # RubyLLM requires a key; local servers ignore it
         config.openai_api_base = base
-        config.openai_use_system_role = true   # otherwise system prompts go out as "developer"
       end
     end
 end

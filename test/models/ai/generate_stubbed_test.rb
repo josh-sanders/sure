@@ -1,9 +1,10 @@
 require_relative "spike_helper"
 
 # WebMock with each provider's documented response shapes and error wording,
-# for servers the spike had no key for (Anthropic, OpenRouter chat, OpenAI)
-# and for behaviour the live servers no longer show (LM Studio now accepts
-# strict schemas). These prove the request each transport builds and the
+# for servers the spike had no key for (Anthropic, OpenAI), for OpenRouter
+# shapes its free models don't show (Gemini's reasoning_details), and for
+# behaviour the live servers no longer show (LM Studio now accepts strict
+# schemas). These prove the request each transport builds and the
 # fallback policy, not the live server.
 class Ai::GenerateStubbedTest < ActiveSupport::TestCase
   include AiSpikeHelper

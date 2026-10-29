@@ -6,8 +6,9 @@
 of the spike). Every criterion in section 19 of the plan passes or has a small fix. None fails.
 Live runs: llama.cpp on venus; Ollama, LM Studio and OpenClaw in temporary containers (see
 "Local servers in containers"); Gemini through Google's OpenAI-compatible API
-(`gemini-3.5-flash-lite`); and Jev's protocol on OpenCode Zen and OpenRouter's decisions gateway.
-Anthropic and OpenAI direct had no key, and the OpenRouter key has no credits for chat models.
+(`gemini-3.5-flash-lite`); OpenRouter's chat completions with free models (see "OpenRouter chat
+on free models"); and Jev's protocol on OpenCode Zen and OpenRouter's decisions gateway.
+Anthropic and OpenAI direct had no key.
 Their rows are judged from RubyLLM's source and from WebMock stubs in each provider's documented
 shapes, and are marked "not tested live". PR 2 should record live cassettes for them before it
 relies on them.
@@ -25,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (103 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (109 runs, 1 skip:
 the live-only timeout test). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
@@ -43,9 +44,9 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 | Anthropic models that reject a forced tool still return structured output (#4513) | Pass; not tested live | `generate_stubbed_test` "Anthropic forces the tool…" and "Anthropic auto model…": `tool_choice` `tool` vs `auto`, one retry with the reminder, and both attempts billed. Uses `Provider::Anthropic.forced_tool_choice_supported?` |
 | `<think>` blocks are stripped | Small fix: Sure's parser strips them; RubyLLM only separates `reasoning_content` | `generate_llama_cpp_test` "an inline think block is stripped…" (live, `reasoning_format: none`, `enable_thinking: true`; the cassette's content holds `</think>`). For chat, inline `<think>` in a stream would reach the user; servers that split reasoning (llama.cpp's default) don't send it inline |
 | Tool calls stream on Ollama, llama.cpp and LM Studio | Pass, live on all three | `converse_tool_round` cassettes under `llama_cpp/`, `ollama/` and `lmstudio/`: `get_accounts` is called on round one, Sure runs it, and the answer streams on round two (`ollama_live_test`, `lmstudio_live_test`, through the shared `local_server_live_tests.rb`). On llama.cpp the call arrives as `{` then `}` deltas and is reassembled. `converse_stubbed_test`: Ollama style (whole calls, no `index`) and LM Studio style (fragments keyed by `index`), accumulated by `lib/ruby_llm/protocol/stream_accumulator.rb:125-165` |
-| Gemini thought signatures survive gateways | Pass, live through Gemini's OpenAI-compatible API; OpenRouter stubbed (no credits) | `gemini_live_test` (live, `gemini/converse_two_rounds`, `gemini-3.5-flash-lite`, effort `low`): three rounds. Round 2 sends one tool call's `extra_content.google.thought_signature` back and round 3 sends both (`protocols/chat_completions/tools.rb:59-61, 117`). Without them Gemini answers 400 "Function call is missing a thought_signature" (`gemini/round_two_without_signatures`). On OpenRouter, `converse_stubbed_test` "OpenRouter Gemini…" sends `reasoning_details` back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
+| Gemini thought signatures survive gateways | Pass, live through Gemini's OpenAI-compatible API; OpenRouter's `reasoning_details` round trip live with Nemotron, Gemini on OpenRouter stubbed (paid) | `gemini_live_test` (live, `gemini/converse_two_rounds`, `gemini-3.5-flash-lite`, effort `low`): three rounds. Round 2 sends one tool call's `extra_content.google.thought_signature` back and round 3 sends both (`protocols/chat_completions/tools.rb:59-61, 117`). Without them Gemini answers 400 "Function call is missing a thought_signature" (`gemini/round_two_without_signatures`). On OpenRouter, `converse_stubbed_test` "OpenRouter Gemini…" sends `reasoning_details` back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
 | Every client honours the resolved proxy | Pass | `test/models/ai/live/proxy_check.rb` through a logging forward proxy: RubyLLM's compatible, embed, Anthropic and OpenRouter clients go through it with `HTTPS_PROXY` only and with `HTTP_PROXY` only, and skip it for `NO_PROXY` hosts. The hand-written Anthropic transport (the `anthropic` gem) ignores `HTTPS_PROXY`: Net::HTTP reads only `http_proxy` even for TLS, and the gem takes no proxy option. Also live on Ollama, LM Studio and OpenClaw (see "The proxy with local servers"), where Sure proxies loopback addresses that Ruby's own lookup would not |
-| Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
+| Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. Live on OpenRouter: a wrong key → 401 → `Unauthorized`; a paid model on a key without credits → 402 → `Refused`, after one request; a free model's shared upstream limit → 429 → `RateLimited` (seen three times, not recorded). WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
 | The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`; not tested live (no OpenAI key) | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
 | Lines removed for `bill_setup` against the hand-written version | Reported below | RubyLLM's `generate` is 26 lines longer than the hand-written one |
 
@@ -146,6 +147,29 @@ both the spike's agent converse and `Assistant::External::Client` from `main`.
   only: with `HTTP_PROXY` and `NO_PROXY=127.0.0.0/8` it still sent `127.0.0.1` to the proxy.
   Moving the agent onto the shared transport gives it the same rules as every other client.
 
+### OpenRouter chat on free models
+
+The key has never bought credits, so `openrouter_chat_live_test` uses `:free` models. They run
+through RubyLLM's `:openrouter` provider, with Sure's app headers.
+
+- **Bill setup in strict mode works on both transports** with `recursive/flint-v1.0:free`. Flint
+  lists `response_format` but not `structured_outputs`, and the answer still parsed. OpenRouter
+  also took a strict schema for `nvidia/nemotron-3.5-lightning:free`, which lists neither. It
+  doesn't reject parameters a model lacks (unless the request sets `provider.require_parameters`),
+  so a strict request there isn't proof the schema was enforced. Sure's parser is what makes
+  these work.
+- **A streamed tool round works** on Nemotron 3.5 Lightning: `get_accounts` on round one, run by
+  Sure, and the answer streamed on round two. **Round two sends the model's `reasoning_details`
+  back**, the live counterpart of the stubbed Gemini test, and the reason the preset uses the
+  `:openrouter` provider.
+- **Errors:** the paid `nvidia/nemotron-3.5-lightning` answers 402 "Insufficient credits", which
+  maps to `Refused` after one request even with `max_retries: 2`. A wrong key is `Unauthorized`.
+  `xingchen-agi/xing4.0-29b-a4b:free` answered 429 "temporarily rate-limited upstream" three
+  times in a row, which maps to `RateLimited`; it recovered before a cassette could catch it.
+  Free models share an upstream pool, so a route that relies on one needs a fallback.
+- **Free models reason at length:** Nemotron spent 1,633 completion tokens on a bill setup, and
+  Flint 830. Their routes need a `max_output_tokens` well above the answer's size.
+
 ### `judge` (Jev's protocol), outside the criteria
 
 The plan keeps the Jev transport hand-written. RubyLLM 2.1.1 has a `judge` API, so the spike
@@ -239,8 +263,10 @@ measurement.
 
 ### Small fixes in Sure's adapter
 
-- `openai_use_system_role = true` on every compatible endpoint. Otherwise RubyLLM sends system
-  prompts with the `developer` role (`protocols/chat_completions/chat.rb:376-383`).
+- `openai_use_system_role = true` on every compatible endpoint, OpenRouter's included: its
+  provider reads the same setting. Otherwise RubyLLM sends system prompts with the `developer`
+  role (`protocols/chat_completions/chat.rb:376-383`). The OpenRouter run first went out as
+  `developer`, because the spike set it only for `:openai`; the free models answered anyway.
 - Always pass `protocol:`. RubyLLM's OpenAI provider defaults to the Responses API.
 - Set `openrouter_app_name` and `openrouter_app_url`. Otherwise OpenRouter sees "RubyLLM" and
   `https://rubyllm.com`.
@@ -279,7 +305,7 @@ measurement.
 ### Not judged in the spike
 
 - Live runs against Anthropic and OpenAI direct (the Responses API and vector stores), which had
-  no key, and OpenRouter's chat models, which need credits.
+  no key, and OpenRouter's paid chat models, such as Gemini, which need credits.
 - The `auto` fallback chain against a live server that rejects strict schemas: none of the three
   local servers does any more.
 - Gemini thought signatures through other gateways, such as LiteLLM.
