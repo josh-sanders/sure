@@ -1,0 +1,192 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":{"description":"UBER *TRIP HELP.UBER.COM","amount":"23.80","classification":"expense"},"questions":{"category":{"type":"choice","instructions":"Which
+        spending category best fits this bank transaction? Pick `__uncategorized__`
+        only if no category is a reasonable fit.","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null,"__uncategorized__":"No
+        listed category is a reasonable fit"}}}}'
+    headers:
+      User-Agent:
+      - ruby_decision_model/0.3.0
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      Authorization:
+      - Bearer public
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 04:41:16 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a185f6-56eb-7d74-be21-018a7b2b389f
+      X-Zen-Model:
+      - jev-1.13-free
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51f81c45af80055-PDX
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"jev-1.13-free","answers":{"category":{"type":"choice","choice":"Transport","confidence":0.99,"probabilities":{"Entertainment":0,"Utilities":0,"Groceries":0,"Transport":0.99,"__uncategorized__":0.01}}},"usage":{"input_tokens":389,"output_tokens":61,"cost":0,"opencode":{"billing_source":"free","list_cost":0,"tokens":{"input":389,"output":61,"reasoning":0,"cache_read":0,"cache_write_5m":0,"cache_write_1h":0}}}}'
+  recorded_at: Thu, 29 Oct 2026 04:41:16 GMT
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":{"description":"PG&E WEB ONLINE PAYMENT","amount":"112.30","classification":"expense"},"questions":{"category":{"type":"choice","instructions":"Which
+        spending category best fits this bank transaction? Pick `__uncategorized__`
+        only if no category is a reasonable fit.","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null,"__uncategorized__":"No
+        listed category is a reasonable fit"}}}}'
+    headers:
+      User-Agent:
+      - ruby_decision_model/0.3.0
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      Authorization:
+      - Bearer public
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 04:41:16 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a185f6-56ea-7ed3-91f4-f3ff71c569fa
+      X-Zen-Model:
+      - jev-1.13-free
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51f81c46c65ef8c-PDX
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"jev-1.13-free","answers":{"category":{"type":"choice","choice":"Utilities","confidence":1,"probabilities":{"Entertainment":0,"Utilities":1,"Groceries":0,"Transport":0,"__uncategorized__":0}}},"usage":{"input_tokens":386,"output_tokens":61,"cost":0,"opencode":{"billing_source":"free","list_cost":0,"tokens":{"input":386,"output":61,"reasoning":0,"cache_read":0,"cache_write_5m":0,"cache_write_1h":0}}}}'
+  recorded_at: Thu, 29 Oct 2026 04:41:16 GMT
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":{"description":"NETFLIX.COM AUTOPAY","amount":"15.49","classification":"expense"},"questions":{"category":{"type":"choice","instructions":"Which
+        spending category best fits this bank transaction? Pick `__uncategorized__`
+        only if no category is a reasonable fit.","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null,"__uncategorized__":"No
+        listed category is a reasonable fit"}}}}'
+    headers:
+      User-Agent:
+      - ruby_decision_model/0.3.0
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      Authorization:
+      - Bearer public
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 04:41:16 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a185f6-573b-702d-9480-5e0be37ef17e
+      X-Zen-Model:
+      - jev-1.13-free
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51f81c4def1e739-ANC
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"jev-1.13-free","answers":{"category":{"type":"choice","choice":"Entertainment","confidence":1,"probabilities":{"Entertainment":1,"Utilities":0,"Groceries":0,"Transport":0,"__uncategorized__":0}}},"usage":{"input_tokens":386,"output_tokens":64,"cost":0,"opencode":{"billing_source":"free","list_cost":0,"tokens":{"input":386,"output":64,"reasoning":0,"cache_read":0,"cache_write_5m":0,"cache_write_1h":0}}}}'
+  recorded_at: Thu, 29 Oct 2026 04:41:16 GMT
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":{"description":"WHOLE FOODS MARKET
+        #10233","amount":"86.12","classification":"expense"},"questions":{"category":{"type":"choice","instructions":"Which
+        spending category best fits this bank transaction? Pick `__uncategorized__`
+        only if no category is a reasonable fit.","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null,"__uncategorized__":"No
+        listed category is a reasonable fit"}}}}'
+    headers:
+      User-Agent:
+      - ruby_decision_model/0.3.0
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      Authorization:
+      - Bearer public
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 04:41:16 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a185f6-56e6-7708-866b-f5b844e12e5b
+      X-Zen-Model:
+      - jev-1.13-free
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51f81c45e1a706c-PDX
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"jev-1.13-free","answers":{"category":{"type":"choice","choice":"Groceries","confidence":1,"probabilities":{"Entertainment":0,"Utilities":0,"Groceries":1,"Transport":0,"__uncategorized__":0}}},"usage":{"input_tokens":390,"output_tokens":63,"cost":0,"opencode":{"billing_source":"free","list_cost":0,"tokens":{"input":390,"output":63,"reasoning":0,"cache_read":0,"cache_write_5m":0,"cache_write_1h":0}}}}'
+  recorded_at: Thu, 29 Oct 2026 04:41:16 GMT
+recorded_with: VCR 6.3.1

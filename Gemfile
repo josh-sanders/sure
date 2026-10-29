@@ -107,6 +107,7 @@ gem "after_commit_everywhere", "~> 1.0"
 gem "ruby-openai"
 gem "anthropic", "~> 1.0"
 gem "ruby_llm", "2.1.1" # spike: pinned exactly (fast majors, one maintainer)
+gem "ruby_decision_model", "0.3.0" # spike: Jev over the most-starred Ruby client
 gem "opentelemetry-sdk", "~> 1.13"
 gem "opentelemetry-exporter-otlp", "~> 0.36"
 

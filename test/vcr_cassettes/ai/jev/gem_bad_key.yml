@@ -1,0 +1,47 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":"NETFLIX.COM AUTOPAY 15.49","questions":{"q":{"type":"noul","instructions":"Is
+        this a subscription?"}}}'
+    headers:
+      User-Agent:
+      - ruby_decision_model/0.3.0
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      Authorization:
+      - Bearer not-a-key
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 04:41:15 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '89'
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a185f6-540d-78b3-ac22-53d1c5375063
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51f81bfdab0ef0c-PDX
+    body:
+      encoding: UTF-8
+      string: '{"error":{"type":"server_error","message":"Upstream request failed:
+        Invalid credential"}}'
+  recorded_at: Thu, 29 Oct 2026 04:41:15 GMT
+recorded_with: VCR 6.3.1

@@ -27,7 +27,8 @@ Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation a
 around it.
 
 Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (147 runs, 1 skip:
-the live-only timeout test). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
+the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
+test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
 
@@ -214,30 +215,87 @@ reasoning tokens.
 - **gpt-oss can't stop reasoning** but reasons briefly anyway. At effort `low` it lost a field
   in each run: one left the category null ("no category matches Netflix"), the other the name.
 
-### `judge` (Jev's protocol), outside the criteria
+### Jev: hand-written, RubyLLM or a Jev gem, outside the criteria
 
-The plan keeps the Jev transport hand-written. RubyLLM 2.1.1 has a `judge` API, so the spike
-checked it against two gateways.
+The plan keeps the Jev transport hand-written. Its wire code in `Provider::Jev` (the request,
+retries, parsing and usage) is 72 code lines, with 444 lines of tests. The spike checked two
+replacements: RubyLLM's `judge`, and `ruby_decision_model`, the most-starred Ruby client for
+decision models (59 stars, 20,528 downloads, 0.3.0 from 2026-10-12, no runtime dependencies,
+"API may change").
 
-- **OpenCode Zen works** (`https://opencode.ai/zen/v1/systemone`, `jev-1.13-free`, anonymous key
-  `public`). RubyLLM's `typesafe` provider sends Jev's System One payload: `state` (Jev's
-  transaction object, unchanged) and a hash of `noul`/`choice`/`score` questions. It parses all
-  three answers: `judge_jev_live_test` (live, `jev/judge_ruby_llm`). Sure's `Provider::Jev` gets
-  the same `choice` from the same endpoint (`jev/judge_provider_jev`). A made-up key gets 401
-  "Invalid credential", which RubyLLM maps to `UnauthorizedError`.
-- **OpenRouter doesn't.** RubyLLM's System One path is fixed to `<base>/v1/systemone`
-  (`protocols/system_one/judgments.rb`), and OpenRouter serves decisions at
-  `/api/alpha/decisions`, so the request gets a 404. RubyLLM's OpenAI Decisions protocol does
-  reach that path, but OpenRouter rejects its payload (`input` plus an array of questions) with a
-  400. Both are recorded in `openrouter/judge_ruby_llm`. Sure's `JEV_ENDPOINT` is a full URL and
-  reaches either gateway.
-- **Respan `span-01-lite` on OpenRouter:** the `:free` variant answers `noul` on a string state,
-  and rejects Jev's transaction object with a 400 ("state must be a string or…"). The paid
-  variant takes `noul`, `choice` and `score`, but returned 402 "Insufficient credits" for this
-  key, so it wasn't run.
-- **So a `judge` over RubyLLM would serve TypeSafe and OpenCode Zen, but not OpenRouter.** Jev's
-  fan-out over `parallel_requests` stays Sure's either way, since RubyLLM makes one request per
-  `judge`. Keeping Jev hand-written, as planned, costs nothing and keeps every gateway.
+**RubyLLM's `judge`.**
+
+- **OpenCode Zen works on 2.1.1** (`https://opencode.ai/zen/v1/systemone`, `jev-1.13-free`,
+  anonymous key `public`). RubyLLM's `typesafe` provider sends Jev's System One payload and
+  parses all three answer types (`judge_jev_live_test`, live, `jev/judge_ruby_llm`). A made-up
+  key gets 401, mapped to `UnauthorizedError`.
+- **OpenRouter doesn't work on 2.1.1, and does on `main`.** 2.1.1 posts to `<base>/v1/systemone`,
+  a 404 on OpenRouter, and its OpenAI Decisions payload gets a 400 (`openrouter/judge_ruby_llm`).
+  [#1264](https://github.com/crmne/ruby_llm/pull/1264), merged on 2026-10-26 and not yet
+  released, adds OpenRouter judgments as a dialect of System One posting to `alpha/decisions`,
+  with OpenRouter's reported cost. Judged from the PR and source only: running unreleased code
+  from GitHub was blocked in this session, and OpenRouter's Jev models are paid.
+- **Paths are still fixed per provider on `main`:** `<base>/v1/systemone` for TypeSafe-style
+  servers, `systemone` for Ollama, `../alpha/decisions` for OpenRouter. A gateway at any other
+  path can't be reached; Sure's `JEV_ENDPOINT` takes any full URL.
+- **No batching or concurrency for judgments.** RubyLLM's batch API covers chats and embeddings
+  only, and its fiber concurrency is for tool calls. No issue or PR asks for either.
+
+**The `ruby_decision_model` gem** (`Provider::JevGem`, 54 code lines, replacing the 72).
+
+- It takes over only `decide!`. Everything above the wire stays Sure's: the fan-out, the
+  category criteria, the opt-out sentinel and the confidence rules.
+- **Sure's 30 Jev tests pass against it, with four overridden** (`jev_gem_test`). All four are
+  one difference: the gem rejects a whole response for one malformed answer (a choice or score
+  without a confidence, a noul outside 0..1), where Sure keeps the answer with a confidence of 0.
+  In Sure's fan-out that rejection would fail every transaction in the batch, so the adapter
+  rescues it and withholds only the malformed answer. Only the error message tells that case
+  apart from an unparseable body, and the request's usage is lost with it.
+- **The adapter has to bring its own transport and URL handling.** The gem's `Net::HTTP` ignores
+  Sure's custom CA settings and opens a new connection per request; the adapter injects a Faraday
+  transport. The gem appends a fixed path to a base URL, so the adapter subclasses its System One
+  provider to post to Sure's full URL.
+- **Live on OpenCode Zen** (`jev_gem_live_test`): four transactions categorized correctly through
+  `auto_categorize`'s fan-out, and a 401 that isn't retried.
+- **It brings** vendor providers Sure doesn't have (OpenAI Decisions, Cloudflare Clef, Perplexity,
+  Databricks), retries that honour `Retry-After`, and a request id per response.
+
+**The fan-out is Sure's in every design.** Jev takes one state per request; nothing documents a
+multi-state request, and other clients fan out on their side (go-jev's `Map` runs four at a
+time). Neither RubyLLM nor the gem fans out, so the batching code is the same whichever client is
+underneath, and isn't a reason to keep the wire code hand-written.
+`test/models/ai/live/jev_fanout_check.rb` timed 16 easy transactions on OpenCode Zen, one run
+each:
+
+| | Concurrency 1 | 4 | 8 | 16 |
+|---|---|---|---|---|
+| Hand-written, new connection per request | 11.44 s | 3.25 s | 1.73 s | 0.80 s |
+| Gem, new connection per request | 11.70 s | 3.14 s | 1.78 s | 0.87 s |
+| Gem, kept-alive connection per thread | 6.07 s | 1.82 s | 1.16 s | 0.95 s |
+
+| Packed (gem, kept-alive) | Requests | Time | Input tokens | Right |
+|---|---|---|---|---|
+| One transaction per request (above) | 16 | 0.80–11.70 s | 6,405 | 16/16 |
+| 4 per request, in parallel | 4 | 0.89 s | 3,227 | 16/16 |
+| 8 per request, in parallel | 2 | 0.78 s | 2,711 | 16/16 |
+| 16 in one request | 1 | 2.83 s | 2,453 | 16/16 |
+
+- **The two clients are equally fast.** The time is the network's.
+- **Concurrency scales almost linearly to 16** on this gateway; Sure's default is 8.
+- **Reusing connections halves the serial time,** because each request otherwise does a TLS
+  handshake. Sure's Faraday client doesn't reuse connections either; a persistent adapter would.
+- **Packing is the biggest tuning lever:** several transactions in one state, one `choice`
+  question each. Eight per request used 58% fewer input tokens, because the category list is
+  sent once per request instead of once per transaction, at the same speed and accuracy. Jev
+  bills input tokens only. One request with all 16 was slower. Accuracy was measured on easy
+  transactions only; packing could let one transaction's details sway another's answer, so an
+  eval should check it before Sure relies on it.
+
+**So the choice is about the 72 lines, not the fan-out.** The gem saves 18 lines for a second
+dependency at 0.3.0 with one semantic difference to paper over. RubyLLM's `judge` adds no
+dependency once a release carries #1264, but can't reach a gateway at an arbitrary path. Either
+way the fan-out, packing and connection reuse are Sure's to tune.
+
 - **A 402 maps to `Ai::Error::Refused`** (`RubyLLM::PaymentRequiredError`). Section 9 doesn't
   name it, but an empty balance is a key's state, like a 401, not a refusal of one request.
 

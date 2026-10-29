@@ -30,10 +30,11 @@ module AiSpikeHelper
   # beside the new ones, and these share one URI, so replay would pick stale ones.
   # Sure's VCR setup ignores localhost, where the spike's containers listen, so
   # localhost is recorded only inside this block.
-  def with_spike_cassette(name, &)
+  # Parallel requests to one URI arrive in any order, so they match on the body too.
+  def with_spike_cassette(name, match: %i[method uri], &)
     FileUtils.rm_f(Rails.root.join("test/vcr_cassettes/ai/#{name}.yml")) if recording?
     VCR.configuration.ignore_localhost = false
-    VCR.use_cassette("ai/#{name}", record: recording? ? :all : :none, match_requests_on: %i[method uri], &)
+    VCR.use_cassette("ai/#{name}", record: recording? ? :all : :none, match_requests_on: match, &)
   ensure
     VCR.configuration.ignore_localhost = true
   end
