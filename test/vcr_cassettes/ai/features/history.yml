@@ -1,0 +1,122 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"Be
+        brief."},{"role":"user","content":"My favourite number is 42. Just say OK."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:29:33 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=653
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl-N1mr_luI3C3MQmK3MoORfmHM1tscFCjHflIDIXIkTUFFPZEBBkJZkrp_-fEyg9FSlmKgSIVCRmU41yr4J5ZoOHh07jaGU11-BUvd2zUITgumaiebXFFmmSCKlMotyLr8BzIem6OIWaVphhvi1WMMStro2m2a7EL97SBxQHH5cHzD_OSBw1nCgBMkUBcEpCzxPhinAbrbLtcngav21bCZohHReV6jVJFXwC16FL9dWh4nPnRvgkGpIn0jhbI-RxQXVq84vm9N0w-OCSTyDJ3As;
+        expires=Fri, 30-Apr-2027 22:29:32 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:29:33 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"OK.","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TVj4uoaiXsXZVt08nsF4qL7TklNpw3aS5BKgmPVr7gPMQ4SWyIZdoaGLGJ6ygr2mukkRUJ6cBFOj/4epPTYoY0yuY176a0bzhcrJP14USJXqSagwRk2Hqbik="}},"role":"assistant"}}],"created":1793312973,"id":"zMjjaqjoM6H81e8PkJeR0Ak","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":2,"prompt_tokens":17,"total_tokens":19}}'
+  recorded_at: Thu, 29 Oct 2026 22:29:33 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"Be
+        brief."},{"role":"user","content":"My favourite number is 42. Just say OK."},{"role":"assistant","content":"OK."},{"role":"user","content":"What
+        is my favourite number?"}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:29:34 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=869
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl6VeVc1bpT1zYHrxn0OBSDgJ7niu7AhFDBnmXdncr2jCHMAOjc8n3q4z4_zJjLjB7fC9XtIhCiS-4JoQv7ANsrWAVPDrYkS1tabXqdvfV9AFrNH1H6FtUf4ygeOm7uL8RbC6XX9u1G6o6FrsN_vrRvb-1rTiXaVVJPNqCNU41hzRcVEjynBcPigBMkUBcEpCz8OxqtETwfPmXIcI9mKCoPrG3147G4Eyf9hup8uhap9tlKOyT15Lx1P4YZCGPLFlQYhbL-LvjhO9-wMERnNGdAo;
+        expires=Fri, 30-Apr-2027 22:29:33 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:29:34 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"42","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TzBTSVKoep77fhSME8KB+T1GNqCaUh5EWtXheThwJxI3yxOans6VWWe4tRAK42cQClhRVxfzNR4YDDqTytV4Bp1K6r6MwSzRRRcAh5ohbamcONrRQzpPWH8M="}},"role":"assistant"}}],"created":1793312974,"id":"zcjjaoffKa6s1e8PtL_syQs","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":2,"prompt_tokens":27,"total_tokens":29}}'
+  recorded_at: Thu, 29 Oct 2026 22:29:34 GMT
+recorded_with: VCR 6.3.1

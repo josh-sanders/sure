@@ -1,0 +1,65 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"NETFLIX.COM
+        AUTOPAY charged 15.49 on the 15th of every month. Describe the bill."}],"stream":false,"response_format":{"type":"json_schema","json_schema":{"name":"Ai__RubyLlmFeaturesLiveTest__BillSchema","schema":{"type":"object","properties":{"name":{"type":"string","description":"Merchant
+        name"},"amount":{"type":"number","description":"Charge amount"},"frequency":{"type":"string","enum":["weekly","monthly","yearly"]},"day_of_month":{"type":"integer","minimum":1,"maximum":31}},"required":["name","amount","frequency","day_of_month"],"additionalProperties":false},"strict":true}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:52 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1177
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9AglzLeNUaRUfOR4yWDaBvKXm_vZYBrl0-WR497yVma8yDoHYoDuoV2oooR0My1iKOzm1JmN82WANjQRR_Mzv_JDgKMakdgkTHBFotlmJHyMLk_l65MRaeYFQLS9qAKphP7wmfXvDf9Xu3zec9jKydKY1ZTu_sZ1F8StNy8CFLE7k2QhsrzzhsnKAEyRQFwSkLPqCC3zoUH5BUknMwDMXSqlKSWLOOHe-PEWuKQI3O3BgZOQr-I0ieOZY2O-TWLN3Gz2Mfnrg9DT3cSeMqJrB7HCg;
+        expires=Fri, 30-Apr-2027 22:24:51 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:52 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"{\n  \"name\":
+        \"NETFLIX.COM\",\n  \"amount\": 15.49,\n  \"frequency\": \"monthly\",\n  \"day_of_month\":
+        15\n}","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0T1u6PbEHlqpihwNOuZZsz7soya2symwxZ0nBWF46aZvcX3vZj/ZfykvGj6sPFuwKipYk7JQ+YThQnzitGcqMYG6Y35h7+N5/zu70YrF4F+6HYSsF+afpAyC0="}},"role":"assistant"}}],"created":1793312692,"id":"tMfjaoPyCIj91e8PiLXIsAs","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":48,"prompt_tokens":30,"total_tokens":78}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:53 GMT
+recorded_with: VCR 6.3.1

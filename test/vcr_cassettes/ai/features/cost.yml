@@ -1,0 +1,143 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"Say
+        OK."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:38 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=679
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl8jbtBWmDwE8GzTRm_4RZhfk-1-qnrSYeUqxSFHP9cOKLxX3tf_f8nzptDIfcRx4KWliDDExG4I8dO4-uW-j6CRhgFWyjlXOv5FZNvxzoFEyDvYaI_M1-435qJWy8NaB4-QxwUD8jHYGLPQlQZ2YPDy7HtH-GEJUppBQzVKmLJAGQSiwMKErKAEyRQFwSkLPu8WIURNxj1tcgn6i5ICyqkf9VApAbDMzK66klge_1tNsJ2rdeUA9HOQjTRKqBSjkY4_Dgai3IdIYELwOSgkgBg;
+        expires=Fri, 30-Apr-2027 22:24:37 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:38 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"OK.","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TeaI52qQD03/dYMCQ90gfiqmE8CbbrHWF4QCXYC9cTEF+F29eOL0C1G6bFTNHsBEULxu1gS1fALVxfoITc9OAv3qgjkVn0epeFBMs4yu7TQY0nzz85f8Ia1A="}},"role":"assistant"}}],"created":1793312678,"id":"psfjapTOB-2_1e8P1N_J2Qg","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":2,"prompt_tokens":4,"total_tokens":6}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:38 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Say OK."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      X-Goog-Api-Key:
+      - "<SPIKE_GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Gemini-Service-Tier:
+      - standard
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:39 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=609
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "OK.",
+                    "thoughtSignature": "EmAKXgFpFH0Tf2s92dWaec0G9ndeJG8a6iFwNGp3JrDrwVN//bMBxyB1NiMltIA2xt91obFVQJEYSC7rTs93Kzchp805SQn6EyRnO1+wvSihM8KjFbCg7sPlFZEvNne3UMY="
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 4,
+            "candidatesTokenCount": 2,
+            "totalTokenCount": 6,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 4
+              }
+            ],
+            "serviceTier": "standard"
+          },
+          "modelVersion": "gemini-3.5-flash-lite",
+          "responseId": "psfjaobFOZSL0-kPqeKn-AU"
+        }
+  recorded_at: Thu, 29 Oct 2026 22:24:39 GMT
+recorded_with: VCR 6.3.1

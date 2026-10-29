@@ -1,0 +1,165 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"How
+        many accounts do I have? Look them up, then answer in one sentence."}],"stream":false,"tools":[{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_categories","description":"Returns
+        categories for the user''s family, ordered alphabetically by hierarchy, with
+        pagination.\n\nEach entry includes id, name, color, icon, parent_id (null
+        for top-level), and\nname_with_parent (e.g. \"Food & Drink > Restaurants\").
+        Use this before creating\nsubcategories or referencing a category by id in
+        update_category or delete_category.\n\nNote on pagination:\n\nThis function
+        can be paginated. You can expect the following properties in the response:\n\n-
+        `total_pages`: The total number of pages of results\n- `page`: The current
+        page of results\n- `page_size`: The number of results per page (defaults to
+        50)\n- `total_results`: The total number of results\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"}},"required":[],"additionalProperties":false}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:33:17 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=757
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl2OM1Vs8O1MzsKBkM3b7BvKaW8ZkMFm0FrbacuMK65OCi1wlp7cxS3Qyv0wbT8HaKPQEYOYhaoFAm2r-XIqQoYjIxH0dXjYQy0KqrzGuoodY8m2DrIJKcZ9oDLam1SUD6ocsebc3Z-xXHPibXu5WbOYZWFmmeF_kOB7ZLGbYsDVKIdHd5k21QigBMkUBcEpCz3nUXDmCTrGFYj1pPUSGjbsr4UlWcuY4aqpWrXbkWfLde4H_zeXeqncjWhkxPOxqdGvSLNc0XVIyhk-smsvUxgs;
+        expires=Fri, 30-Apr-2027 22:33:17 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:33:17 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TPCFriMlVq2o5R22UspbIuHpcZL4kL3oOEaXrWjVfRFlY6d0AboOyEwg3COGXNNedcYGho6+tmCFsFlpCdstWnNlqMEVH1Uf3CxUITQO0PXG+4NvelU7XLWM="}},"function":{"arguments":"{}","name":"get_accounts"},"id":"call_99122","type":"function"}]}}],"created":1793313197,"id":"rcnjasDEGO6Nvr0P-KyXyAk","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":10,"prompt_tokens":504,"total_tokens":514}}'
+  recorded_at: Thu, 29 Oct 2026 22:33:17 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"How
+        many accounts do I have? Look them up, then answer in one sentence."},{"role":"assistant","content":"","tool_calls":[{"id":"call_99122","type":"function","function":{"name":"get_accounts","arguments":"{}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TPCFriMlVq2o5R22UspbIuHpcZL4kL3oOEaXrWjVfRFlY6d0AboOyEwg3COGXNNedcYGho6+tmCFsFlpCdstWnNlqMEVH1Uf3CxUITQO0PXG+4NvelU7XLWM="}}}]},{"role":"tool","content":"{\"as_of_date\":\"2026-10-29\",\"accounts\":[{\"id\":\"49f71985-8465-574b-a018-7af0abc5345c\",\"name\":\"Collectable
+        Account\",\"balance\":\"550.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550.00\",\"classification\":\"asset\",\"type\":\"OtherAsset\",\"start_date\":\"2026-10-28\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"aad48ae3-4b2b-5230-92ff-6d00f8b5daff\",\"name\":\"Robinhood
+        Brokerage Account\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Investment\",\"start_date\":\"2026-10-27\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"799e13c1-4593-5fa9-8a04-8968add3691d\",\"name\":\"IOU
+        (personal debt to friend)\",\"balance\":\"200.0\",\"currency\":\"USD\",\"balance_formatted\":\"$200.00\",\"classification\":\"liability\",\"type\":\"OtherLiability\",\"start_date\":\"2026-10-28\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"20e51c3e-939a-59cd-998f-b3650207b9d5\",\"name\":\"123
+        Maybe Court\",\"balance\":\"550000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$550,000.00\",\"classification\":\"asset\",\"type\":\"Property\",\"start_date\":\"2026-10-28\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"c3c1ddc8-35d1-5226-9b75-d5f9aa2aa089\",\"name\":\"Bitcoin\",\"balance\":\"10000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$10,000.00\",\"classification\":\"asset\",\"type\":\"Crypto\",\"start_date\":\"2026-10-28\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"720db67d-edd7-5941-9160-d7f03e14fdac\",\"name\":\"Checking
+        Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-24\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"31c59c3c-28bf-5aad-8fd6-6f8e79e846c7\",\"name\":\"Mortgage
+        Loan\",\"balance\":\"500000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$500,000.00\",\"classification\":\"liability\",\"type\":\"Loan\",\"start_date\":\"2026-10-28\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"11dfb81d-1a81-52ef-a94f-2fffd93f8e25\",\"name\":\"Plaid
+        Depository Account\",\"balance\":\"5000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$5,000.00\",\"classification\":\"asset\",\"type\":\"Depository\",\"start_date\":\"2026-10-28\",\"is_linked\":true,\"provider\":\"plaid\",\"status\":\"active\"},{\"id\":\"b599e848-533e-5b48-a342-2385ebc4e4e4\",\"name\":\"Honda
+        Accord\",\"balance\":\"18000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$18,000.00\",\"classification\":\"asset\",\"type\":\"Vehicle\",\"start_date\":\"2026-10-28\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"},{\"id\":\"d39209a6-df5b-5a21-aab2-21641a771c60\",\"name\":\"Credit
+        Card\",\"balance\":\"1000.0\",\"currency\":\"USD\",\"balance_formatted\":\"$1,000.00\",\"classification\":\"liability\",\"type\":\"CreditCard\",\"start_date\":\"2026-10-25\",\"is_linked\":false,\"provider\":null,\"status\":\"active\"}]}","tool_call_id":"call_99122"}],"stream":false,"tools":[{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_categories","description":"Returns
+        categories for the user''s family, ordered alphabetically by hierarchy, with
+        pagination.\n\nEach entry includes id, name, color, icon, parent_id (null
+        for top-level), and\nname_with_parent (e.g. \"Food & Drink > Restaurants\").
+        Use this before creating\nsubcategories or referencing a category by id in
+        update_category or delete_category.\n\nNote on pagination:\n\nThis function
+        can be paginated. You can expect the following properties in the response:\n\n-
+        `total_pages`: The total number of pages of results\n- `page`: The current
+        page of results\n- `page_size`: The number of results per page (defaults to
+        50)\n- `total_results`: The total number of results\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"}},"required":[],"additionalProperties":false}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:33:19 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1063
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl6nRyoBPWx3pZCm6VmKspwkwpig6LHOjSL5NYU5_PiS2vf8N-pftxoMPxY_VUd_uRssp-gw-bcwnmgF7KvzkumIGEQ6oKVH7KHFf4G4OkICCwBLCJ8CkPFn2h-t4PAyv3r4fDEbXBiSRjIoH0NAuZkKNKBlxfkpOzKNFEY6r5nIvVZz1MjvWpSgBMkUBcEpCz5DK9BEd7W-DhpvGXq9g3xaGwv5uQgYgGN8sPrGfwE_BAZe2KiGpedJ3vVz48L0Ig2gMbOxbuDxlfP2sFpx0iAg;
+        expires=Fri, 30-Apr-2027 22:33:18 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:33:19 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"You
+        have a total of 10 accounts.","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TpQdljT/Xb5DjO4HujQkliYEYnlayfWDzb+wuereh5Sf3WsABunhRuAbX0rDlqnDPy+MCsmpgKnaBBEsGDgv36UskfEtadZFHzUWkdPqhuDAVX+kTUFXwUio="}},"role":"assistant"}}],"created":1793313199,"id":"rsnjaujlGorKrfcPv8DrwAM","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":10,"prompt_tokens":1626,"total_tokens":1636}}'
+  recorded_at: Thu, 29 Oct 2026 22:33:19 GMT
+recorded_with: VCR 6.3.1

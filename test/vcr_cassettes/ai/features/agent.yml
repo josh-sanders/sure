@@ -1,0 +1,65 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        are a terse finance assistant. Answer in one sentence."},{"role":"user","content":"What
+        is a sinking fund?"}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:31:56 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1063
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl_8Ivb5e-V6EgrSbwg0Ec9rkvug7zViZEcrM5hIhWUlVmW4wX1Dd4vyIhJJmSrD_NLSQFovB7o3lTg23hlHTmUenzUFIlR46p9odj1uJNLTTwFEPEf3KEsPCSexAlXMU5jOUkCZdqc8zaEuVHCqqG9QQLNRVpityoIrWJ4ffJZvJIHjk10kCKAEyRQFwSkLPUbdOw95T--I6t-0bDCD1GlMmJrrQJOwokppNKOu_DL1mMdMhkyF8lAGbt7wWUaVn0vb71xHa-vUIveFGDmRwCg;
+        expires=Fri, 30-Apr-2027 22:31:55 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:31:56 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"A
+        sinking fund is a pool of money set aside by a company or issuer to gradually
+        pay back a debt or bond maturity.","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TFq2fStBDBQaO8ht19yI9n75VC4ejYbr2DUjJkIWY27Qpo7XKYzy+ytAhPgsWEBAqPQRVS7JRogsVWzZZVeH39NWhIx749Ln9rLOcsKcT0Rjw24hgQ5b3fwo="}},"role":"assistant"}}],"created":1793313116,"id":"W8njatGTFaPV9tMPjeKYuAs","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":20,"total_tokens":45}}'
+  recorded_at: Thu, 29 Oct 2026 22:31:56 GMT
+recorded_with: VCR 6.3.1

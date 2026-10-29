@@ -1,0 +1,747 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:40 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=695
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl8AJ1FXM7KU1KlfttAZ-c5XGP4Ps5Btyk6XwGY7S2ZmndaIyUL_rmXopkX1_XIjpQSSGww84uKYHq4KDzH0m4jr5CAtG4sobB-0Ht-RsJaZXpp-plJDk9-uDy5ZjF4NX2gPWBzMf6qag1vfNyYAsZlJTvZwQjvpDgbIBfD78gPMwhOmASfw3KAEyRQFwSkLPCxMjRlLyEuxduN94Q1Nw6zqiyH7AVC1P89nzVwxR6sBaP3RUwch7j_W5y3M2GZWqqe9lErBMk2DQQvDEBqykCA;
+        expires=Fri, 30-Apr-2027 22:24:39 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:40 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}},"function":{"arguments":"{\"page\":1}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_149974","type":"function"}]}}],"created":1793312680,"id":"p8fjaquqL9i01e8P8c7YwAk","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":91,"total_tokens":116}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:40 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:41 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=731
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl1yxoFSbyP5bo6hnz0HdFoACHHZXIFj4SFXaug9tg3M02bflISSxOiEyDh5jNCpgkUo9bIJ5pDf1tr1j8Vj2JKn5IMlDCmgSCazB8BE7NmVngygSFCr7NVTnzXr2tJgLKsVGJc6G-emsq7kHOr4mW4MXuIwRf34L615Cpnky5eql3Qy21SvUKAEyRQFwSkLPoVxc12DhjsI5Sqs-1H-xVMFjhE3x-kcPYVkzpn0Kp57GO17NIz2Te1Rqe2ri1VNN71QW0qPK9hOoT0BvN5VUBw;
+        expires=Fri, 30-Apr-2027 22:24:40 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:41 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}},"function":{"arguments":"{\"page\":2}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_120765","type":"function"}]}}],"created":1793312681,"id":"qMfjatb7K-TKrfcPtvi50QQ","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":173,"total_tokens":198}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:41 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:41 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=705
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9AglyybTY1NepIZiDjp8NjGjQqmEHOTbMSMw1FD1AputQB7-1ZqnclGnSoTkSb7yFHSeTaSFkrKUDJn1OasS51AK69-EZkD8hBWDynR6B3R7exqBTkV8cgayWmFZg8ReM5K3FZkaNKD1b-bemeVDBs-V9ge0pPMhGHPLqZkQpUy--3c0ZcwsCL_XCgBMkUBcEpCz40B-NWNRuO6Xb7cBI9THuK5HW3hJ-UFC1uOxt0Jp-3rT48FJCMjG5Yb-B_qW_i47CmBmLFDU7u3qrTg12P7-AE;
+        expires=Fri, 30-Apr-2027 22:24:41 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:41 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}},"function":{"arguments":"{\"page\":3}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_91268","type":"function"}]}}],"created":1793312681,"id":"qcfjavaQIZSM1e8PocOjuAk","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":255,"total_tokens":280}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:42 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:43 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=945
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl0c7NoaJwl-DOijU4E93PjdsRyRkj9OogyZprPwKJ9FeDOc7wF4YBgBP6y4aHryULj7XOxgNuXOVHtFuOeGK7JsQ8D1T4fsUPligzxixOA2Mu3syfhybEL_ax19FF7FU9B-jwrqa7mD7p_fbH1xYZE9MmBS_ZFe_M35nN3DYyvawEriYdG0TeSgBMkUBcEpCzwod-LXYMHCEMDMqFeISDK0WNNTM-Z1c0bBtl_4eXMVw8vNVRQ4J6XUvYhlCDME1131OtRLkMtMvB9WoShiy3wg;
+        expires=Fri, 30-Apr-2027 22:24:42 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:43 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}},"function":{"arguments":"{\"page\":4}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_134244","type":"function"}]}}],"created":1793312683,"id":"qsfjarGkHuvY9tMP3cGhqAU","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":337,"total_tokens":362}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:43 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:44 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=764
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl-8tBOFgWk2pYQnPagAQuPI-HA8N7SkgXC8C-jezPE9fBpz9SUcfaVBhcLdhYr2v9_-fdfPQZu8A5Y_NhXZ9iHeozkD8OaO_ZZEEoMXDGhhha66JsU8NsGerihz1y5mXT-5VBBD5ChrTa6MeorJJXk6vcIZnyxljmvuUI-8ZILVodc3bfTmZRigBMkUBcEpCz5lzhuGQ3bBr769HArWskIytqrEXqaR8WQfJ809DYpmYdvkzpiIG9n2n0YUutiJx8PHk4ddrACmzKGfl7aPb_ww;
+        expires=Fri, 30-Apr-2027 22:24:43 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:44 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}},"function":{"arguments":"{\"page\":5}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_108740","type":"function"}]}}],"created":1793312684,"id":"q8fjauapJpL81e8PnO2uuAg","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":419,"total_tokens":444}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:44 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"},{"role":"assistant","content":"","tool_calls":[{"id":"call_108740","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":5}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}}}]},{"role":"tool","content":"{\"page\":5,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":6}","tool_call_id":"call_108740"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:44 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=714
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Aglzg521zWsvXuxZ7rYMAw4bZ019TE5j4wvclFSJmvjfzJ-FF-s9mNSo2bSHUqGHFV8AnEs9MceA80mCAioX7OffPI02o9mT_sIrwje2A5nUWfQpXcyqk3qsvO2zH-zQkOHgD5h34vBDj78i4Ks0kueObwTabI9N44ryMtHG6W0vFbqhDp7bU5pCgBMkUBcEpCz0EGbtKNqaD_zeQYSOc-Jyw02HNE4ZpvmCI6LqGI9oIYOy5h7A5lQtJg0LPBhAwIAEgHzSY8t67hLhAuPgAqzQk;
+        expires=Fri, 30-Apr-2027 22:24:44 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:44 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TUyY7rUd7OU84IG5xHBPzhn3q/nJ/OGFGD+67OOVWiPZkC6xe2xbyxNW8dw+KbAW/HYkKNtRa+itJXEfNGS6gfi4a3yp7AoizHCZd2i9DJs7xTAur6s9yDCg="}},"function":{"arguments":"{\"page\":6}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_134274","type":"function"}]}}],"created":1793312684,"id":"rMfjau34ItHXrfcPqM6uuAU","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":501,"total_tokens":526}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:45 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"},{"role":"assistant","content":"","tool_calls":[{"id":"call_108740","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":5}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}}}]},{"role":"tool","content":"{\"page\":5,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":6}","tool_call_id":"call_108740"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134274","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":6}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TUyY7rUd7OU84IG5xHBPzhn3q/nJ/OGFGD+67OOVWiPZkC6xe2xbyxNW8dw+KbAW/HYkKNtRa+itJXEfNGS6gfi4a3yp7AoizHCZd2i9DJs7xTAur6s9yDCg="}}}]},{"role":"tool","content":"{\"page\":6,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":7}","tool_call_id":"call_134274"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:45 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=806
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl4X3aQGMCMlOU8EjiW_KvDnPGurTRRubfTXp4FCxdVRR8Tzm5iKRE6uw0bU-aFeIidE5uXW2x3e1z240Nj0zrilrCHRbPdAssSq4WQaRd4WRW8iuBtvT_PhnDRvdvGGOAweZoGMgpKSO8uCU0_lD9lKCmkLDkvdGUbra2eoJ93Wb42tcTsLkKygBMkUBcEpCz8G2bSB-lf1i1bEs8Rb2ftaE5MIz-G4pVwRCfyNtfMg8RsktjLt1cmkdJPKmldrao3GZcpW2LM3HfW-uWrDISQg;
+        expires=Fri, 30-Apr-2027 22:24:45 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:45 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0Tv+URoyOJCaVYTr4J0P3gnqD+Ubvj85CLTXv7nsucNa2Z3uY532BjA47JK8H6XbMv0+jugcGrMMOA/dePUi7KKpZ/aGJv6ai6AhXLTwOpUEOH/2AQ/oxW+4k="}},"function":{"arguments":"{\"page\":7}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_84836","type":"function"}]}}],"created":1793312685,"id":"rcfjaqvxHpSM1e8PocOjuAk","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":583,"total_tokens":608}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:46 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"},{"role":"assistant","content":"","tool_calls":[{"id":"call_108740","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":5}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}}}]},{"role":"tool","content":"{\"page\":5,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":6}","tool_call_id":"call_108740"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134274","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":6}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TUyY7rUd7OU84IG5xHBPzhn3q/nJ/OGFGD+67OOVWiPZkC6xe2xbyxNW8dw+KbAW/HYkKNtRa+itJXEfNGS6gfi4a3yp7AoizHCZd2i9DJs7xTAur6s9yDCg="}}}]},{"role":"tool","content":"{\"page\":6,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":7}","tool_call_id":"call_134274"},{"role":"assistant","content":"","tool_calls":[{"id":"call_84836","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":7}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0Tv+URoyOJCaVYTr4J0P3gnqD+Ubvj85CLTXv7nsucNa2Z3uY532BjA47JK8H6XbMv0+jugcGrMMOA/dePUi7KKpZ/aGJv6ai6AhXLTwOpUEOH/2AQ/oxW+4k="}}}]},{"role":"tool","content":"{\"page\":7,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":8}","tool_call_id":"call_84836"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:47 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1046
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl5NyG5ELbfM2suNiwak-A5E1DVg8HhMhzHUp-gRHgcolFZSXLMKmAyuoIk-RqKuD9ImBJZ0lcvXZn4qIzKVQzKzM8wLwqvL0KHIvmNyB9wmD34yvVwKfT_nqj-BMfR9EtjzsbQ8X6FOz6hRjIR_dODBpcYhih9nSH35scARh6cCvJo8wv70mKAEyRQFwSkLPPSleZ8XPm0Lk3YS7edECNsKz9XbrDTPYr5qmbowMbzAgIUefPI8KH8Cmrhz6QbnDwcehMNvP2Yln5moiCGnaCQ;
+        expires=Fri, 30-Apr-2027 22:24:46 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:47 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TwBgdy9mQCkTm2Vl0jpOzsjcVBpQpSm+LME9I32ATwVyXlOLif3uW2Yyx7Hnqtx8hUg28Q9arZ3edvBJlkTX3amuOZnciGIzN3ozU+KiMIZD/6p6iGillCS0="}},"function":{"arguments":"{\"page\":8}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_74969","type":"function"}]}}],"created":1793312687,"id":"rsfjao2YIbHkosUPmbvR4Qs","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":665,"total_tokens":690}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:47 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"},{"role":"assistant","content":"","tool_calls":[{"id":"call_108740","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":5}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}}}]},{"role":"tool","content":"{\"page\":5,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":6}","tool_call_id":"call_108740"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134274","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":6}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TUyY7rUd7OU84IG5xHBPzhn3q/nJ/OGFGD+67OOVWiPZkC6xe2xbyxNW8dw+KbAW/HYkKNtRa+itJXEfNGS6gfi4a3yp7AoizHCZd2i9DJs7xTAur6s9yDCg="}}}]},{"role":"tool","content":"{\"page\":6,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":7}","tool_call_id":"call_134274"},{"role":"assistant","content":"","tool_calls":[{"id":"call_84836","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":7}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0Tv+URoyOJCaVYTr4J0P3gnqD+Ubvj85CLTXv7nsucNa2Z3uY532BjA47JK8H6XbMv0+jugcGrMMOA/dePUi7KKpZ/aGJv6ai6AhXLTwOpUEOH/2AQ/oxW+4k="}}}]},{"role":"tool","content":"{\"page\":7,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":8}","tool_call_id":"call_84836"},{"role":"assistant","content":"","tool_calls":[{"id":"call_74969","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":8}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TwBgdy9mQCkTm2Vl0jpOzsjcVBpQpSm+LME9I32ATwVyXlOLif3uW2Yyx7Hnqtx8hUg28Q9arZ3edvBJlkTX3amuOZnciGIzN3ozU+KiMIZD/6p6iGillCS0="}}}]},{"role":"tool","content":"{\"page\":8,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":9}","tool_call_id":"call_74969"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:48 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=964
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl_QafCwb0YOd4SFORWE1QUbbRk_WRn_4f7MCyYwlLhh3Yd-fWaFZyXWV2s21ACCN_ld8R8y3CSpkKU4X3hLQrm7ePFDYKQhT06pz-2EqkQbXTr0ThxCSGaf6imlJA5GNVrTyvKwf7fWyIuwe3iQyrm-m_BWsNXKzXdbgU7887wr5rik9IZ4bKAEyRQFwSkLPj74dDRIWzvpcMFe8wfej9xpYccM5zuf3CiJlWPrWcee9BcboJQWvnuET3Db6waqjzOSaIfEJpgbNF_BSoQZADQ;
+        expires=Fri, 30-Apr-2027 22:24:47 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:48 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TFBpkmdirZcqaeb1gmULK6aZMZ6TgG7pWl6kMiGDtRO4vhw3x2la966tile0RxfpRgMF1pznsGagIodRaLoVkhknbAMm3VmmQoLipr8Cnbvj+8rbmVoEWUGs="}},"function":{"arguments":"{\"page\":9}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_95697","type":"function"}]}}],"created":1793312688,"id":"r8fjapvFMOON1e8P5sacmAk","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":747,"total_tokens":772}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:48 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"},{"role":"assistant","content":"","tool_calls":[{"id":"call_108740","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":5}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}}}]},{"role":"tool","content":"{\"page\":5,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":6}","tool_call_id":"call_108740"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134274","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":6}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TUyY7rUd7OU84IG5xHBPzhn3q/nJ/OGFGD+67OOVWiPZkC6xe2xbyxNW8dw+KbAW/HYkKNtRa+itJXEfNGS6gfi4a3yp7AoizHCZd2i9DJs7xTAur6s9yDCg="}}}]},{"role":"tool","content":"{\"page\":6,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":7}","tool_call_id":"call_134274"},{"role":"assistant","content":"","tool_calls":[{"id":"call_84836","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":7}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0Tv+URoyOJCaVYTr4J0P3gnqD+Ubvj85CLTXv7nsucNa2Z3uY532BjA47JK8H6XbMv0+jugcGrMMOA/dePUi7KKpZ/aGJv6ai6AhXLTwOpUEOH/2AQ/oxW+4k="}}}]},{"role":"tool","content":"{\"page\":7,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":8}","tool_call_id":"call_84836"},{"role":"assistant","content":"","tool_calls":[{"id":"call_74969","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":8}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TwBgdy9mQCkTm2Vl0jpOzsjcVBpQpSm+LME9I32ATwVyXlOLif3uW2Yyx7Hnqtx8hUg28Q9arZ3edvBJlkTX3amuOZnciGIzN3ozU+KiMIZD/6p6iGillCS0="}}}]},{"role":"tool","content":"{\"page\":8,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":9}","tool_call_id":"call_74969"},{"role":"assistant","content":"","tool_calls":[{"id":"call_95697","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":9}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TFBpkmdirZcqaeb1gmULK6aZMZ6TgG7pWl6kMiGDtRO4vhw3x2la966tile0RxfpRgMF1pznsGagIodRaLoVkhknbAMm3VmmQoLipr8Cnbvj+8rbmVoEWUGs="}}}]},{"role":"tool","content":"{\"page\":9,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":10}","tool_call_id":"call_95697"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:49 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=826
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9AglyiVaM7TgKszWPsRm6CS8SJFzsH0cngosH25YKIMpAV_c72NZoFg9Bi0Nyd6oY-66EiYr6Q5by6u6w_rN4bF775YmY5oDQbgmIPUnu92eT6exWgiRARU242S8Pptkzt9nrFDDHNysQe_DzI2Ocw3dcRgkzADXFypQAYQATpsXm8FBeero0vlKAEyRQFwSkLPlWHojD0iCuuzPKZA7B_5ttTlsgvaHg_aXK7RMaMH9hvP8Di2TktEAlmjus9ZRIIREcYJqQrFxrsLlQKPnXb8Cw;
+        expires=Fri, 30-Apr-2027 22:24:48 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:49 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCOBGfVM2/DKrN9XdNgSPXAadRagFd9prJOSMT23YRpSrOhl6tIg878gY+/LaCIG1M8Tq9qB3Ua+uljWi3mHZ7165XMyZRbytNFwVU22oGJeOttYfoVj4Xo0="}},"function":{"arguments":"{\"page\":10}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_106672","type":"function"}]}}],"created":1793312689,"id":"sMfjaun3MpCt1e8P7ajPyAs","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":26,"prompt_tokens":830,"total_tokens":856}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:49 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"},{"role":"assistant","content":"","tool_calls":[{"id":"call_108740","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":5}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}}}]},{"role":"tool","content":"{\"page\":5,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":6}","tool_call_id":"call_108740"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134274","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":6}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TUyY7rUd7OU84IG5xHBPzhn3q/nJ/OGFGD+67OOVWiPZkC6xe2xbyxNW8dw+KbAW/HYkKNtRa+itJXEfNGS6gfi4a3yp7AoizHCZd2i9DJs7xTAur6s9yDCg="}}}]},{"role":"tool","content":"{\"page\":6,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":7}","tool_call_id":"call_134274"},{"role":"assistant","content":"","tool_calls":[{"id":"call_84836","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":7}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0Tv+URoyOJCaVYTr4J0P3gnqD+Ubvj85CLTXv7nsucNa2Z3uY532BjA47JK8H6XbMv0+jugcGrMMOA/dePUi7KKpZ/aGJv6ai6AhXLTwOpUEOH/2AQ/oxW+4k="}}}]},{"role":"tool","content":"{\"page\":7,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":8}","tool_call_id":"call_84836"},{"role":"assistant","content":"","tool_calls":[{"id":"call_74969","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":8}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TwBgdy9mQCkTm2Vl0jpOzsjcVBpQpSm+LME9I32ATwVyXlOLif3uW2Yyx7Hnqtx8hUg28Q9arZ3edvBJlkTX3amuOZnciGIzN3ozU+KiMIZD/6p6iGillCS0="}}}]},{"role":"tool","content":"{\"page\":8,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":9}","tool_call_id":"call_74969"},{"role":"assistant","content":"","tool_calls":[{"id":"call_95697","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":9}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TFBpkmdirZcqaeb1gmULK6aZMZ6TgG7pWl6kMiGDtRO4vhw3x2la966tile0RxfpRgMF1pznsGagIodRaLoVkhknbAMm3VmmQoLipr8Cnbvj+8rbmVoEWUGs="}}}]},{"role":"tool","content":"{\"page\":9,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":10}","tool_call_id":"call_95697"},{"role":"assistant","content":"","tool_calls":[{"id":"call_106672","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":10}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCOBGfVM2/DKrN9XdNgSPXAadRagFd9prJOSMT23YRpSrOhl6tIg878gY+/LaCIG1M8Tq9qB3Ua+uljWi3mHZ7165XMyZRbytNFwVU22oGJeOttYfoVj4Xo0="}}}]},{"role":"tool","content":"{\"page\":10,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":11}","tool_call_id":"call_106672"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:50 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=770
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl58BMvBwcQmVjELO0LDw66l58AcRck8QYDZtcH9vkY9LLbO_1dwG_ojSFyeyf6A4IbIzt0zy1aifnxad0ZOwt0zOaVPplZr-xBqwLXXmxMWabaV9la43zmNoA2EvecrCkyQ4CAe6S4hwauav9EDZRiuWCFbWf_Wbui3M9HkKmtCaNDurCD00KAEyRQFwSkLPx9zij029q1WuGbHbMftZLrjypRwsMnH3HgGoGc0kFIc3d-wVx49y0qFvTvki48SJyUx7O5ynfzD6kT71aCXEDg;
+        expires=Fri, 30-Apr-2027 22:24:49 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:50 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TWPJEgm6R+9ZO/GZvMDZDDolhHfuJSqNNRJKlOZmEXmGWOF6U0i6skH+Z4GHR/MYEBmLZ9mwfkelKNjO27z/GLpI/Gv/FQAnDfhuzGsEjZulBbcwNhB0Qjec="}},"function":{"arguments":"{\"page\":11}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_133595","type":"function"}]}}],"created":1793312690,"id":"scfjavanNeTLrfcPxZyy0QU","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":26,"prompt_tokens":915,"total_tokens":941}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:50 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"user","content":"List
+        all my transactions. Fetch every page."},{"role":"assistant","content":"","tool_calls":[{"id":"call_149974","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":1}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TDDVnuWrUWUJW0fAYFPJwxtfattxLehHgboseafCBLcOpIw1F/YcfPJP7LEs9U8eJSZJ1BYiM64kzTtsWK3N22VClc8V3snIcIjszEzV4WfE1O9IvdK1ht34="}}}]},{"role":"tool","content":"{\"page\":1,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":2}","tool_call_id":"call_149974"},{"role":"assistant","content":"","tool_calls":[{"id":"call_120765","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":2}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TBgseeBOPWMEgY1KBjUn2nSP3/c04Llt2MbkDsXHpefq6LvP8goLuXH3g6xAwHvYz7gDfdhdJpTtXYHxpLS9LI8nZzmWMzrQug0ZBpLNV+CShC5BD3sClHI0="}}}]},{"role":"tool","content":"{\"page\":2,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":3}","tool_call_id":"call_120765"},{"role":"assistant","content":"","tool_calls":[{"id":"call_91268","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":3}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TZR647w6Cq+2YqfCnr29SD/Hb2Nkb4VClrSS1qvEb0jm559AGGmygt9dYZ78lwAaWWMKqI8HDrDYXzC02FAC0j2YgFG4HQtgd8vdA3Y22DBJVfevuzCugOP8="}}}]},{"role":"tool","content":"{\"page\":3,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":4}","tool_call_id":"call_91268"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134244","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":4}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCdkIczLHDJQzgyc5EpW/AWyEJBVb9D98AFb9w42gZduAOrcgwXFxD9at5UN90rGfY6bS62wQEG2L6Ajy8DNPKOAnBW6e5fjXOSS5dCHdPyglKbDnD7Fc0LI="}}}]},{"role":"tool","content":"{\"page\":4,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":5}","tool_call_id":"call_134244"},{"role":"assistant","content":"","tool_calls":[{"id":"call_108740","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":5}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TEXdRg4SikyR3smNc9VUFUpDOtTD/6A8Lp+w6S+XQFaCVfZ5akOyh9E8sb7cgG3fRisvNPi9Lc3DxEEN8oC7dlD2EO7SMcU4Hu+W+738dkI+wxLrrUWmLXKE="}}}]},{"role":"tool","content":"{\"page\":5,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":6}","tool_call_id":"call_108740"},{"role":"assistant","content":"","tool_calls":[{"id":"call_134274","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":6}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TUyY7rUd7OU84IG5xHBPzhn3q/nJ/OGFGD+67OOVWiPZkC6xe2xbyxNW8dw+KbAW/HYkKNtRa+itJXEfNGS6gfi4a3yp7AoizHCZd2i9DJs7xTAur6s9yDCg="}}}]},{"role":"tool","content":"{\"page\":6,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":7}","tool_call_id":"call_134274"},{"role":"assistant","content":"","tool_calls":[{"id":"call_84836","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":7}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0Tv+URoyOJCaVYTr4J0P3gnqD+Ubvj85CLTXv7nsucNa2Z3uY532BjA47JK8H6XbMv0+jugcGrMMOA/dePUi7KKpZ/aGJv6ai6AhXLTwOpUEOH/2AQ/oxW+4k="}}}]},{"role":"tool","content":"{\"page\":7,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":8}","tool_call_id":"call_84836"},{"role":"assistant","content":"","tool_calls":[{"id":"call_74969","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":8}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TwBgdy9mQCkTm2Vl0jpOzsjcVBpQpSm+LME9I32ATwVyXlOLif3uW2Yyx7Hnqtx8hUg28Q9arZ3edvBJlkTX3amuOZnciGIzN3ozU+KiMIZD/6p6iGillCS0="}}}]},{"role":"tool","content":"{\"page\":8,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":9}","tool_call_id":"call_74969"},{"role":"assistant","content":"","tool_calls":[{"id":"call_95697","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":9}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TFBpkmdirZcqaeb1gmULK6aZMZ6TgG7pWl6kMiGDtRO4vhw3x2la966tile0RxfpRgMF1pznsGagIodRaLoVkhknbAMm3VmmQoLipr8Cnbvj+8rbmVoEWUGs="}}}]},{"role":"tool","content":"{\"page\":9,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":10}","tool_call_id":"call_95697"},{"role":"assistant","content":"","tool_calls":[{"id":"call_106672","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":10}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TCOBGfVM2/DKrN9XdNgSPXAadRagFd9prJOSMT23YRpSrOhl6tIg878gY+/LaCIG1M8Tq9qB3Ua+uljWi3mHZ7165XMyZRbytNFwVU22oGJeOttYfoVj4Xo0="}}}]},{"role":"tool","content":"{\"page\":10,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":11}","tool_call_id":"call_106672"},{"role":"assistant","content":"","tool_calls":[{"id":"call_133595","type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","arguments":"{\"page\":11}"},"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TWPJEgm6R+9ZO/GZvMDZDDolhHfuJSqNNRJKlOZmEXmGWOF6U0i6skH+Z4GHR/MYEBmLZ9mwfkelKNjO27z/GLpI/Gv/FQAnDfhuzGsEjZulBbcwNhB0Qjec="}}}]},{"role":"tool","content":"{\"page\":11,\"transactions\":[{\"name\":\"Coffee\",\"amount\":-3.5}],\"more_pages_remain\":true,\"next_page\":12}","tool_call_id":"call_133595"}],"stream":false,"tools":[{"type":"function","function":{"name":"ai--ruby_llm_features_live_test--counting","description":"Returns
+        the next page of the user''s transactions. Keep calling it while it says more
+        pages remain.","parameters":{"type":"object","properties":{"page":{"type":"integer","description":"Page
+        number, starting at 1"}},"required":["page"],"additionalProperties":false,"strict":true}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:24:51 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1090
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl2kQauJG-0phHnHwAWzVgQh0GosmRyIo5eh56_VBVdaHITWWwQxbxBaWfIqFYmeurvogXB6tPr7Xu0YUByFXKQIQ34OogFYE5Tt5MmWoOKepVNkWxAIphA4CNbLSVMbt394bU53yCJW0WrmJPvztwS-pIWKEzMlEh8MpadaXKAT4MZZXmHCW4CgBMkUBcEpCz0cSRJ7RRbtpX5AgZ4EhAxf_z11Px63Ml9xeYRbV24s0ZB5-JtlWNEM9xznEzjfox8STw0FMWBrXa3okXY8xbw4;
+        expires=Fri, 30-Apr-2027 22:24:50 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 22:24:51 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"tool_calls","index":0,"message":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TtSwXaswoRLV6nKR5cQLhiOH5SnNq6EDzdQ369fLDL77G9EWdW5G7Bolw5X1fHa8WDZnVrXTO+C3/nzg97QmfyK9520w98szzr5Hgk00ehyZwn9EoOhRsFzk="}},"function":{"arguments":"{\"page\":12}","name":"ai--ruby_llm_features_live_test--counting"},"id":"call_157454","type":"function"}]}}],"created":1793312691,"id":"ssfjaq3UOP3M2roPj-LEsAY","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":26,"prompt_tokens":1000,"total_tokens":1026}}'
+  recorded_at: Thu, 29 Oct 2026 22:24:51 GMT
+recorded_with: VCR 6.3.1

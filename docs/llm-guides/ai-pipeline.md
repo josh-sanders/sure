@@ -59,6 +59,67 @@ judgement of RubyLLM: Chatwoot still embeds through `RubyLLM.embed`
 `embed` over RubyLLM passes here: `embed_test` (live, `embed`) returns two 384-dimension vectors
 and one `embed.ai` event.
 
+### Decisions register
+
+The spike's second purpose is to sort the plan's choices into **product decisions** and
+**technical limits**, and to gather evidence on both sides of every product decision. Nothing
+here is final, and that includes scope: an "out of scope" line is a product decision too.
+- **A technical limit** is something a server, a gem or a protocol does, recorded live or read
+  in the source, often with a known workaround.
+- **A product decision** is Sure's choice, with the evidence for and against it so far.
+
+**Product decisions**
+
+| Decision (plan section) | For | Against | Evidence |
+|---|---|---|---|
+| Adopt RubyLLM for the transports (§19) | One streaming parser for every protocol; an explicit proxy for every client; unknown models; Gemini signatures and `reasoning_details` kept | `generate` is 26 lines longer; fast releases; some fixes lean on private API (`usage_entries:`); five ecosystem gems still pin 1.x | Criteria; "What the owner watches on upgrade"; feature tests |
+| Sure owns the tool loop (§5.5, §8.4) | Round cap, final round without tools, turn deadline, cancel; RubyLLM's `ask` has no round cap (12 rounds until the spike's guard) | `ask` needs no loop code; `run_tools` brings approvals, parallel tools and resume for about 40 lines | "RubyLLM running Sure's tools"; `features/tool_loop` |
+| Sure stores chat history, not RubyLLM (§8.4, proposal 04) | Mobile API and broadcasts unchanged; model picked per turn; no usage ledger | RubyLLM's history knows each message's producer and strips other providers' leftovers; approvals that survive restarts | "Switching providers"; RubyLLM install templates |
+| Failover only at the start of a turn (§5.5) | No half-written answer from two models | Provider state can move (Google's placeholder signature); RubyLLM falls back even after chunks have streamed and reports it | `switch/placeholder_round_llama_gemini`; `fallback.rb` |
+| Gemini through Google's OpenAI-compatible API (§4.2) | One more compatible server, one code path | Native provider continues other models' tool rounds, prices calls, and has Gemini-only features (search grounding, batches) | `switch/round_llama_gemini_native`; `features/cost` |
+| The `auto` JSON-mode chain (§7) | Servers differ on strict schemas | Retries 400s unrelated to JSON (resent a whole PDF twice); re-asks when the answer is legitimately empty; a slow model's three attempts took 26 minutes | PDF and OCR spikes |
+| Prompts as `.md` with `%{}`, no ERB (§8.3) | Family overrides are user text; ERB would run code | RubyLLM's agent instructions and 2.1 partials need ERB templates | "Prompt partials" (discussion) |
+| Jev hand-written (§7) | Any gateway URL; no dependency | 72 lines to maintain; RubyLLM's `judge` works on OpenCode Zen; `ruby_decision_model` covers it in 54 | Jev section |
+| PDF import: images for vision, text otherwise, unavailable for a scan (PDF spike) | Every right extraction came from those two inputs | Anthropic and OpenAI read PDFs natively (not tested live) | `statements/`, `ocr/` |
+| Page rendering in a child process vs `ruby-vips` in process | Child keeps poppler's memory away from the worker | `ruby-vips` is simpler, already bundled; the child needs limits to be worth it | `page_images_test` |
+| Answer-free checks on extractions, `dates_anchored` ≥ 0.5 | Separated all 14 right from all 12 wrong recordings | Threshold tuned on two statements | "Checks on an extraction" |
+| OpenAI vector stores vs pgvector (§5.5) | No embedding model to run | Indexing isn't awaited; scans index empty; no score threshold; files outlive removal | `openai/vector_store_statements` |
+| Tracing: `content` vs `metadata` (§10) | `metadata` sends no financial data | It loses route, prompt key, Sure's error class | "Tracing modes" |
+| Sure is an MCP server, not a client (§20, proposal 04) | No third-party server gets family data | RubyLLM 2.1 has an MCP client built in | Pending: MCP client test |
+| RubyLLM's usage ledger off (no `ruby_llm_usages`) | No per-call database check; Sure's own `LlmUsage` | The ledger is where RubyLLM's history finds a message's producer | "What the owner watches on upgrade" |
+| Auto-upload of large files off | A statement never stays in a provider's Files API | Anthropic over 24 MB then can't take the file at all | `extract_statement_stubbed_test` |
+| Chat storage redesign out of scope (§20) | The plumbing needs one additive column | RubyLLM's persistence pays off if RubyLLM runs the loop | "Switching providers" |
+| Local OCR as a two-step route (OCR model, then extraction) | Read both statements completely on CPU | Needs a second model or endpoint per route; a prompt per model | `ocr/` |
+
+**Technical limits** (as found; each has the workaround noted)
+- Gemini's compatible API and llama.cpp reject RubyLLM's PDF `file` part (400); only OpenRouter
+  accepts it, and bills parsing even on free models. Workaround: page images or text.
+- llama.cpp without a vision projector answers images with a 500. Workaround: check the route's
+  `vision` need first.
+- Gemini refuses a tool round another model started (400, missing `thought_signature`).
+  Workaround: Google's placeholder, or the native provider.
+- RubyLLM sends a PDF as a `file` part to every OpenAI-compatible server, so
+  `convert_unsupported_attachments` never runs for them.
+- RubyLLM downloads non-image URL attachments from the Rails process (`Attachment#fetch_content`).
+- RubyLLM's fallbacks can't move between two endpoints of the same provider: `:openai` has one
+  `openai_api_base`.
+- RubyLLM's `input_tokens` excludes cached tokens (reported 512 where the prompt was 12,457).
+- RubyLLM retries OpenAI's `insufficient_quota` 429 like a rate limit.
+- Anthropic checks the balance before the model name, and blocks `count_tokens` without credits.
+- `pdftoppm` exits 0 with a 1×1 PNG when it can't allocate a page.
+- Active Storage blocks libvips's PDF loader (`Vips.block_untrusted`).
+- llama-server drops special tokens (an OCR model's table tags) unless started with `--special`.
+- Free tiers: OpenRouter allows 50 requests a day without credits; Gemini's free tier has a
+  per-minute cap that a 12-round tool loop exceeds.
+- Five ecosystem gems pin RubyLLM 1.x: `ruby_llm-skills`, `-tribunal`, `-top_secret`, `-mcp`,
+  `-instrumentation`.
+
+**RubyLLM features still to test** (each against the decision it bears on): MCP client, tool
+approval in `ask`, batches, prompt caching, provider tools and web search with citations, RAG,
+cost tracking in Rails, text to speech, OCR, video, moderation, Rails persistence with two
+application models, generators, AI coding assistant support, evaluations, and the ecosystem
+gems. Results go into the tables above as they land.
+
 ### The external assistant (agent mode), outside the criteria
 
 Today's `Assistant::External::Client` (141 code lines) speaks plain OpenAI chat completions over
