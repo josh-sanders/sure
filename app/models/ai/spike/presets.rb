@@ -9,6 +9,7 @@ module Ai::Spike::Presets
     openrouter: "https://openrouter.ai/api/v1",
     gemini: "https://generativelanguage.googleapis.com/v1beta/openai",
     anthropic: "https://api.anthropic.com",
+    openai: "https://api.openai.com/v1",
     openclaw: "http://openclaw.test:18789/v1/chat/completions"
   }.freeze
 
@@ -61,6 +62,13 @@ module Ai::Spike::Presets
     Ai::Spike::Endpoint.new(name: "Gemini", protocol: :compatible, preset: :gemini,
                             base_url: PLACEHOLDERS[:gemini], api_key: ENV["SPIKE_GEMINI_API_KEY"],
                             json_mode: "auto", timeout_seconds: 120, **overrides)
+  end
+
+  # OpenAI direct (section 4.2): the preset sets responses_api, stateless.
+  def openai(**overrides)
+    Ai::Spike::Endpoint.new(name: "OpenAI", protocol: :compatible, preset: :openai,
+                            base_url: PLACEHOLDERS[:openai], api_key: ENV["SPIKE_OPENAI_API_KEY"],
+                            json_mode: "strict", responses_api: true, timeout_seconds: 120, **overrides)
   end
 
   def anthropic(**overrides)

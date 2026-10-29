@@ -1,0 +1,204 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/embeddings
+    body:
+      encoding: UTF-8
+      string: '{"model":"text-embedding-3-small","input":["Netflix"]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 429
+      message: Too Many Requests
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 10:52:54 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '283'
+      Connection:
+      - keep-alive
+      Cf-Ray:
+      - a521a223fb4ed713-BNE
+      Cf-Cache-Status:
+      - DYNAMIC
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Vary:
+      - Origin
+      Access-Control-Expose-Headers:
+      - CF-Ray
+      - CF-Ray
+      X-Content-Type-Options:
+      - nosniff
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      X-Request-Id:
+      - req_2804940a83944b708e205e7faa3e81db
+      Set-Cookie:
+      - __cf_bm=O9S39PUSqZpYUD1fVoHDliXU6iWs0wdGJxxsEfpIQjs-1793271173.7613173-1.0.1.1-WQn1I1QygmsOM4CSnbsWlYd2hqFLb3oVo3iq5vQAz1cF1DvYxO.Y5O.kzRyoGeCax1y91z6TQDIhCJWbQT2G.8EJi7cvypiUjPBR7fyhVqTwvYnAMic6NIXjQLRcGMyB;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu,
+        29 Oct 2026 11:22:54 GMT
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: |
+        {
+            "error": {
+                "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+                "type": "insufficient_quota",
+                "param": null,
+                "code": "credit_balance_exhausted"
+            }
+        }
+  recorded_at: Thu, 29 Oct 2026 10:52:54 GMT
+- request:
+    method: post
+    uri: https://api.openai.com/v1/embeddings
+    body:
+      encoding: UTF-8
+      string: '{"model":"text-embedding-3-small","input":["Netflix"]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 429
+      message: Too Many Requests
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 10:52:55 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '283'
+      Connection:
+      - keep-alive
+      Cf-Ray:
+      - a521a22b7e51d715-BNE
+      Cf-Cache-Status:
+      - DYNAMIC
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Vary:
+      - Origin
+      Access-Control-Expose-Headers:
+      - CF-Ray
+      - CF-Ray
+      X-Content-Type-Options:
+      - nosniff
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      X-Request-Id:
+      - req_3879136e9be04c30887103aae591de0b
+      Set-Cookie:
+      - __cf_bm=GzIl8JWpv7uVWh5e1j7qQSHr6IhCTOh8j4fnCWxPvSs-1793271174.9583728-1.0.1.1-PD5t59j39LHljlg_uiY15b8KVK.MPNCKxnHVkwpSvER.mqRRrt1uDhRROtGaZTWSP6UTpZ1LPCziqO4hzQYc8xQxlm6N.4kZPTNyHNmU5q8NQZdi.wy_qN2eK3tT.u8l;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu,
+        29 Oct 2026 11:22:55 GMT
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: |
+        {
+            "error": {
+                "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+                "type": "insufficient_quota",
+                "param": null,
+                "code": "credit_balance_exhausted"
+            }
+        }
+  recorded_at: Thu, 29 Oct 2026 10:52:55 GMT
+- request:
+    method: post
+    uri: https://api.openai.com/v1/embeddings
+    body:
+      encoding: UTF-8
+      string: '{"model":"text-embedding-3-small","input":["Netflix"]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 429
+      message: Too Many Requests
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 10:52:55 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '283'
+      Connection:
+      - keep-alive
+      Cf-Ray:
+      - a521a22fac94329b-BNE
+      Cf-Cache-Status:
+      - DYNAMIC
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Vary:
+      - Origin
+      Access-Control-Expose-Headers:
+      - CF-Ray
+      - CF-Ray
+      X-Content-Type-Options:
+      - nosniff
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      X-Request-Id:
+      - req_e056f68b220a4ef09933179d600b9ea6
+      Set-Cookie:
+      - __cf_bm=B.zIt1NWMxD3WWW35_7.ndg6CDyilHygqEodIE9mPug-1793271175.6292286-1.0.1.1-l8wbE6pJ.u5LKayMscJmB8MpNmki34fArSeB5PapA9rLknREITRI6ZjlSc1Eqs7pXm8f8PKET2Z5Hs.YEj7iwrVUaGEug6fz6_udXtOcyX7LHKnSNQfuVt8fL5sER9xX;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu,
+        29 Oct 2026 11:22:55 GMT
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: |
+        {
+            "error": {
+                "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+                "type": "insufficient_quota",
+                "param": null,
+                "code": "credit_balance_exhausted"
+            }
+        }
+  recorded_at: Thu, 29 Oct 2026 10:52:55 GMT
+recorded_with: VCR 6.3.1

@@ -8,8 +8,8 @@ Live runs: llama.cpp on venus; Ollama, LM Studio and OpenClaw in temporary conta
 "Local servers in containers"); Gemini through Google's OpenAI-compatible API
 (`gemini-3.5-flash-lite`); OpenRouter's chat completions with free models (see "OpenRouter chat
 on free models"); and Jev's protocol on OpenCode Zen and OpenRouter's decisions gateway.
-OpenAI direct had no key. Anthropic's key has no credits, so only its error paths ran live (see
-"Anthropic on a key without credits").
+The Anthropic and OpenAI keys have no credits, so only their error paths ran live (see "Anthropic
+and OpenAI on keys without credits").
 Their rows are judged from RubyLLM's source and from WebMock stubs in each provider's documented
 shapes, and are marked "not tested live". PR 2 should record live cassettes for them before it
 relies on them.
@@ -27,7 +27,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf` (200 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf` (206 runs, 1 skip:
 the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -48,8 +48,8 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 | Tool calls stream on Ollama, llama.cpp and LM Studio | Pass, live on all three | `converse_tool_round` cassettes under `llama_cpp/`, `ollama/` and `lmstudio/`: `get_accounts` is called on round one, Sure runs it, and the answer streams on round two (`ollama_live_test`, `lmstudio_live_test`, through the shared `local_server_live_tests.rb`). On llama.cpp the call arrives as `{` then `}` deltas and is reassembled. `converse_stubbed_test`: Ollama style (whole calls, no `index`) and LM Studio style (fragments keyed by `index`), accumulated by `lib/ruby_llm/protocol/stream_accumulator.rb:125-165` |
 | Gemini thought signatures survive gateways | Pass, live through Gemini's OpenAI-compatible API; OpenRouter's `reasoning_details` round trip live with Nemotron, Gemini on OpenRouter stubbed (paid) | `gemini_live_test` (live, `gemini/converse_two_rounds`, `gemini-3.5-flash-lite`, effort `low`): three rounds. Round 2 sends one tool call's `extra_content.google.thought_signature` back and round 3 sends both (`protocols/chat_completions/tools.rb:59-61, 117`). Without them Gemini answers 400 "Function call is missing a thought_signature" (`gemini/round_two_without_signatures`). On OpenRouter, `converse_stubbed_test` "OpenRouter Gemini…" sends `reasoning_details` back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
 | Every client honours the resolved proxy | Pass | `test/models/ai/live/proxy_check.rb` through a logging forward proxy: RubyLLM's compatible, embed, Anthropic and OpenRouter clients go through it with `HTTPS_PROXY` only and with `HTTP_PROXY` only, and skip it for `NO_PROXY` hosts. The hand-written Anthropic transport (the `anthropic` gem) ignores `HTTPS_PROXY`: Net::HTTP reads only `http_proxy` even for TLS, and the gem takes no proxy option. Also live on Ollama, LM Studio and OpenClaw (see "The proxy with local servers"), where Sure proxies loopback addresses that Ruby's own lookup would not |
-| Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. Live on Anthropic, both transports: no credits → 400 → `Refused`, and a wrong key → 401 → `Unauthorized`, each after one request. Live on OpenRouter: a wrong key → 401 → `Unauthorized`; a paid model on a key without credits → 402 → `Refused`, after one request; a free model's shared upstream limit → 429 → `RateLimited` (seen three times, not recorded). WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
-| The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`; not tested live (no OpenAI key) | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
+| Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. Live on Anthropic, both transports: no credits → 400 → `Refused`, and a wrong key → 401 → `Unauthorized`, each after one request. Live on OpenAI: no credits → 429 `insufficient_quota` → `RateLimited`, sent three times by RubyLLM (`max_retries: 2`) and once by `ruby-openai`; a wrong key → 401 → `Unauthorized`. Live on OpenRouter: a wrong key → 401 → `Unauthorized`; a paid model on a key without credits → 402 → `Refused`, after one request; a free model's shared upstream limit → 429 → `RateLimited` (seen three times, not recorded). WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
+| The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`; not tested live past the error path (the key has no credits; see "Anthropic and OpenAI on keys without credits") | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
 | Lines removed for `bill_setup` against the hand-written version | Reported below | RubyLLM's `generate` is 26 lines longer than the hand-written one |
 
 Chatwoot's #16078 kept audio transcription and embeddings on their dedicated OpenAI endpoints
@@ -216,7 +216,9 @@ reasoning tokens.
 - **gpt-oss can't stop reasoning** but reasons briefly anyway. At effort `low` it lost a field
   in each run: one left the category null ("no category matches Netflix"), the other the name.
 
-### Anthropic on a key without credits
+### Anthropic and OpenAI on keys without credits
+
+#### Anthropic
 
 `anthropic_live_test`, cassettes under `anthropic/`, model `claude-haiku-5-5`.
 
@@ -237,6 +239,31 @@ reasoning tokens.
 - **A wrong key** is a 401 → `Unauthorized` after one request on both transports.
 - **The streamed chat turn** sends `stream: true` and the `get_accounts` tool, and gets the
   same 400 before any chunk.
+
+#### OpenAI
+
+`openai_live_test`, cassettes under `openai/`, model `gpt-5-mini`, with a new `openai` preset
+(`responses_api: true`).
+
+- **What answers.** `GET /v1/models` and listing vector stores answer 200. Chat completions,
+  the Responses API and embeddings answer **429** `insufficient_quota`, code
+  `credit_balance_exhausted`: "You have no credits remaining." There's no `Retry-After`.
+- **RubyLLM retries it.** With `max_retries: 2`, RubyLLM sent each request three times, on
+  chat completions, the Responses API and embeddings. Its only payment pattern is Anthropic's
+  "credit balance is too low", so OpenAI's spent balance is an ordinary `RateLimitError`.
+  `ruby-openai` doesn't retry, so the hand-written transport sent one.
+- **Both become `RateLimited`,** which section 9 treats as retryable, with failover and a key
+  mark. For a spent balance that's half right: the key mark and failover help, and the retries
+  can't. With RubyLLM's own retries plus a job's, one categorization run would repeat requests
+  that can't succeed until someone adds credit.
+- **For the plan:** give an empty balance its own error, as the Anthropic case already asks.
+  Here Sure has to recognise it itself: `insufficient_quota` in the error body, or the message,
+  then stop retrying. RubyLLM gives no hook before its retry middleware, so either
+  `max_retries` stays 0 for OpenAI and Sure retries, or the spent balance costs two wasted
+  requests a call.
+- **A wrong key** is a 401 → `Unauthorized` after one request on both transports.
+- **Not covered:** a vector store's create, upload and search, which stay on `ruby-openai`
+  (`VectorStore::Openai`). Listing works on this key; the rest would write to the account.
 
 ### Jev: hand-written, RubyLLM or a Jev gem, outside the criteria
 
@@ -395,7 +422,7 @@ RubyLLM's `generate`. Today Sure prepares it differently per provider:
 
 The spike sent `Ai::Generations::ExtractBankStatement` three ways: the text layer, the PDF as
 RubyLLM's file part, and page images at 150 dpi, as Sure renders them. `Pdf::PageImages` renders
-the pages through `ruby-vips` (see "Rendering pages with ruby-vips" below). Super VL's two image
+the pages through `ruby-vips` (see "Rendering pages: pdftoppm today, ruby-vips in the spike" below). Super VL's two image
 cassettes hold the `pdftoppm` renders of the first run, because its re-run hit OpenRouter's
 daily limit for free models. Gemini read both renders identically.
 
@@ -461,7 +488,7 @@ transaction makes the closing balance. Tests: `extract_statement_live_test`, cas
   - the hand-written transports refuse attachments rather than drop them;
   - these cassettes add 10.5 MB, because the retries resend the base64 file.
 - **Not tested:**
-  - OpenAI direct (the Responses API's `input_file`) and Anthropic live, which had no key;
+  - OpenAI direct (the Responses API's `input_file`) and Anthropic live, whose keys have no credits;
   - a local vision model: venus has no vision projector (mmproj) for its GGUFs;
   - statements over five pages.
 
@@ -472,10 +499,45 @@ model, the feature is unavailable ("no model can read scanned PDFs"). Send the P
 to providers that read it natively (Anthropic, OpenAI) or to OpenRouter with a named engine.
 Reconcile every result.
 
-#### Rendering pages with ruby-vips
+#### Rendering pages: pdftoppm today, ruby-vips in the spike
 
-Today's `Provider::Openai::PdfProcessor` shells out to `pdftoppm` (poppler-utils, in the
-Dockerfile) and reads PNGs back from a temp directory. No Ruby gem renders a PDF on its own: each
+**What Sure does today.** One place renders pages,
+`Provider::Openai::PdfProcessor#convert_pdf_to_images`
+(`app/models/provider/openai/pdf_processor.rb:229`), with
+`system("pdftoppm", "-png", "-r", "150", pdf_path, output_prefix)`. It writes the upload to a temp
+directory and reads the PNGs back. `nil` from `system` means `pdftoppm` isn't installed, and
+`false` means it failed.
+
+- **When it runs:** only on the OpenAI-compatible path, and only for a scan. `:auto` mode tries
+  the text layer first and renders when that fails; `:vision` renders straight away. The
+  Anthropic path sends the PDF itself and renders nothing. Callers are `ProcessPdfJob`
+  (`ai_low_priority`) and the admin health probe, which renders a synthetic PDF.
+- **Every page, for five.** No `-f`/`-l` page range is passed, so `pdftoppm` renders the whole
+  upload, and `process_with_vision` sends `first(5)`. A 200-page statement renders 195 pages
+  that are thrown away.
+- **No limits.** Nothing bounds its time or memory. A PDF that makes poppler hang holds the job
+  indefinitely. The health probe's `Timeout.timeout` raises in the Ruby thread but doesn't kill
+  the child.
+- **The isolation is partial.** The child has its own memory, so a poppler crash doesn't take
+  the worker down. But it runs as the same user with the same file access, and it inherits the
+  worker's environment, which on most deployments holds API keys and the database URL. It's a
+  guard against crashes, not against a poppler exploit.
+- **The upload is parsed in process anyway.** `pdf-reader` reads the text layer inside the
+  worker, for `Pdf::TextExtractor`, `BankStatementExtractor`, statement metadata detection and
+  `VectorStore::Embeddable`. The last runs on a web thread today. `pdf-reader` is pure Ruby: a
+  hostile PDF can make it raise or burn CPU, but not corrupt memory the way a bug in C code like
+  poppler can.
+
+So the choice for the plan isn't "isolated or not". `ruby-vips` in process adds poppler, C
+code, to a worker that already parses the upload with pure-Ruby `pdf-reader`. Today's child
+process keeps poppler's memory out of the worker, but shares its environment and has no limits.
+A child process that isolates properly, running either `pdftoppm` or `ruby-vips`, needs:
+- a timeout that kills it;
+- a page range (`-f 1 -l 5`, or vips's `page:` and `n:`);
+- a stripped environment (`system({}, "pdftoppm", …, unsetenv_others: true)`);
+- ideally, a memory limit.
+
+**Ruby gems.** No Ruby gem renders a PDF on its own: each
 one wraps poppler, MuPDF or Ghostscript. `ruby-vips` is already in the bundle (2.2.4, through
 `image_processing` for Active Storage), and the Dockerfile already installs `libvips`. Debian's
 `libvips` renders PDFs with poppler (`libvips42t64` depends on `libpoppler-glib8t64`), the
@@ -499,10 +561,13 @@ process:
     an Active Storage variant included, can decode a PDF;
   - poppler parses the user's upload inside the Rails worker, where `pdftoppm` parsed it in a
     child process. A poppler crash or exploit would then hit the worker.
-- **For the plan:** `pdftoppm` in a child process keeps the isolation Rails asks for. `ruby-vips`
-  in process is simpler, but needs the unblock above. A third choice is `ruby-vips` in a child
-  process, which keeps both, for more code. The spike uses the in-process unblock to show it
-  works; the choice belongs to the plan.
+- **For the plan:** three choices.
+  - A child process with the limits above keeps poppler away from the worker's memory and
+    secrets. That's today's `pdftoppm`, hardened.
+  - `ruby-vips` in process is simpler, but needs the unblock above.
+  - `ruby-vips` in a child process keeps both properties, for more code.
+
+  The spike uses the in-process unblock to show that it works; the choice belongs to the plan.
 
 ### Tracing modes: content and metadata, outside the criteria
 
@@ -613,8 +678,8 @@ measurement.
 
 ### Not judged in the spike
 
-- Anthropic's successful paths live (its key has no credits), OpenAI direct (the Responses API
-  and vector stores), which had no key, and OpenRouter's paid chat models, such as Gemini, which
+- Anthropic's and OpenAI's successful paths live, including the Responses API and vector
+  stores (both keys have no credits), and OpenRouter's paid chat models, such as Gemini, which
   need credits.
 - The `auto` fallback chain against a live server that rejects strict schemas: none of the three
   local servers does any more.
