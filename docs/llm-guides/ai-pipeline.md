@@ -26,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (117 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (121 runs, 1 skip:
 the live-only timeout test). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
@@ -177,7 +177,10 @@ through RubyLLM's `:openrouter` provider, with Sure's app headers.
 
   Both transports' forms reach the model: RubyLLM sends `reasoning: {effort:}` and the
   hand-written one a top-level `reasoning_effort`. So `none` is the setting that saves tokens, on
-  the models that allow it. Where a model refuses it, a strict route gets `Refused` with that
+  the models that allow it. OpenRouter's own switch, `reasoning: {enabled: false}` in the
+  endpoint's `extra_body`, behaves the same on both models and both transports: Nemotron 0
+  reasoning tokens (116–119 in all, answer correct), Flint the same 400. A route needs no
+  separate on/off setting; effort `none` covers it. Where a model refuses it, a strict route gets `Refused` with that
   message; an `auto` route would read the 400 as a JSON-mode rejection, drop the effort with
   `response_format` and retry (`JsonMode`, not run live), which works but blames the wrong thing.
   Section 7 should let a route's effort be checked like its JSON mode, and the routes need a

@@ -82,6 +82,34 @@ class Ai::OpenrouterChatLiveTest < ActiveSupport::TestCase
     end
   end
 
+  # OpenRouter's own switch, which a route can't express: an operator would
+  # put it in the endpoint's extra_body, which both transports send as given.
+  # It behaves exactly like effort none on both models.
+  { "flint" => FLINT, "lightning" => LIGHTNING }.each do |short, model|
+    { "ruby_llm" => false, "hand-written" => true }.each do |transport, hand_written|
+      test "OpenRouter: #{transport} #{short} with reasoning enabled false (live)" do
+        cassette = "reasoning_off_#{short}_#{transport.underscore}"
+        endpoint = openrouter(max_retries: 0, extra_body: { reasoning: { enabled: false } })
+        with_spike_cassette("openrouter/#{cassette}") do
+          @outcome = begin
+            bill_setup.call(route: openrouter_route(model, endpoint:), hand_written:)
+          rescue Ai::Error::Base => e
+            e
+          end
+        end
+
+        assert_equal({ "enabled" => false }, sent.sole["reasoning"])
+        if short == "flint"
+          assert_equal [ Ai::Error::Refused, 400 ], [ @outcome.class, @outcome.status ]
+          assert_equal "Reasoning is mandatory for this endpoint and cannot be disabled.", @outcome.message
+        else
+          assert_netflix @outcome.value
+          assert_equal 0, reasoning_tokens(cassette).sole.last
+        end
+      end
+    end
+  end
+
   test "OpenRouter: a streamed tool call, run by Sure, then the answer on round two (live)" do
     RubyLLM::Tool.any_instance.expects(:call).never
     chunks = []
