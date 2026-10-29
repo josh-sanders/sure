@@ -34,7 +34,8 @@ class Ai::ExtractStatementStubbedTest < ActiveSupport::TestCase
     assert_equal FILES.join("impact_scanned.pdf").binread, Base64.decode64(document["source"]["data"])
 
     WebMock::RequestRegistry.instance.reset!
-    statement([ attachment("impact_scanned-1.png"), attachment("impact_scanned-2.png") ]).call(route: anthropic_route)
+    pages = Pdf::PageImages.pages(FILES.join("impact_scanned.pdf").binread)
+    statement(pages.each_with_index.map { |png, i| Ai::Transport::Base::Attachment.new(data: png, filename: "page-#{i + 1}.png") }).call(route: anthropic_route)
     assert_equal %w[image image text], user_content(%r{api.anthropic.com}).map { _1["type"] }.sort
   end
 

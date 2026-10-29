@@ -3,7 +3,10 @@ require_relative "spike_helper"
 # Spike: reading a bank statement through RubyLLM's generate, live. Each
 # statement goes as Sure's text path sends it today (the PDF's text layer),
 # as the PDF itself (RubyLLM's file part), and as page images (Sure's
-# fallback for scans, rendered by pdftoppm at 150 dpi as Sure does).
+# fallback for scans, at 150 dpi as Sure renders them; Pdf::PageImages
+# renders them through ruby-vips). openrouter_vl's image cassettes hold
+# pdftoppm's renders: the re-run with ruby-vips's hit OpenRouter's daily
+# limit for free models. Gemini read both renders the same.
 #
 # Two public sample statements (test/fixtures/files/statements/):
 # - bac_ocr: one page, an OCR'd text layer with errors (run-together
@@ -93,7 +96,9 @@ class Ai::ExtractStatementLiveTest < ActiveSupport::TestCase
       text = Pdf::TextExtractor.pages(pdf).each_with_index.flat_map { |page, i| [ "--- Page #{i + 1} ---", page ] }.join("\n\n")
       Ai::Generations::ExtractBankStatement.new(text:)
     when "file" then Ai::Generations::ExtractBankStatement.new(files: [ attachment(FILES.join("#{statement}.pdf")) ])
-    when "images" then Ai::Generations::ExtractBankStatement.new(files: Dir[FILES.join("#{statement}-*.png")].sort.map { attachment(_1) })
+    when "images"
+      pages = Pdf::PageImages.pages(pdf).each_with_index.map { |png, i| Ai::Transport::Base::Attachment.new(data: png, filename: "#{statement}-#{i + 1}.png") }
+      Ai::Generations::ExtractBankStatement.new(files: pages)
     end
   end
 

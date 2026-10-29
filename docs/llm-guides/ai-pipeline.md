@@ -26,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (187 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf` (194 runs, 1 skip:
 the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -371,7 +371,10 @@ RubyLLM's `generate`. Today Sure prepares it differently per provider:
 - the Anthropic path sends the PDF itself.
 
 The spike sent `Ai::Generations::ExtractBankStatement` three ways: the text layer, the PDF as
-RubyLLM's file part, and page images at 150 dpi, as Sure renders them.
+RubyLLM's file part, and page images at 150 dpi, as Sure renders them. `Pdf::PageImages` renders
+the pages through `ruby-vips` (see "Rendering pages with ruby-vips" below). Super VL's two image
+cassettes hold the `pdftoppm` renders of the first run, because its re-run hit OpenRouter's
+daily limit for free models. Gemini read both renders identically.
 
 It used two public sample statements (`test/fixtures/files/statements/`):
 - **BAC:** one page, with a machine-OCR'd text layer full of errors (`£44.079.83`, words run
@@ -396,7 +399,7 @@ transaction makes the closing balance. Tests: `extract_statement_live_test`, cas
   supports PDFs. Sure has to decide what to send from the model's capabilities.
 - **Page images are what works for a vision model.** Gemini and Super VL read the scan
   completely. They didn't count the twice-listed transactions twice, and they took page 1's
-  version of the disputed row, the one the running balances agree with. Today's `pdftoppm`
+  version of the disputed row, the one the running balances agree with. Today's image
   fallback is the right shape, but its five-page limit stays a limit.
 - **The text layer works for a capable model**, even with OCR errors: llama.cpp's Qwen3.6 and
   Gemini both got 13/13. On the scan's empty text layer both returned an empty statement rather
@@ -445,6 +448,38 @@ images. Without one, send the text layer. If the text layer is empty and there's
 model, the feature is unavailable ("no model can read scanned PDFs"). Send the PDF itself only
 to providers that read it natively (Anthropic, OpenAI) or to OpenRouter with a named engine.
 Reconcile every result.
+
+#### Rendering pages with ruby-vips
+
+Today's `Provider::Openai::PdfProcessor` shells out to `pdftoppm` (poppler-utils, in the
+Dockerfile) and reads PNGs back from a temp directory. No Ruby gem renders a PDF on its own: each
+one wraps poppler, MuPDF or Ghostscript. `ruby-vips` is already in the bundle (2.2.4, through
+`image_processing` for Active Storage), and the Dockerfile already installs `libvips`. Debian's
+`libvips` renders PDFs with poppler (`libvips42t64` depends on `libpoppler-glib8t64`), the
+engine behind `pdftoppm`. The spike's `Pdf::PageImages` (21 code lines) renders every page in
+process:
+
+- **Same output.** Sure's base image (`ruby:3.4.9-slim`, Debian 13, libvips 8.16.1) and the
+  toolbox (libvips 8.18.5) give the same page sizes as `pdftoppm` at 150 dpi, give or take a
+  pixel: 1275×1650 for US Letter. Gemini read the `vips` renders exactly as it read
+  `pdftoppm`'s, with the same results and input tokens.
+- **What it gains:** no subprocess, temp files or `system` return codes; errors are
+  `Vips::Error`; and the page count, so the five-page limit is a choice. `poppler-utils` could
+  leave the Dockerfile, though the poppler library stays as `libvips`'s dependency.
+- **What it costs: Rails blocks it, deliberately.** Active Storage calls
+  `Vips.block_untrusted(true)` at boot (`active_storage/vips.rb`), which blocks every libvips
+  operation not fuzzed for untrusted input. The PDF loader is one of them, so in Rails
+  `pdfload_buffer` raises "operation is blocked". `Pdf::PageImages` unblocks only
+  `VipsForeignLoadPdf`, behind a mutex, while it renders, and blocks it again
+  (`page_images_test`). That has two costs:
+  - the block is process-wide, so while a render runs any libvips call in the process,
+    an Active Storage variant included, can decode a PDF;
+  - poppler parses the user's upload inside the Rails worker, where `pdftoppm` parsed it in a
+    child process. A poppler crash or exploit would then hit the worker.
+- **For the plan:** `pdftoppm` in a child process keeps the isolation Rails asks for. `ruby-vips`
+  in process is simpler, but needs the unblock above. A third choice is `ruby-vips` in a child
+  process, which keeps both, for more code. The spike uses the in-process unblock to show it
+  works; the choice belongs to the plan.
 
 ### Tracing modes: content and metadata, outside the criteria
 
