@@ -74,23 +74,47 @@ module Ai::Transport::RubyLlmAdapter
     end
 
     def converse_with(chat, request, &on_chunk)
-      chat.with_instructions(request.instructions)
+      prepare_converse(chat, request)
       chat.with_tools(*ruby_llm_tools(request.tools)) if request.tools.any?
       chat.with_tool_options(choice: request.tool_choice) if request.tool_choice
+      generate_turn(chat, &on_chunk)
+    end
+
+    def prepare_converse(chat, request)
+      chat.with_instructions(request.instructions)
       chat.with_max_output_tokens(request.max_tokens) if request.max_tokens
       # OpenAI's `user` field (an agent keys its sessions on it). RubyLLM's
       # with_end_user sends safety_identifier to the :openai provider instead.
       options = endpoint.extra_body.merge(request.metadata[:end_user] ? { user: request.metadata[:end_user] } : {})
       chat.with_provider_options(options) if options.present?
       ruby_llm_messages(request.messages).each { chat.add_message(_1) }
+    end
 
+    def generate_turn(chat, &on_chunk)
       message = mapping_errors do
         chat.generate { |chunk| on_chunk&.call(chunk.content) if chunk.content.present? }
       end
-      tool_calls = message.tool_calls.to_h.values.map { Ai::Transport::Base::ToolCall.new(id: _1.id, name: _1.name, arguments: _1.arguments) }
-      state = message.to_h.slice(:thinking, :thinking_signature, :raw_reasoning, :tool_calls)
-      Ai::Transport::Base::Turn.new(text: message.content.to_s, tool_calls:, usage: usage_of(message), raw_id: raw_id(message),
-                                    finish_reason: message.finish_reason, provider_state: state.presence)
+      Ai::Transport::Base::Turn.new(text: message.content.to_s, tool_calls: sure_tool_calls(message), usage: usage_of(message),
+                                    raw_id: raw_id(message), finish_reason: message.finish_reason, provider_state: provider_state(message))
+    end
+
+    def sure_tool_calls(message)
+      message.tool_calls.to_h.values.map { Ai::Transport::Base::ToolCall.new(id: _1.id, name: _1.name, arguments: _1.arguments) }
+    end
+
+    def provider_state(message) = message.to_h.slice(:thinking, :thinking_signature, :raw_reasoning, :tool_calls).presence
+
+    # RubyLLM's history back into Sure's messages, which Sure stores.
+    def sure_messages(messages)
+      messages.reject { _1.role == :system }.map do |message|
+        case message.role
+        when :assistant
+          Ai::Transport::Base::Message.new(role: :assistant, content: message.content.to_s, tool_calls: sure_tool_calls(message),
+                                           provider_state: provider_state(message))
+        when :tool then Ai::Transport::Base::Message.new(role: :tool, content: message.content.to_s, tool_call_id: message.tool_call_id)
+        else Ai::Transport::Base::Message.new(role: message.role, content: message.content.to_s)
+        end
+      end
     end
 
     class DeclaredTool < RubyLLM::Tool

@@ -1,0 +1,184 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        are a finance assistant. Use tools to look up or change the user''s data.
+        Be brief."},{"role":"user","content":"Create a tag called Ski trip."}],"stream":true,"max_completion_tokens":4096,"tools":[{"type":"function","function":{"name":"get_tags","description":"Returns
+        tags defined for the user''s family, sorted alphabetically, with pagination.\n\nUse
+        this when the user wants to see available tags or before referencing\na tag
+        in another operation like create_tag or update_tag.\n\nNote on pagination:\n\nThis
+        function can be paginated. You can expect the following properties in the
+        response:\n\n- `total_pages`: The total number of pages of results\n- `page`:
+        The current page of results\n- `page_size`: The number of results per page
+        (defaults to 50)\n- `total_results`: The total number of results\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"create_tag","description":"Creates
+        a new tag for the user''s family.\n\nTags are applied to transactions to organize
+        them beyond categories.\nIf color is omitted, one is chosen automatically
+        from the default palette.\nTag names must be unique within the family.\n","parameters":{"type":"object","properties":{"name":{"type":"string","description":"Tag
+        name (must be unique within the family)"},"color":{"type":"string","description":"Hex
+        color code (e.g. #e99537). If omitted, one is chosen from the default palette."}},"required":["name"],"additionalProperties":false}}}],"stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Type:
+      - text/event-stream
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      X-Accel-Buffering:
+      - 'no'
+      Date:
+      - Thu, 29 Oct 2026 08:23:27 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793262207,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"tool_calls":[{"index":0,"id":"wTQtwMNoiwATKXZFHdGjDusTHJA2f88u","type":"function","function":{"name":"create_tag","arguments":"{"}}]}}],"created":1793262207,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"\"name\":\""}}]}}],"created":1793262207,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"S"}}]}}],"created":1793262208,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"ki"}}]}}],"created":1793262208,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":" trip"}}]}}],"created":1793262208,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"\""}}]}}],"created":1793262208,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"}"}}]}}],"created":1793262208,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":"tool_calls","index":0,"delta":{}}],"created":1793262208,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[],"created":1793262208,"id":"chatcmpl-0fGanucV8W6aV6tIQ8niGTVf4RDa2nS7","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk","usage":{"completion_tokens":27,"prompt_tokens":637,"total_tokens":664,"prompt_tokens_details":{"cached_tokens":633}},"timings":{"cache_n":633,"prompt_n":4,"prompt_ms":150.398,"prompt_per_token_ms":37.5995,"prompt_per_second":26.59609835237171,"predicted_n":27,"predicted_ms":1616.208,"predicted_per_token_ms":62.161846153846156,"predicted_per_second":16.08703830200073,"draft_n":13,"draft_n_accepted":13}}
+
+        data: [DONE]
+
+  recorded_at: Thu, 29 Oct 2026 08:23:28 GMT
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        are a finance assistant. Use tools to look up or change the user''s data.
+        Be brief."},{"role":"user","content":"Create a tag called Ski trip."},{"role":"assistant","content":"","tool_calls":[{"id":"wTQtwMNoiwATKXZFHdGjDusTHJA2f88u","type":"function","function":{"name":"create_tag","arguments":"{\"name\":\"Ski
+        trip\"}"}}]},{"role":"tool","content":"{\"error\":\"The user denied the create_tag
+        tool call.\"}","tool_call_id":"wTQtwMNoiwATKXZFHdGjDusTHJA2f88u"}],"stream":true,"max_completion_tokens":4096,"tools":[{"type":"function","function":{"name":"get_tags","description":"Returns
+        tags defined for the user''s family, sorted alphabetically, with pagination.\n\nUse
+        this when the user wants to see available tags or before referencing\na tag
+        in another operation like create_tag or update_tag.\n\nNote on pagination:\n\nThis
+        function can be paginated. You can expect the following properties in the
+        response:\n\n- `total_pages`: The total number of pages of results\n- `page`:
+        The current page of results\n- `page_size`: The number of results per page
+        (defaults to 50)\n- `total_results`: The total number of results\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"create_tag","description":"Creates
+        a new tag for the user''s family.\n\nTags are applied to transactions to organize
+        them beyond categories.\nIf color is omitted, one is chosen automatically
+        from the default palette.\nTag names must be unique within the family.\n","parameters":{"type":"object","properties":{"name":{"type":"string","description":"Tag
+        name (must be unique within the family)"},"color":{"type":"string","description":"Hex
+        color code (e.g. #e99537). If omitted, one is chosen from the default palette."}},"required":["name"],"additionalProperties":false}}}],"stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Type:
+      - text/event-stream
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      X-Accel-Buffering:
+      - 'no'
+      Date:
+      - Thu, 29 Oct 2026 08:23:28 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"I"}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" was"}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" unable"}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" to"}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" create"}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" \""}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"S"}}],"created":1793262209,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"ki"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" trip"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\""}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" tag"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" as"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" you"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" declined"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" the"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":" request"}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"."}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":"stop","index":0,"delta":{}}],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[],"created":1793262210,"id":"chatcmpl-HPJLFRIE2qQYVhS55VKiGMxWKH2Gur4D","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk","usage":{"completion_tokens":19,"prompt_tokens":694,"total_tokens":713,"prompt_tokens_details":{"cached_tokens":663}},"timings":{"cache_n":663,"prompt_n":31,"prompt_ms":631.679,"prompt_per_token_ms":20.37674193548387,"prompt_per_second":49.07555894687017,"predicted_n":19,"predicted_ms":1220.276,"predicted_per_token_ms":67.79311111111112,"predicted_per_second":14.750761303180592,"draft_n":10,"draft_n_accepted":9}}
+
+        data: [DONE]
+
+  recorded_at: Thu, 29 Oct 2026 08:23:30 GMT
+recorded_with: VCR 6.3.1
+...

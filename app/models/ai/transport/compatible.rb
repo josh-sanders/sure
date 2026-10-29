@@ -14,12 +14,29 @@ class Ai::Transport::Compatible < Ai::Transport::Base
 
   def converse(request, &on_chunk)
     instrument("converse", model: request.model, request: request.to_h.except(:model), tools: request.tools.map(&:name)) do
-      chat = chat_for(request.model)
-      chat.with_thinking(effort: request.reasoning_effort) if request.reasoning_effort && !endpoint.agent   # Anthropic ignores it (section 7)
-      chat.with_headers(Ai::Transport::Http.headers(endpoint).merge(agent_headers)) if endpoint.agent
-      converse_with(chat, request, &on_chunk)
+      converse_with(converse_chat(request), request, &on_chunk)
     end
   end
+
+  # Spike (Ai::Conversation::RubyLlmLoop): a chat holding the history and
+  # the tools RubyLLM runs itself, advanced one model call at a time by
+  # tool_round, each a converse.ai event as in Sure's own loop.
+  def tool_chat(request, tools:)
+    converse_chat(request).tap do |chat|
+      prepare_converse(chat, request)
+      chat.with_tools(*tools)
+    end
+  end
+
+  def tool_round(chat, request, &on_chunk)
+    instrument("converse", model: request.model, request: request.to_h.except(:model, :messages, :tools).merge(messages: history(chat)),
+                           tools: chat.tools.keys.map(&:to_s)) do
+      chat.with_tool_options(choice: request.tool_choice)
+      generate_turn(chat, &on_chunk)
+    end
+  end
+
+  def history(chat) = sure_messages(chat.messages)
 
   def embed(texts, model:)
     instrument("embed", model:, request: { count: texts.size }) do
@@ -50,7 +67,14 @@ class Ai::Transport::Compatible < Ai::Transport::Base
       { "X-Agent-Id" => endpoint.agent_settings[:agent_id], "X-Session-Key" => endpoint.agent_settings[:session_key] }.compact
     end
 
-    def chat_for(model) = ruby_llm_chat(model, provider: ruby_llm_provider, protocol: endpoint.responses_api ? :responses : :chat_completions)
+    def converse_chat(request)
+      chat = chat_for(request.model)
+      chat.with_thinking(effort: request.reasoning_effort) if request.reasoning_effort && !endpoint.agent   # Anthropic ignores it (section 7)
+      chat.with_headers(Ai::Transport::Http.headers(endpoint).merge(agent_headers)) if endpoint.agent
+      chat
+    end
+
+    def chat_for(model) =ruby_llm_chat(model, provider: ruby_llm_provider, protocol: endpoint.responses_api ? :responses : :chat_completions)
 
     # OpenRouter keeps its own provider: only it round-trips reasoning_details
     # (Gemini's thought signatures). Every other compatible server is :openai.

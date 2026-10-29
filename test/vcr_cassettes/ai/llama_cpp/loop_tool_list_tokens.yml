@@ -1,0 +1,595 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        are a finance assistant. Use tools to look up or change the user''s data.
+        Be brief."},{"role":"user","content":"Hi"}],"stream":true,"max_completion_tokens":1,"stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Type:
+      - text/event-stream
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      X-Accel-Buffering:
+      - 'no'
+      Date:
+      - Thu, 29 Oct 2026 08:24:07 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793262247,"id":"chatcmpl-FDke4kFCJWIhoYpwzmmAoquCKeuWP57i","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"Hello"}}],"created":1793262247,"id":"chatcmpl-FDke4kFCJWIhoYpwzmmAoquCKeuWP57i","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":"length","index":0,"delta":{}}],"created":1793262247,"id":"chatcmpl-FDke4kFCJWIhoYpwzmmAoquCKeuWP57i","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[],"created":1793262247,"id":"chatcmpl-FDke4kFCJWIhoYpwzmmAoquCKeuWP57i","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk","usage":{"completion_tokens":1,"prompt_tokens":39,"total_tokens":40,"prompt_tokens_details":{"cached_tokens":35}},"timings":{"cache_n":35,"prompt_n":4,"prompt_ms":148.037,"prompt_per_token_ms":37.00925,"prompt_per_second":27.020271959037267,"predicted_n":1,"predicted_ms":0.001,"predicted_per_token_ms":0.0,"predicted_per_second":0.0}}
+
+        data: [DONE]
+
+  recorded_at: Thu, 29 Oct 2026 08:24:07 GMT
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        are a finance assistant. Use tools to look up or change the user''s data.
+        Be brief."},{"role":"user","content":"Hi"}],"stream":true,"max_completion_tokens":1,"tools":[{"type":"function","function":{"name":"get_transactions","description":"Use
+        this to search user''s transactions by using various optional filters.\n\nThis
+        function is great for things like:\n- Finding specific transactions\n- Getting
+        basic stats about a small group of transactions\n\nThis function is not great
+        for:\n- Large time periods (use the get_income_statement function for this)\n\nFilters
+        take exact names: use the values returned by get_accounts,\nget_categories,
+        get_merchants, and get_tags when unsure. Pass\ntypes: [\"income\", \"expense\"]
+        to exclude transfers between the user''s\nown accounts. Use a small page_size
+        when you only need a few rows.\n\nNote on pagination:\n\nThis function can
+        be paginated.  You can expect the following properties in the response:\n\n-
+        `total_pages`: The total number of pages of results\n- `page`: The current
+        page of results\n- `page_size`: The number of results per page (defaults to
+        50)\n- `total_results`: The total number of results for the given filters\n-
+        `total_income`: The total income for the given filters\n- `total_expenses`:
+        The total expenses for the given filters\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50); use small values to save tokens"},"order":{"type":"string","enum":["asc","desc"],"description":"Sort
+        direction (defaults to desc)"},"sort_by":{"type":"string","enum":["date","amount"],"description":"Sort
+        by date (default) or by absolute amount"},"search":{"type":"string","description":"Search
+        for transactions by name"},"amount":{"type":"string","description":"Amount
+        for transactions (must be used with amount_operator)"},"amount_operator":{"type":"string","description":"Operator
+        for amount (must be used with amount)","enum":["equal","less","greater"]},"start_date":{"type":"string","description":"Start
+        date for transactions in YYYY-MM-DD format"},"end_date":{"type":"string","description":"End
+        date for transactions in YYYY-MM-DD format"},"types":{"type":"array","description":"Filter
+        by kind; [\"income\", \"expense\"] excludes transfers between the user''s
+        own accounts","items":{"enum":["income","expense","transfer"]},"minItems":1,"uniqueItems":true},"statuses":{"type":"array","description":"Filter
+        by status","items":{"enum":["pending","confirmed"]},"minItems":1,"uniqueItems":true},"account_ids":{"type":"array","description":"Filter
+        by account UUIDs as returned by get_accounts","items":{"type":"string"},"minItems":1,"uniqueItems":true},"accounts":{"type":"array","description":"Filter
+        by exact account names as returned by get_accounts","items":{"type":"string"},"minItems":1,"uniqueItems":true},"categories":{"type":"array","description":"Filter
+        by exact category names as returned by get_categories (\"Uncategorized\" is
+        accepted)","items":{"type":"string"},"minItems":1,"uniqueItems":true},"merchants":{"type":"array","description":"Filter
+        by exact merchant names as returned by get_merchants","items":{"type":"string"},"minItems":1,"uniqueItems":true},"tags":{"type":"array","description":"Filter
+        by exact tag names as returned by get_tags","items":{"type":"string"},"minItems":1,"uniqueItems":true}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_recurring_transactions","description":"Lists
+        detected and manual recurring transactions (subscriptions, salaries,\nrecurring
+        bills and transfers) with expected amounts and next expected dates.\n\nGreat
+        for questions like: What subscriptions am I paying for? What bills are\ncoming
+        up this month? How much recurring spend do I have?\n\n`status` defaults to
+        \"active\". Pass `upcoming_within_days` to only see items\nexpected between
+        today and that many days from now (overdue items appear\nwhen no window is
+        given). totals_by_currency sums active items excluding\ntransfers, which move
+        money between the user''s own accounts.\n","parameters":{"type":"object","properties":{"status":{"type":"string","enum":["active","inactive","all"],"description":"Filter
+        by status (defaults to active)"},"upcoming_within_days":{"type":"integer","minimum":1,"maximum":365,"description":"Only
+        include items whose next expected date falls within this many days"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_accounts","description":"Use
+        this to see what accounts the user has along with their current balances.\n\nReturns
+        account ids. Use them for account_ids filters in other tools.\n\nPass include_balance_series:
+        true only when the user asks about balance\nhistory; the series is omitted
+        by default to keep responses small.\n","parameters":{"type":"object","properties":{"include_balance_series":{"type":"boolean","description":"Include
+        a historical balance series per account (defaults to false)"},"series_period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Period
+        for the balance series (defaults to last_365_days)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_holdings","description":"Use
+        this to search user''s investment holdings by using various optional filters.\n\nThis
+        function is great for things like:\n- Finding specific holdings or securities\n-
+        Getting portfolio composition and allocation\n- Viewing investment performance
+        and cost basis\n\nNote: This function only returns holdings from Investment
+        and Crypto accounts.\n\nNote on pagination:\n\nThis function can be paginated.
+        You can expect the following properties in the response:\n\n- `total_pages`:
+        The total number of pages of results\n- `page`: The current page of results\n-
+        `page_size`: The number of results per page (this will always be 50)\n- `total_results`:
+        The total number of results for the given filters\n- `total_value`: The total
+        value of all holdings for the given filters\n\nSimple example (all current
+        holdings):\n\n```\nget_holdings({\n  page: 1\n})\n```\n\nMore complex example
+        (various filters):\n\n```\nget_holdings({\n  page: 1,\n  accounts: [\"Brokerage
+        Account\"],\n  securities: [\"AAPL\", \"GOOGL\"]\n})\n```\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number"},"accounts":{"type":"array","description":"Filter holdings by account
+        name (only Investment and Crypto accounts are supported)","items":{"enum":["Bitcoin","Robinhood
+        Brokerage Account"]},"minItems":1,"uniqueItems":true},"securities":{"type":"array","description":"Filter
+        holdings by security ticker symbol","items":{"enum":["AAPL"]},"minItems":1,"uniqueItems":true}},"required":["page"],"additionalProperties":false}}},{"type":"function","function":{"name":"get_balance_sheet","description":"Use
+        this to get the user''s balance sheet with varying amounts of historical data.\n\nThis
+        is great for answering questions like:\n- What is the user''s net worth?  What
+        is it composed of?\n- How has the user''s wealth changed over time?\n\nFor
+        \"net worth over time\" questions, pass a named period (or a custom\nstart_date
+        and end_date) and an interval to control the granularity of\nthe history series.
+        The default is the last 5 years at 1 month.\n","parameters":{"type":"object","properties":{"period":{"type":"string","enum":["last_day","current_week","last_7_days","current_month","last_month","last_30_days","last_90_days","current_year","last_365_days","last_5_years","last_10_years","all_time"],"description":"Named
+        period for the history series (defaults to the last 5 years)"},"start_date":{"type":"string","description":"Custom
+        range start in YYYY-MM-DD format; overrides period when end_date is also given"},"end_date":{"type":"string","description":"Custom
+        range end in YYYY-MM-DD format; overrides period when start_date is also given"},"interval":{"type":"string","enum":["1
+        day","1 week","1 month"],"description":"Series granularity (defaults to 1
+        month)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_income_statement","description":"Use
+        this to get income and expense insights by category, for a specific time period\n\nThis
+        is great for answering questions like:\n- What is the user''s net income for
+        the current month?\n- What are the user''s spending habits?\n- How much income
+        or spending did the user have over a specific time period?\n\nSpending trends
+        and comparisons:\n- Month over month: pass group_by: \"month\" for a monthly_series\n  (calendar
+        months, unlike get_budget which honors a custom month start)\n- Versus the
+        prior period: pass compare_previous_period: true\n- Per account: pass account_ids
+        from get_accounts (totals only; the\n  category breakdown is family-wide and
+        is omitted with this filter)\n\nSimple example:\n\n```\nget_income_statement({\n  start_date:
+        \"2024-01-01\",\n  end_date: \"2024-12-31\"\n})\n```\n","parameters":{"type":"object","properties":{"start_date":{"type":"string","description":"Start
+        date for aggregation period in YYYY-MM-DD format"},"end_date":{"type":"string","description":"End
+        date for aggregation period in YYYY-MM-DD format"},"account_ids":{"type":"array","description":"Account
+        UUIDs from get_accounts; scopes totals to those accounts and omits the category
+        breakdown","items":{"type":"string"},"minItems":1,"uniqueItems":true},"group_by":{"type":"string","enum":["none","month"],"description":"Pass
+        \"month\" to add a monthly_series of income/expenses/net per calendar month"},"compare_previous_period":{"type":"boolean","description":"Adds
+        totals for the equal-length period immediately before start_date, with deltas"}},"required":["start_date","end_date"],"additionalProperties":false}}},{"type":"function","function":{"name":"get_budget","description":"Use
+        this to see how the user is tracking against their monthly budget — total\nbudgeted
+        vs spent and a parent/subcategory breakdown matching the budget UI.\n\nThis
+        is great for answering questions like:\n- How am I tracking against my budget
+        this month?\n- Which categories am I over budget on?\n- How does this month''s
+        spending compare to the last few months?\n\nParameters:\n- `month` (optional):
+        \"YYYY-MM\" or \"MMM-YYYY\". Defaults to the current month.\n- `prior_months`
+        (optional): integer 0..11. Number of months\n  preceding the target month
+        to include for trend comparison. Default 0.\n\nExample (current month only):\n\n```\nget_budget({})\n```\n\nExample
+        (current month plus last 2 months):\n\n```\nget_budget({ month: \"2026-10\",
+        prior_months: 2 })\n```\n","parameters":{"type":"object","properties":{"month":{"type":"string","description":"Target
+        month in YYYY-MM or MMM-YYYY format. Defaults to the current month."},"prior_months":{"type":"integer","description":"Number
+        of months before the target month to also return for trend comparison.","minimum":0,"maximum":11}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"import_bank_statement","description":"Use
+        this to import transactions from a bank statement PDF that has already been
+        uploaded.\n\nThis function will:\n1. Extract transaction data from the PDF
+        using AI\n2. Create a transaction import with the extracted data\n3. Return
+        the import ID and extracted transactions for review\n\nThe PDF must have already
+        been uploaded via the PDF import feature.\nOnly use this for PDFs that are
+        identified as bank statements.\n\nExample:\n\n```\nimport_bank_statement({\n  pdf_import_id:
+        \"abc123-def456\",\n  account_id: \"xyz789\"\n})\n```\n\nIf account_id is
+        not provided, you should ask the user which account to import to.\n","parameters":{"type":"object","properties":{"pdf_import_id":{"type":"string","description":"The
+        ID of the PDF import to extract transactions from"},"account_id":{"type":"string","description":"The
+        ID of the account to import transactions into. If not provided, will return
+        available accounts."}},"required":["pdf_import_id"],"additionalProperties":false}}},{"type":"function","function":{"name":"search_family_files","description":"Search
+        through documents that the family has uploaded to their financial document
+        store.\n\nUse this when the user asks questions about their uploaded financial
+        documents such as\ntax returns, bank statements, contracts, insurance policies,
+        investment reports, or any\nother files they''ve imported.\n\nReturns relevant
+        excerpts from matching documents along with the source filename and\na relevance
+        score.\n\nSupported file types include: PDF, DOCX, XLSX, PPTX, TXT, CSV, JSON,
+        XML, HTML, MD,\nand common source code formats.\n\nExample:\n\n```\nsearch_family_files({\n  query:
+        \"What was the total income on my 2024 tax return?\"\n})\n```\n","parameters":{"type":"object","properties":{"query":{"type":"string","description":"The
+        search query to find relevant information in the family''s uploaded documents"},"max_results":{"type":"integer","description":"Maximum
+        number of results to return (default: 10, max: 20)"}},"required":["query"],"additionalProperties":false}}},{"type":"function","function":{"name":"create_goal","description":"Creates
+        a goal for the user''s family.\n\nUse when the user describes a target they
+        want to save toward — e.g.\n\"vacation in 4 months for $5000\", \"downpayment
+        for a car next year\",\n\"build an emergency fund of $10k\".\n\nBefore calling,
+        confirm the key details by paraphrasing back to the\nuser: the name, target
+        amount, target date (if mentioned), and which\nof their accounts will fund
+        it. Only call once they''ve confirmed.\n\nConstraints:\n- The goal must link
+        to at least one of the user''s Depository\n  accounts (checking, savings,
+        HSA, CD, money-market).\n- The target is in the family''s primary currency.
+        Accounts in other\n  currencies are converted to it; earmarks stay in each
+        account''s\n  own currency.\n- Use account names exactly as listed in the
+        user''s Depository\n  accounts.\n\nOn success returns the new goal''s URL
+        so you can point the user to\nit. On a soft failure (e.g. account name doesn''t
+        match), the\nresponse includes the available account list so you can re-ask.\n","parameters":{"type":"object","properties":{"name":{"type":"string","description":"Short
+        goal name, e.g. ''Vacation in Italy''."},"target_amount":{"type":"number","description":"Total
+        amount to save, in the family''s primary currency."},"target_date":{"type":"string","description":"Optional
+        ISO 8601 date (YYYY-MM-DD) for when the user wants to reach the target."},"linked_account_names":{"type":"array","items":{"type":"string"},"description":"Names
+        of the user''s Depository accounts to link. Must contain at least one. Use
+        names exactly as they appear in the available accounts list. The goal''s balance
+        is the balance of these accounts."},"earmarks":{"type":"object","description":"Optional
+        map of account name to the amount to reserve from that account, in that account''s
+        currency, e.g. {\"Livret A\": 2000}. Required for an account already claimed
+        in full by another goal — the available accounts list says which, and how
+        much room is left. Accounts left out of this map reserve whatever the account
+        has spare.","additionalProperties":{"type":"number"}},"notes":{"type":"string","description":"Optional
+        freeform notes."}},"required":["name","target_amount","linked_account_names"],"additionalProperties":false}}},{"type":"function","function":{"name":"set_opening_balance","description":"Sets
+        the opening balance of a manual account (one not synced from a\nbank or other
+        provider) and, optionally, the date it applies from.\nUse it when an account''s
+        history starts on the wrong date or from the\nwrong amount, e.g. a loan whose
+        first repayment predates its opening\nbalance, or a savings account that opened
+        at zero.\n\nbalance uses the same sign convention as get_accounts (a loan''s\noutstanding
+        amount is positive). date must be before the account''s\noldest entry; omit
+        it to keep the current opening date.\n\nThe result says whether the current
+        balance changes: if the account has\na later balance update, only the history
+        before it changes. Pass\ndry_run: true to see the effect without changing
+        anything.\n","parameters":{"type":"object","properties":{"account_id":{"type":"string","description":"Manual
+        account ID from get_accounts."},"balance":{"type":"number","description":"Opening
+        balance in the account''s currency."},"date":{"type":"string","description":"Date
+        the opening balance applies from (YYYY-MM-DD), before the account''s oldest
+        entry. Omit to keep the current date."},"dry_run":{"type":"boolean","description":"Describe
+        the change without making it. Defaults to false."}},"required":["account_id","balance"],"additionalProperties":false}}},{"type":"function","function":{"name":"unmatch_transfer","description":"Unlinks
+        a transfer (or a credit card or loan payment) between two of\nthe user''s
+        accounts, so its two transactions count as ordinary income\nand spending again.
+        Use it to undo a wrong match: the transactions are\nkept, and can then be
+        matched with the right counterparts.\n\nPass the id of either transaction
+        in the transfer (get_transactions\nmarks them is_transfer), or the transfer_id.
+        Works on confirmed and\npending transfers. Both accounts must be writable.\n\nBy
+        default the pairing is also recorded as rejected, so Sure''s\nauto-match won''t
+        suggest it again; pass reject: false to only unlink.\nFee transactions attached
+        to the transfer are deleted with it (listed\nin the result). Pass dry_run:
+        true to see the effect first.\n","parameters":{"type":"object","properties":{"transaction_id":{"type":"string","description":"ID
+        of either transaction in the transfer, from get_transactions. Omit when passing
+        transfer_id."},"transfer_id":{"type":"string","description":"Transfer ID.
+        Omit when passing transaction_id."},"reject":{"type":"boolean","description":"Also
+        stop auto-match from suggesting this pairing again. Defaults to true."},"dry_run":{"type":"boolean","description":"Describe
+        the change without making it. Defaults to false."}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"update_transfer","description":"Changes
+        how a confirmed transfer between two of the user''s accounts\ncounts in budgets
+        and reports.\n\ninvestment_contribution: a transfer from a cash account into
+        an\ninvestment or crypto account counts as spending by default (an\ninvestment
+        contribution). Pass false to make it a plain transfer that\nbudgets and reports
+        ignore, e.g. when the brokerage or crypto account is\nonly used to convert
+        money into another currency; pass true to count it\nas spending again. The
+        choice survives\naccount syncs. Other transfers have no such switch.\n\nPass
+        the id of either transaction in the transfer (get_transactions\nmarks them
+        is_transfer), or the transfer_id. Both accounts must be\nwritable. Pass dry_run:
+        true to see the effect first.\n","parameters":{"type":"object","properties":{"transaction_id":{"type":"string","description":"ID
+        of either transaction in the transfer, from get_transactions. Omit when passing
+        transfer_id."},"transfer_id":{"type":"string","description":"Transfer ID.
+        Omit when passing transaction_id."},"investment_contribution":{"type":"boolean","description":"true
+        counts a transfer into an investment or crypto account as spending; false
+        makes it a plain transfer."},"dry_run":{"type":"boolean","description":"Describe
+        the change without making it. Defaults to false."}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_tags","description":"Returns
+        tags defined for the user''s family, sorted alphabetically, with pagination.\n\nUse
+        this when the user wants to see available tags or before referencing\na tag
+        in another operation like create_tag or update_tag.\n\nNote on pagination:\n\nThis
+        function can be paginated. You can expect the following properties in the
+        response:\n\n- `total_pages`: The total number of pages of results\n- `page`:
+        The current page of results\n- `page_size`: The number of results per page
+        (defaults to 50)\n- `total_results`: The total number of results\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"create_tag","description":"Creates
+        a new tag for the user''s family.\n\nTags are applied to transactions to organize
+        them beyond categories.\nIf color is omitted, one is chosen automatically
+        from the default palette.\nTag names must be unique within the family.\n","parameters":{"type":"object","properties":{"name":{"type":"string","description":"Tag
+        name (must be unique within the family)"},"color":{"type":"string","description":"Hex
+        color code (e.g. #e99537). If omitted, one is chosen from the default palette."}},"required":["name"],"additionalProperties":false}}},{"type":"function","function":{"name":"update_tag","description":"Updates
+        an existing tag''s name or color.\n\nIdentify the tag by its current name.
+        At least one of new_name or color must be provided.\nUse get_tags first to
+        confirm the tag exists.\n","parameters":{"type":"object","properties":{"name":{"type":"string","description":"Current
+        name of the tag to update","enum":["Trips","Emergency fund","Test"]},"new_name":{"type":"string","description":"New
+        name for the tag (optional)"},"color":{"type":"string","description":"New
+        hex color code (optional)"}},"required":["name"],"additionalProperties":false}}},{"type":"function","function":{"name":"get_categories","description":"Returns
+        categories for the user''s family, ordered alphabetically by hierarchy, with
+        pagination.\n\nEach entry includes id, name, color, icon, parent_id (null
+        for top-level), and\nname_with_parent (e.g. \"Food & Drink > Restaurants\").
+        Use this before creating\nsubcategories or referencing a category by id in
+        update_category or delete_category.\n\nNote on pagination:\n\nThis function
+        can be paginated. You can expect the following properties in the response:\n\n-
+        `total_pages`: The total number of pages of results\n- `page`: The current
+        page of results\n- `page_size`: The number of results per page (defaults to
+        50)\n- `total_results`: The total number of results\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"create_category","description":"Creates
+        a new category for the user''s family.\n\nCategories support two levels of
+        hierarchy: a top-level category can have subcategories,\nbut subcategories
+        cannot have children. Provide parent_id (from get_categories) to make\na subcategory
+        — it will inherit the parent''s color automatically.\n\nIf icon is omitted
+        it is suggested from the name. If color is omitted a palette color is used\n(ignored
+        for subcategories since color is inherited). Category names must be unique.\n","parameters":{"type":"object","properties":{"name":{"type":"string","description":"Category
+        name (must be unique within the family)"},"color":{"type":"string","description":"Hex
+        color code (e.g. #e99537). Ignored for subcategories. Defaults to a palette
+        color."},"icon":{"type":"string","description":"Lucide icon name (e.g. ''shopping-cart'').
+        Suggested from name if omitted."},"parent_id":{"type":"string","description":"ID
+        of an existing top-level category to nest under (makes this a subcategory).
+        Use get_categories to find ids."}},"required":["name"],"additionalProperties":false}}},{"type":"function","function":{"name":"update_category","description":"Updates
+        an existing category''s name, color, icon, or parent.\n\nUse get_categories
+        first to find the category id. At least one of name, color,\nicon, or parent_id
+        must be supplied. Changing a parent''s color does not cascade to\nexisting
+        subcategories (their colors are set when they are saved).\n\nPass parent_id
+        to move the category under another top-level category (it takes the\nparent''s
+        color), or pass an empty string to make it a top-level category. A category\nthat
+        has subcategories cannot itself become a subcategory.\n","parameters":{"type":"object","properties":{"id":{"type":"string","description":"ID
+        of the category to update (use get_categories to find it)"},"name":{"type":"string","description":"New
+        name for the category (optional)"},"color":{"type":"string","description":"New
+        hex color code (optional)"},"icon":{"type":"string","description":"New Lucide
+        icon name (optional)"},"parent_id":{"type":"string","description":"ID of a
+        top-level category to move this category under, or an empty string to make
+        it top-level (optional)"}},"required":["id"],"additionalProperties":false}}},{"type":"function","function":{"name":"delete_category","description":"Deletes
+        a category from the user''s family. This cannot be undone.\n\nUse get_categories
+        first to find the category id. Transactions in the deleted category\nare moved
+        to replacement_id when given, otherwise they become uncategorized. Subcategories\nof
+        a deleted top-level category are kept and become top-level categories. Budget\nallocations
+        for the deleted category are removed.\n\nConfirm with the user before calling
+        this tool.\n","parameters":{"type":"object","properties":{"id":{"type":"string","description":"ID
+        of the category to delete (use get_categories to find it)"},"replacement_id":{"type":"string","description":"ID
+        of a category to move the deleted category''s transactions to (optional).
+        Transactions become uncategorized if omitted."}},"required":["id"],"additionalProperties":false}}},{"type":"function","function":{"name":"get_merchants","description":"Returns
+        merchants relevant to the user''s transactions, sorted alphabetically,\nwith
+        pagination. Each entry includes the stable id needed for\nupdate_transaction''s
+        merchant_id and the exact name usable in\nget_transactions'' merchants filter.\n\nPass
+        `search` to filter by name instead of paging through everything.\n","parameters":{"type":"object","properties":{"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"},"search":{"type":"string","description":"Case-insensitive
+        substring filter on merchant name"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_rules","description":"Lists
+        the family''s transaction rules: conditions, actions (with account,\ncategory,
+        tag and merchant names), whether each rule is active, its\neffective_date,
+        and its latest run.\n\nActive rules run again on every sync. Pass rule_id
+        for a single rule,\nwhich also includes how many transactions it currently
+        matches.\n\nUse search to check whether a rule already exists: it matches
+        the rule\nname, condition values (e.g. a payee in a \"name contains\" condition),\naction
+        values, and the names of categories the rule sets.\n\nResults are paginated
+        (page_size defaults to 50); the\nresponse includes total_results, page, page_size
+        and total_pages.\n","parameters":{"type":"object","properties":{"rule_id":{"type":"string","description":"Optional.
+        Return only this rule, with its current match count."},"active":{"type":"boolean","description":"Optional.
+        true for active rules only, false for inactive only."},"search":{"type":"string","description":"Optional.
+        Case-insensitive text to find in the rule name, condition and action values,
+        or the name of a category it sets."},"page":{"type":"integer","minimum":1,"description":"Page
+        number (defaults to 1)"},"page_size":{"type":"integer","minimum":1,"maximum":100,"description":"Results
+        per page (defaults to 50)"}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"get_rule_options","description":"Returns
+        what a transaction rule can contain: each condition type with its\noperators
+        and value format, and each action type with its value format.\nCall this before
+        preview_rule or create_rule.\n\nText conditions match case-insensitively with
+        \"like\" (contains). Amount\nconditions compare the absolute amount. Actions
+        that call an AI model\n(auto categorize, auto detect merchants) are not available
+        here.\n","parameters":{"type":"object","properties":{},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"preview_rule","description":"Shows
+        which transactions a rule matches, without changing anything.\nPass either
+        rule_id (a saved rule) or an unsaved definition (conditions,\nactions, optional
+        effective_date); see get_rule_options for valid values.\n\nReturns match_count
+        (every matching transaction in the family, which is\nwhat the rule would touch),
+        a sample of the most recent matches in\naccounts you can see, with their current
+        category and merchant, and the\nactions in readable form. Check the sample
+        before create_rule or\napply_rule: a loose condition (e.g. \"greater than\"
+        instead of \"equal to\")\nrewrites far more transactions than intended.\n\nFor
+        a saved rule it also returns preview_token, which apply_rule needs.\nNo token
+        is issued when no matches are shown: with sample_size 0, or\nwhen every match
+        is in an account you cannot see.\n","parameters":{"type":"object","properties":{"rule_id":{"type":"string","description":"A
+        saved rule from get_rules. Omit when passing a definition."},"conditions":{"type":"array","description":"All
+        conditions must match (AND). Use a compound condition with operator \"or\"
+        for alternatives.","items":{"type":"object","properties":{"condition_type":{"type":"string","description":"A
+        condition key from get_rule_options, or \"compound\" to group sub_conditions."},"operator":{"type":"string","description":"An
+        operator value from get_rule_options for this condition. For compound: \"and\"
+        or \"or\"."},"value":{"type":"string","description":"Text, number, or an id
+        (account, category, tag, merchant) depending on the condition. Omit for is_null
+        / is_not_null and compound."},"sub_conditions":{"type":"array","description":"Only
+        for compound conditions: one level of plain conditions (no nesting).","items":{"type":"object"}}},"required":["condition_type","operator"]}},"actions":{"type":"array","description":"At
+        least one action. Each action type may appear once.","items":{"type":"object","properties":{"action_type":{"type":"string","description":"An
+        action key from get_rule_options."},"value":{"description":"Category/merchant/account
+        id, activity label or new name depending on the action; an array of tag ids
+        for set_transaction_tags. Omit for actions without a value.","anyOf":[{"type":"string"},{"type":"array","items":{"type":"string"}}]}},"required":["action_type"]}},"effective_date":{"type":"string","description":"Optional
+        YYYY-MM-DD. The rule only touches transactions on or after this date."},"sample_size":{"type":"integer","description":"Matches
+        to list, most recent first (default 10, max 25)."}},"required":[],"additionalProperties":false}}},{"type":"function","function":{"name":"create_rule","description":"Saves
+        a new transaction rule. The rule is always saved inactive: it does\nnot change
+        any transaction until apply_rule activates it.\n\nBuild the definition from
+        get_rule_options, and check it with\npreview_rule first. Returns the saved
+        rule and the same preview as\npreview_rule; pass its preview_token to apply_rule
+        after checking the sample.\n","parameters":{"type":"object","properties":{"name":{"type":"string","description":"Optional
+        rule name shown in Settings > Rules."},"conditions":{"type":"array","description":"All
+        conditions must match (AND). Use a compound condition with operator \"or\"
+        for alternatives.","items":{"type":"object","properties":{"condition_type":{"type":"string","description":"A
+        condition key from get_rule_options, or \"compound\" to group sub_conditions."},"operator":{"type":"string","description":"An
+        operator value from get_rule_options for this condition. For compound: \"and\"
+        or \"or\"."},"value":{"type":"string","description":"Text, number, or an id
+        (account, category, tag, merchant) depending on the condition. Omit for is_null
+        / is_not_null and compound."},"sub_conditions":{"type":"array","description":"Only
+        for compound conditions: one level of plain conditions (no nesting).","items":{"type":"object"}}},"required":["condition_type","operator"]}},"actions":{"type":"array","description":"At
+        least one action. Each action type may appear once.","items":{"type":"object","properties":{"action_type":{"type":"string","description":"An
+        action key from get_rule_options."},"value":{"description":"Category/merchant/account
+        id, activity label or new name depending on the action; an array of tag ids
+        for set_transaction_tags. Omit for actions without a value.","anyOf":[{"type":"string"},{"type":"array","items":{"type":"string"}}]}},"required":["action_type"]}},"effective_date":{"type":"string","description":"Optional
+        YYYY-MM-DD. The rule only touches transactions on or after this date."},"sample_size":{"type":"integer","description":"Matches
+        to list in the preview (default 10, max 25)."}},"required":["conditions","actions"],"additionalProperties":false}}},{"type":"function","function":{"name":"update_rule","description":"Updates
+        a transaction rule from get_rules. Any of:\n- name: rename it (an active rule
+        stays active).\n- conditions / actions: replace that whole list (send every
+        item, not\n  just the changed one). effective_date: change it, or \"\" to
+        clear it.\n  Any of these deactivates the rule; call apply_rule after checking
+        the\n  returned preview.\n- active: false to stop the rule running on sync.
+        It cannot activate a\n  rule; use apply_rule for that.\n\nRules with AI-backed
+        actions (auto categorize, auto detect merchants)\nmust be edited in Settings
+        > Rules.\n","parameters":{"type":"object","properties":{"rule_id":{"type":"string","description":"Rule
+        ID from get_rules."},"name":{"type":"string","description":"New name. Pass
+        \"\" to clear it."},"conditions":{"type":"array","description":"All conditions
+        must match (AND). Use a compound condition with operator \"or\" for alternatives.","items":{"type":"object","properties":{"condition_type":{"type":"string","description":"A
+        condition key from get_rule_options, or \"compound\" to group sub_conditions."},"operator":{"type":"string","description":"An
+        operator value from get_rule_options for this condition. For compound: \"and\"
+        or \"or\"."},"value":{"type":"string","description":"Text, number, or an id
+        (account, category, tag, merchant) depending on the condition. Omit for is_null
+        / is_not_null and compound."},"sub_conditions":{"type":"array","description":"Only
+        for compound conditions: one level of plain conditions (no nesting).","items":{"type":"object"}}},"required":["condition_type","operator"]}},"actions":{"type":"array","description":"At
+        least one action. Each action type may appear once.","items":{"type":"object","properties":{"action_type":{"type":"string","description":"An
+        action key from get_rule_options."},"value":{"description":"Category/merchant/account
+        id, activity label or new name depending on the action; an array of tag ids
+        for set_transaction_tags. Omit for actions without a value.","anyOf":[{"type":"string"},{"type":"array","items":{"type":"string"}}]}},"required":["action_type"]}},"effective_date":{"type":"string","description":"Optional
+        YYYY-MM-DD. The rule only touches transactions on or after this date."},"active":{"type":"boolean","description":"Only
+        false is accepted: deactivates the rule."},"sample_size":{"type":"integer","description":"Matches
+        to list in the preview (default 10, max 25)."}},"required":["rule_id"],"additionalProperties":false}}},{"type":"function","function":{"name":"apply_rule","description":"Activates
+        a rule and applies it to the transactions it matches now. Once\nactive, it
+        also runs on every future sync. Undo future runs with\nupdate_rule active:
+        false; changes already made are not reverted.\n\npreview_token must come from
+        the latest preview_rule, create_rule or\nupdate_rule for this rule (get_rules
+        does not issue one). It expires\nafter 30 minutes. If the rule or its matches
+        have\nchanged since, nothing is applied and a fresh preview, with a new\ntoken,
+        is returned.\n\nBy default transactions whose category, merchant, name or
+        tags were set\nby hand keep them. Pass override_locked: true to overwrite
+        those too\n(what the Settings > Rules Apply button does).\n\nRuns in the background;
+        check the result later with get_rules rule_id.\n","parameters":{"type":"object","properties":{"rule_id":{"type":"string","description":"Rule
+        ID from get_rules or create_rule."},"preview_token":{"type":"string","description":"preview_token
+        from the latest preview of this rule."},"override_locked":{"type":"boolean","description":"Also
+        overwrite values the user set by hand (default false)."}},"required":["rule_id","preview_token"],"additionalProperties":false}}},{"type":"function","function":{"name":"update_transaction","description":"Updates
+        an existing transaction.\n\nUse get_transactions first to find the transaction
+        id, and get_categories,\nget_tags, or the current transaction merchant before
+        referencing related ids.\n\nThis tool can update the transaction name, notes,
+        category, merchant, and\ntags. It will not edit split child transactions directly.\n","parameters":{"type":"object","properties":{"id":{"type":"string","description":"Transaction
+        ID from get_transactions"},"name":{"type":"string","description":"New transaction
+        name. Omit to leave unchanged."},"notes":{"type":["string","null"],"description":"New
+        transaction notes. Use null to clear notes. Omit to leave unchanged."},"category_id":{"type":["string","null"],"description":"Category
+        ID from get_categories. Use null to clear category. Omit to leave unchanged."},"merchant_id":{"type":["string","null"],"description":"Merchant
+        ID currently available to the family. Use null to clear merchant. Omit to
+        leave unchanged."},"tag_ids":{"type":"array","items":{"type":"string"},"description":"Full
+        list of tag IDs to set. Use an empty array to clear all tags. Omit to leave
+        unchanged."}},"required":["id"],"additionalProperties":false}}},{"type":"function","function":{"name":"create_transaction","description":"Creates
+        a new transaction on one of the user''s accounts.\n\nUse this to record a
+        transaction the app cannot see on its own — a\nmanual account, an off-platform
+        payment, a cash transaction, or a line\nfrom a statement export. It writes
+        through the same Entry + Transaction\npath the app''s own create endpoint
+        uses, so balance recalculation and\nprovider-sync protection behave exactly
+        as they do for a transaction\nentered by hand.\n\nAmount sign convention (matches
+        the rest of the app):\n  - negative amount = income / money in\n  - positive  amount
+        = expense / money out\nYou may instead pass a positive magnitude plus `type`
+        (\"income\" or\n\"expense\"); the sign is then derived from `type`. If you
+        pass neither\na sign nor a `type`, the amount is stored exactly as given.\n\nIdempotency:
+        if you pass `external_id` (and optionally `source`,\ndefaulting to \"mcp\"),
+        a repeat call with the same account + source +\nexternal_id returns the existing
+        transaction instead of creating a\nduplicate. This makes batch imports safe
+        to retry.\n\nThe account must be one the user can write to (owner or full-control\nshare).
+        Related ids (category, merchant, tags) must belong to the\nuser''s family.\n\nExample:\n\n```\ncreate_transaction({\n  account_id:
+        \"abc123-...\",\n  date: \"2026-09-11\",\n  amount: 2194.15,\n  type: \"expense\",\n  name:
+        \"Roche\",\n  category_id: \"def456-...\"\n})\n```\n","parameters":{"type":"object","properties":{"account_id":{"type":"string","description":"UUID
+        of the account to record the transaction on. The user must be able to write
+        to it (owner or full-control share)."},"date":{"type":"string","description":"ISO
+        8601 date (YYYY-MM-DD) of the transaction."},"amount":{"type":"number","description":"Transaction
+        amount in the account''s currency. Negative = income (money in), positive
+        = expense (money out). If `type` is also given, `type` decides the sign and
+        the magnitude of `amount` is used."},"name":{"type":"string","description":"Transaction
+        name / payee / description."},"type":{"type":"string","enum":["income","expense","inflow","outflow"],"description":"Optional.
+        Derives the amount sign: income/inflow -> negative, expense/outflow -> positive.
+        Omit to store `amount` as given."},"currency":{"type":"string","description":"ISO
+        4217 currency code. Defaults to the account''s currency."},"notes":{"type":["string","null"],"description":"Optional
+        notes. Use null to store an empty note."},"category_id":{"type":["string","null"],"description":"Category
+        ID from get_categories. Must belong to the user''s family."},"merchant_id":{"type":["string","null"],"description":"Merchant
+        ID available to the family. Must be a valid merchant id."},"tag_ids":{"type":"array","items":{"type":"string"},"description":"Tag
+        IDs from get_tags. Must belong to the user''s family."},"external_id":{"type":"string","description":"Optional
+        stable external identifier (e.g. a row id from a statement export). With `source`,
+        makes the call idempotent."},"source":{"type":"string","description":"Optional
+        provenance label paired with external_id (defaults to \"mcp\")."},"user_modified":{"type":"boolean","description":"If
+        true, mark the transaction user-modified so a later provider sync will not
+        overwrite it (defaults to false)."}},"required":["account_id","date","amount","name"],"additionalProperties":false}}},{"type":"function","function":{"name":"delete_transaction","description":"Permanently
+        deletes a transaction from the ledger. This is destructive\nand irreversible:
+        the transaction and its ledger entry are removed and\nthe account balance
+        is recalculated.\n\nUse get_transactions first to find the transaction id
+        (the same id\ncreate_transaction returns). Optionally pass account_id as a
+        guard so a\nmismatched id cannot delete the wrong record.\n\nIt deletes the
+        transaction''s root ledger entry, which cascades to the\ntransaction. It will
+        not delete a split child transaction individually —\ndelete the split parent
+        instead.\n","parameters":{"type":"object","properties":{"id":{"type":"string","description":"Transaction
+        ID from get_transactions (the same ID create_transaction returns)."},"account_id":{"type":"string","description":"Optional
+        guard. If provided, the transaction must also belong to this writable account;
+        a mismatch returns not_found."}},"required":["id"],"additionalProperties":false}}},{"type":"function","function":{"name":"get_transfer_match_candidates","description":"Shows
+        how a transaction can be matched as a transfer between the user''s\nown accounts
+        (e.g. a card payment, a loan repayment, a move to savings).\n\nReturns the
+        transaction''s current transfer, if any. A transfer with\nstatus \"pending\"
+        is an auto-match Sure suggested that the user has not\nreviewed yet; confirm
+        or reject it with review_transfer.\n\nOtherwise returns candidate transactions
+        in other accounts: opposite\ndirection, matching amount, within 30 days. `previously_rejected`
+        marks a\npairing the user already rejected, so ask before matching it.\n\nUse
+        match_transfer to link the transaction with a candidate, or with\nan account
+        that has no matching transaction (e.g. a manual loan account).\n","parameters":{"type":"object","properties":{"transaction_id":{"type":"string","description":"Transaction
+        ID from get_transactions."}},"required":["transaction_id"],"additionalProperties":false}}},{"type":"function","function":{"name":"match_transfer","description":"Marks
+        a transaction as a transfer between the user''s own accounts, so it\nstops
+        counting as income or spending and moves the other account''s\nbalance. Payments
+        to loans and credit cards still count in budgets.\n\nPass exactly one of:\n-
+        counterpart_transaction_id: an existing transaction to pair with,\n  from
+        get_transfer_match_candidates.\n- target_account_id: an account (from get_accounts)
+        with no matching\n  transaction; a counterpart transaction is created there.\n\nPass
+        dry_run: true to see what would happen without changing anything.\n\nReturns
+        already_linked (with the transfer id) if either transaction is\nalready in
+        a transfer. If the pair you asked for is already a pending\nauto-match, returns
+        pending_match: confirm it with review_transfer\n(action \"confirm\"). For
+        a pending auto-match with a different\ncounterpart, reject it with review_transfer
+        first. Matching the same\nconfirmed pair again is a no-op.\n","parameters":{"type":"object","properties":{"transaction_id":{"type":"string","description":"Transaction
+        ID from get_transactions."},"counterpart_transaction_id":{"type":"string","description":"Existing
+        opposite transaction to pair with, from get_transfer_match_candidates. Omit
+        when passing target_account_id."},"target_account_id":{"type":"string","description":"Account
+        to create the counterpart transaction in, from get_accounts. Omit when passing
+        counterpart_transaction_id."},"dry_run":{"type":"boolean","description":"Describe
+        the change without making it. Defaults to false."}},"required":["transaction_id"],"additionalProperties":false}}},{"type":"function","function":{"name":"review_transfer","description":"Confirms
+        or rejects a transfer that Sure auto-matched and the user has\nnot reviewed
+        yet (status \"pending\" in get_transfer_match_candidates).\n\nconfirm keeps
+        the match. reject unlinks the two transactions and stops\nauto-match from
+        suggesting that pairing again.\n\nOnly pending transfers can be reviewed.
+        Both accounts must be writable.\n","parameters":{"type":"object","properties":{"transfer_id":{"type":"string","description":"Transfer
+        ID from get_transfer_match_candidates."},"action":{"type":"string","enum":["confirm","reject"],"description":"confirm
+        or reject."}},"required":["transfer_id","action"],"additionalProperties":false}}},{"type":"function","function":{"name":"update_budget","description":"Updates
+        the user''s monthly budget: total budgeted spending, expected income,\nand/or
+        per-category budgeted amounts.\n\nCall get_budget first to see current amounts
+        and exact category names.\nAmounts are plain non-negative numbers in the family''s
+        currency. Only the\nfields and categories you pass are changed. Setting a
+        subcategory''s amount\nkeeps its parent''s total in sync automatically. The
+        \"Uncategorized\" bucket\ncannot be set directly — it is the unallocated remainder
+        of total budgeted\nspending.\n\nParameters:\n- `month` (optional): \"YYYY-MM\"
+        or \"MMM-YYYY\". Defaults to the current month.\n- `budgeted_spending` (optional):
+        total planned spending for the month.\n- `expected_income` (optional): expected
+        income for the month.\n- `categories` (optional): array of { category: <name
+        or id>, amount: <number> }.\n\nAt least one of budgeted_spending, expected_income,
+        or categories is required.\n\nExample (set the total and two category allocations
+        for August 2026):\n\n```\nupdate_budget({\n  month: \"2026-08\",\n  budgeted_spending:
+        6500,\n  categories: [\n    { category: \"Groceries\", amount: 900 },\n    {
+        category: \"Dining Out\", amount: 250 }\n  ]\n})\n```\n","parameters":{"type":"object","properties":{"month":{"type":"string","description":"Target
+        month in YYYY-MM or MMM-YYYY format. Defaults to the current month."},"budgeted_spending":{"type":"number","minimum":0,"description":"Total
+        planned spending for the month, in the family currency."},"expected_income":{"type":"number","minimum":0,"description":"Expected
+        income for the month, in the family currency."},"categories":{"type":"array","description":"Per-category
+        budget allocations to set.","items":{"type":"object","properties":{"category":{"type":"string","description":"Category
+        name (exact match, case-insensitive) or category id (use get_categories)."},"amount":{"type":"number","minimum":0,"description":"New
+        budgeted amount for this category."}},"required":["category","amount"],"additionalProperties":false}}},"required":[],"additionalProperties":false}}}],"tool_choice":"none","stream_options":{"include_usage":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Type:
+      - text/event-stream
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      X-Accel-Buffering:
+      - 'no'
+      Date:
+      - Thu, 29 Oct 2026 08:24:07 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"role":"assistant","content":null}}],"created":1793262258,"id":"chatcmpl-xLA5isaBUloBCTQCVoBS5nGg0igjKlud","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"Hello"}}],"created":1793262258,"id":"chatcmpl-xLA5isaBUloBCTQCVoBS5nGg0igjKlud","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[{"finish_reason":"length","index":0,"delta":{}}],"created":1793262258,"id":"chatcmpl-xLA5isaBUloBCTQCVoBS5nGg0igjKlud","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk"}
+
+        data: {"choices":[],"created":1793262258,"id":"chatcmpl-xLA5isaBUloBCTQCVoBS5nGg0igjKlud","model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion.chunk","usage":{"completion_tokens":1,"prompt_tokens":12457,"total_tokens":12458,"prompt_tokens_details":{"cached_tokens":11941}},"timings":{"cache_n":11941,"prompt_n":516,"prompt_ms":10401.982,"prompt_per_token_ms":20.15887984496124,"prompt_per_second":49.6059308697131,"predicted_n":1,"predicted_ms":0.001,"predicted_per_token_ms":0.0,"predicted_per_second":0.0}}
+
+        data: [DONE]
+
+  recorded_at: Thu, 29 Oct 2026 08:24:18 GMT
+recorded_with: VCR 6.3.1
+...

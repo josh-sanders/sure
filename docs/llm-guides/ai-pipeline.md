@@ -26,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (148 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (160 runs, 1 skip:
 the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -304,6 +304,64 @@ way the fan-out, packing and connection reuse are Sure's to tune.
 - **A 402 maps to `Ai::Error::Refused`** (`RubyLLM::PaymentRequiredError`). Section 9 doesn't
   name it, but an empty balance is a key's state, like a 401, not a refusal of one request.
 
+### RubyLLM running Sure's tools, outside the criteria
+
+The plan keeps the tool loop in `Ai::Conversation`. RubyLLM 2.1 lets a caller step its loop:
+`Chat#generate` makes one model call and `#run_tools` runs the pending tool calls, both public.
+So Sure can keep the loop and its bounds while RubyLLM runs the tools. The spike tried that.
+
+- **The pieces:**
+  - `Ai::Conversation::RubyLlmLoop` (35 code lines) steps the loop.
+  - `Ai::Conversation::SureTool` (18 lines) wraps each `Assistant::Function` as a
+    `RubyLLM::Tool`. It still calls the function through `Assistant::FunctionToolCaller`, so a
+    tool's failure is still Sure's data: a not-found has no SQL in it, and the retry hints stay.
+  - The compatible transport adds `tool_chat`, `tool_round` and `history` (36 net lines).
+  - Total: about 89 lines, against the 9 lines of `run_tools` in Sure's own 47-line loop.
+  - Compatible transport only; the Anthropic transport wasn't adapted.
+- **The bounds hold:**
+  - at most `max_tool_rounds` model calls, the last with `tool_choice: none`;
+  - one deadline for the turn, checked while streaming and now also before each tool (a
+    `before_tool_call` callback);
+  - a cancel checked at the same points stops the turn before a tool runs;
+  - one `converse.ai` event per round, as before.
+- **What it gains, live on llama.cpp** (`ruby_llm_loop_test`, cassettes `llama_cpp/loop_*`):
+  - **Approval for write tools.** `requires_approval` with a resolver that reads Sure's own
+    record of the decision. Undecided: the turn ends `:awaiting_approval` with the history so far
+    (user, then the assistant's `create_tag` call), and no tag is created. A later `respond`
+    with that stored history, after approval, runs `create_tag` and the model confirms. After a
+    denial, RubyLLM sends `{"error":"The user denied the create_tag tool call."}` and the model
+    says it didn't create the tag.
+  - **Tools in parallel** (`concurrency: :threads`). Qwen3.6 asked for `get_accounts` and
+    `get_categories` in one round, and both ran off the job's thread. RubyLLM wraps each thread
+    in the Rails executor, so each checks out its own database connection and starts with empty
+    `Current` attributes. Sure's tools take the user as an argument and don't read `Current`.
+  - **Resume after a dead worker.** A history ending with a tool call and no result runs that
+    call first, then asks the model.
+  - **`tool_call.ruby_llm` events** with the tool's name, arguments and result, in Sure's process.
+    Sure's Langfuse subscriber listens only to `*.ai`, so they go nowhere unless Sure subscribes.
+  - On OpenRouter Nemotron, RubyLLM keeps `reasoning_details` between rounds itself
+    (`openrouter/loop_tool_round`). Sure still stores it, through `provider_state`, for the next
+    turn.
+- **What Sure still has to build:**
+  - **Which tools write.** Nothing marks them, so the spike goes by name: anything not starting
+    with `get_`, `list_`, `search_` or `preview_`. That's 19 of the 34 tools. An explicit flag on
+    `Assistant::Function` is needed either way, for MCP's `destructiveHint` too.
+  - **The decision and the paused turn**, in Sure's own tables, plus the approve and deny UI.
+  - **Rounds across a pause.** A resumed turn starts a fresh round budget unless Sure carries
+    the count over.
+- **The tool list is big.** Sure's 34 tools (without preview features) add 12,418 prompt tokens
+  to every round on Qwen3.6: 12,457 with the tools against 39 without
+  (`llama_cpp/loop_tool_list_tokens`). That's a fifth of a 64k context before any history.
+  llama.cpp caches most of it between rounds, so time suffers less than context does. RubyLLM's
+  tool search (`defer:`) only works natively on Anthropic and OpenAI's Responses API; every other
+  server gets the whole list. RubyLLM's `input_tokens` left the cached part out here and reported
+  512, the usage-count difference listed under "What the owner watches on upgrade".
+- **Verdict:** it isn't a line saving; it's a feature trade. If Sure wants approvals or parallel
+  tools, RubyLLM's `run_tools` brings them working, on its public API, for about 40 more lines
+  than Sure's own loop. Without those features, Sure's loop is shorter and doesn't depend on
+  RubyLLM's tool semantics, such as its denial message and its unknown-tool error, which lists
+  every tool name.
+
 ### Tracing modes: content and metadata, outside the criteria
 
 Tracing has two modes, and an operator picks one with `Ai::Instrumentation.start_tracing`:
@@ -389,7 +447,9 @@ measurement.
   10-08 and 2.1.1 on 10-11. About 47 issues were closed in the 17 days after 2.1.1. One
   maintainer has 1,752 commits; the next contributor has 138.
 - **Use only the public API:** `RubyLLM.context`, `Chat#generate`, `#add_message`, the `with_*`
-  setters, `Message#to_h`/`.new`, `RubyLLM::Tool` and `.embed`. The maintainer declines to open
+  setters, `Message#to_h`/`.new`, `RubyLLM::Tool` and `.embed`. If RubyLLM runs the tools,
+  add `#run_tools`, `#waiting?`, `#pending_approvals`, `#before_tool_call` and
+  `Tool.requires_approval`. The maintainer declines to open
   the loop's internals (#1291) and to add a supported opt-out from usage recording (#1071).
 - **The railtie's side effects in Rails:**
   - It mixes `acts_as` into `ActiveRecord::Base`.
