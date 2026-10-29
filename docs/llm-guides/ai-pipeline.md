@@ -27,8 +27,8 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (236 runs, 6 skips:
-the live-only timeout test and five OCR runs not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (252 runs, 12 skips:
+the live-only timeout test and OCR combinations not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
@@ -507,6 +507,7 @@ transaction makes the closing balance. Tests: `extract_statement_live_test`, cas
   and every right one reconciles. Sure can run that check on any import without knowing the
   answer, and hold back or flag one that fails. It checks amounts and signs, not dates: in the
   OCR runs below, an extraction with every amount right and ten dates wrong still reconciled.
+  See "Checks on an extraction" for the checks measured on every recording.
 - **OpenRouter bills PDF parsing, even for free models.** With no engine named, OpenRouter
   OCR'd the scan for the text-only Lightning, and the model saw every amount. The cost was
   $0.002 a page, once for every request. The `auto` chain sent each file three times, so the
@@ -584,6 +585,64 @@ A child process that isolates properly, running either `pdftoppm` or `ruby-vips`
 - a page range (`-f 1 -l 5`, or vips's `page:` and `n:`);
 - a stripped environment (`system({}, "pdftoppm", …, unsetenv_others: true)`);
 - ideally, a memory limit.
+
+**The hardened `pdftoppm`, built and tested** (`Pdf::PageImages`, `page_images_test`, with PDFs
+built to misbehave and stand-in `pdftoppm` scripts):
+
+- **The child process:**
+  - `Process.spawn({}, …, unsetenv_others: true)`, so the child's environment is empty: a
+    stand-in that writes its `env` saw none of the worker's variables;
+  - `pgroup: true` and a 30 s timeout that kills the whole group: a stand-in that hangs, with a
+    `sleep` child of its own, was killed after 1 s with both processes gone;
+  - `rlimit_cpu: 60` and `rlimit_as: 1 GB`;
+  - `-f 1 -l 5`: a 300-page upload renders five pages, in about a second with either renderer.
+- **`pdftoppm`'s exit status can't be trusted.** A page it can't allocate isn't an error. Two
+  cases:
+  - poppler's own guard: a 200-inch page, 900 million pixels at 150 dpi, gets "Bogus memory
+    allocation size";
+  - the memory limit: a 100-inch page, 225 million pixels, under 512 MB, gets "Out of memory".
+
+  Either way `pdftoppm` writes a **1×1 PNG and exits 0**, and Sure's current code would send
+  that blank pixel to the model as the page. The hardened path checks every page's size after
+  rendering. Without a limit, the 100-inch page renders in about 3 s, at 15,000 × 15,000.
+- **A pixel limit before rendering, for both renderers.** Each page's MediaBox, read with
+  `pdf-reader` (which already parses every upload), must come to at most 25 million pixels at
+  the requested dpi, about 23 inches square at 150 dpi. This is the only memory guard
+  `ruby-vips` has, because it renders inside the worker, beyond any process limit. A file
+  `pdf-reader` can't open is refused before either renderer runs.
+- **Not covered:**
+  - the child still runs as the worker's user, with its file access. Confining it needs a
+    sandbox such as bubblewrap, or a separate container;
+  - a PDF crafted to be slow rather than large, which only the timeout and CPU limit stop.
+
+#### Checks on an extraction
+
+`ExtractBankStatement#checks` runs on any extraction, without the answer, and
+`ExtractBankStatement.for_pdf` chooses the input:
+- page images with a vision model;
+- the text layer otherwise;
+- `Ai::Error::Unavailable` (`no_text_layer`) for a scan with no vision model, so an empty text
+  layer is never sent.
+
+Every recorded extraction, from the PDF matrix and the OCR runs, carries its checks in its pinned
+summary:
+
+| Check | What it is | Kept |
+|---|---|---|
+| `reconciles` | The opening balance plus every transaction equals the closing balance (zero rows ignored) | Yes |
+| `amounts_in_source` | Every amount appears in the text the model read, the text layer or the OCR transcription; `nil` for images | Yes |
+| `dates_anchored` | The share of rows whose date is the last date printed in the 120 characters before that row's amount | Yes, at 0.5 or more |
+| Dates in the source anywhere | Every date appears somewhere in the source | No: WeVisOne's wrong dates ("1 February", "14 Feb") appear, in "Balance at 1 February" and "timed 9.52 14 Feb" |
+| Dates in the period | Every date falls in the reported period | No: models write the period to fit their dates, so it caught nothing, and it failed a right extraction (Gemini, scan images) |
+
+**Result:** the three kept checks pass all 14 right extractions and fail all 12 wrong or empty
+ones, with no false alarms. Rows where the model returned an error count as neither.
+- **`reconciles` catches all but one,** the amount, sign, missing and merged-row errors.
+- **`dates_anchored` catches the one left,** WeVisOne → Qwen: every amount right, ten dates wrong.
+  It scored 0.08 and 0.15 there, against 0.62–0.77 for right extractions. Right ones fall short
+  of 1.0 for two reasons: one printed date can head two rows, and the scan lists each row twice.
+  The threshold is tuned on two statements, so it's a heuristic, not a rule.
+- **For images read directly there's no source text,** so only `reconciles` applies.
 
 **Ruby gems.** No Ruby gem renders a PDF on its own: each
 one wraps poppler, MuPDF or Ghostscript. `ruby-vips` is already in the bundle (2.2.4, through
@@ -664,9 +723,12 @@ Qwen3.6's extraction took 73–123 s more per statement. Two BAC extractions add
 - **Table cells come out joined.** The OCR model writes tables as HTML. Every `<tr>`, `<td>` and
   `</td>` is missing from llama-server's output; only `<td rowspan="2">`, which the tokenizer
   spells out, survives. So `24.50` and `39,975.50` arrive as `24.5039,975.50`. The tags are
-  probably special tokens, which llama-server leaves out of text by default; its `--special`
-  flag wasn't tried. Qwen3.6 split the joined values correctly every time, but a weaker model
-  might not.
+  special tokens, which llama-server leaves out of text by default. **With `--special`**
+  (RX5950XT's build, `rx5950xt_special`), the same output (1,009 and 2,064 tokens, either way)
+  arrives as proper HTML: 18 rows and 84 cells on BAC, empty cells included, so "Money out" and
+  "Money in" stay apart. The end-of-sequence token `<｜end▁of▁sentence｜>` arrives too, and Sure
+  has to strip it. Qwen3.6 split the joined values correctly every time without it, but a
+  weaker model might not.
 - **WeVisOne isn't a transcriber or an extractor.**
   - **Transcribing:** it ignored the Markdown instruction and answered with grounding pairs
     (`<ref>24.50</ref><box>…</box>`). It quietly corrected printed errors (`£44,079.83`) and
@@ -688,13 +750,15 @@ Qwen3.6's extraction took 73–123 s more per statement. Two BAC extractions add
     so the OCR step needs one per model, not a generic instruction.
   - **Time budgets:** `auto`'s retries multiply a slow local model's time, so a route needs
     a budget for each attempt as well as for the turn.
-  - **Dates:** reconciling doesn't check them. A check that every date falls inside the
-    statement's period would have caught WeVisOne's.
+  - **Dates:** reconciling doesn't check them. A period check wouldn't have caught WeVisOne's
+    (the wrong dates fall inside the period); `dates_anchored` does (see "Checks on an
+    extraction").
 - **Not run:**
   - WeVisOne's two scan transcriptions, because the server stopped mid-run for a model change;
   - its `vips` BAC direct extraction, which would likely take another 26 minutes;
   - 300 dpi, the model card's recommendation;
-  - `--special`.
+  - Qwen3.6's extraction from the `--special` transcriptions, and `--special` on the other
+    builds.
 
 ### Tracing modes: content and metadata, outside the criteria
 

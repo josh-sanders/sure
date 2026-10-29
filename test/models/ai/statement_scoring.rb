@@ -24,6 +24,12 @@ module StatementScoring
   # Transactions matched on month-day and signed amount, each at most once.
   # reconciles: the opening balance plus every transaction makes the closing
   # one, a check Sure could run on any extraction without knowing the answer.
+  # The answer-free checks, and whether they pass the extraction.
+  def checked(generation, value)
+    checks = generation.checks(value)
+    checks.to_h.merge(passed: checks.passed?)
+  end
+
   def score(value, truth)
     got = Array(value[:transactions]).map { |t| [ t["date"].to_s[5, 5], t["amount"].to_f.round(2) ] }
     remaining = got.dup

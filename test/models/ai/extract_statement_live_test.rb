@@ -25,27 +25,27 @@ class Ai::ExtractStatementLiveTest < ActiveSupport::TestCase
   # What each server did, recorded live (see the note's table).
   EXPECTED = {
     [ "gemini", "bac_ocr", "file" ] => "Refused: Invalid content part type: file",
-    [ "gemini", "bac_ocr", "images" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, input: 1252 },
-    [ "gemini", "bac_ocr", "text" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, input: 805 },
+    [ "gemini", "bac_ocr", "images" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, input: 1252, checks: { reconciles: true, amounts_in_source: nil, dates_anchored: nil, passed: true } },
+    [ "gemini", "bac_ocr", "text" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, input: 805, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.77, passed: true } },
     [ "gemini", "impact_scanned", "file" ] => "Refused: Invalid content part type: file",
-    [ "gemini", "impact_scanned", "images" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, input: 2354 },
-    [ "gemini", "impact_scanned", "text" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 531 },
+    [ "gemini", "impact_scanned", "images" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, input: 2354, checks: { reconciles: true, amounts_in_source: nil, dates_anchored: nil, passed: true } },
+    [ "gemini", "impact_scanned", "text" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 531, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
     [ "llama_cpp", "bac_ocr", "file" ] => "Refused: unsupported content[].type",
     [ "llama_cpp", "bac_ocr", "images" ] => "Upstream: image input is not supported - hint: if this is unexpected, you may need to provide the mmproj",
-    [ "llama_cpp", "bac_ocr", "text" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, input: 811 },
+    [ "llama_cpp", "bac_ocr", "text" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, input: 811, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.77, passed: true } },
     [ "llama_cpp", "impact_scanned", "file" ] => "Refused: unsupported content[].type",
     [ "llama_cpp", "impact_scanned", "images" ] => "Upstream: image input is not supported - hint: if this is unexpected, you may need to provide the mmproj",
-    [ "llama_cpp", "impact_scanned", "text" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 551 },
-    [ "openrouter_lightning", "bac_ocr", "file" ] => { matched: 2, of: 13, extra: 9, balances: true, reconciles: false, input: 1216 },
+    [ "llama_cpp", "impact_scanned", "text" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 551, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
+    [ "openrouter_lightning", "bac_ocr", "file" ] => { matched: 2, of: 13, extra: 9, balances: true, reconciles: false, input: 1216, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
     [ "openrouter_lightning", "bac_ocr", "images" ] => "Refused: No endpoints found that support image input",
-    [ "openrouter_lightning", "bac_ocr", "text" ] => { matched: 9, of: 13, extra: 4, balances: true, reconciles: false, input: 825 },
-    [ "openrouter_lightning", "impact_scanned", "file" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 1855 },
+    [ "openrouter_lightning", "bac_ocr", "text" ] => { matched: 9, of: 13, extra: 4, balances: true, reconciles: false, input: 825, checks: { reconciles: false, amounts_in_source: false, dates_anchored: 0.62, passed: false } },
+    [ "openrouter_lightning", "impact_scanned", "file" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 1855, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
     [ "openrouter_lightning", "impact_scanned", "images" ] => "Refused: No endpoints found that support image input",
-    [ "openrouter_lightning", "impact_scanned", "text" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 538 },
-    [ "openrouter_vl", "bac_ocr", "file" ] => { matched: 5, of: 13, extra: 8, balances: true, reconciles: false, input: 1216 },
-    [ "openrouter_vl", "bac_ocr", "images" ] => { matched: 13, of: 13, extra: 1, balances: true, reconciles: true, input: 1325 },
-    [ "openrouter_vl", "impact_scanned", "file" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 1855 },
-    [ "openrouter_vl", "impact_scanned", "images" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, input: 8654 }
+    [ "openrouter_lightning", "impact_scanned", "text" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 538, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
+    [ "openrouter_vl", "bac_ocr", "file" ] => { matched: 5, of: 13, extra: 8, balances: true, reconciles: false, input: 1216, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
+    [ "openrouter_vl", "bac_ocr", "images" ] => { matched: 13, of: 13, extra: 1, balances: true, reconciles: true, input: 1325, checks: { reconciles: true, amounts_in_source: nil, dates_anchored: nil, passed: true } },
+    [ "openrouter_vl", "impact_scanned", "file" ] => { matched: 0, of: 21, extra: 0, balances: false, reconciles: false, input: 1855, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
+    [ "openrouter_vl", "impact_scanned", "images" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, input: 8654, checks: { reconciles: true, amounts_in_source: nil, dates_anchored: nil, passed: true } }
   }.freeze
 
   def self.servers
@@ -118,13 +118,13 @@ class Ai::ExtractStatementLiveTest < ActiveSupport::TestCase
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           with_spike_cassette("statements/#{server}_#{statement}_#{form}") do
             @outcome = begin
-              generation(statement, form).call(route: instance_exec(&config[:route]))
+              (@generation = generation(statement, form)).call(route: instance_exec(&config[:route]))
             rescue Ai::Error::Base => e
               e
             end
           end
 
-          summary = @outcome.is_a?(Exception) ? "#{@outcome.class.name.demodulize}: #{@outcome.message.truncate(160)}" : score(@outcome.value, truth).merge(input: @outcome.usage.input_tokens + @outcome.usage.cache_read_tokens)
+          summary = @outcome.is_a?(Exception) ? "#{@outcome.class.name.demodulize}: #{@outcome.message.truncate(160)}" : score(@outcome.value, truth).merge(input: @outcome.usage.input_tokens + @outcome.usage.cache_read_tokens, checks: checked(@generation, @outcome.value))
           puts "\n  #{server} #{statement} #{form}: #{summary.inspect} requests=#{parts_sent.size} parts=#{parts_sent.inspect} #{(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(1)}s" if recording? || ENV["SPIKE_PRINT"]
           assert_equal EXPECTED.fetch([ server, statement, form ]), summary
         end

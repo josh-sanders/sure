@@ -32,6 +32,8 @@ class Ai::OcrLiveTest < ActiveSupport::TestCase
     [ :rx5950xt, :pdftoppm, "impact_scanned" ] => { pages: 2, output_tokens: 2064, finish: :stop, chars: 4095, amounts: 21, of: 21 },
     [ :rx5950xt, :vips, "bac_ocr" ] => { pages: 1, output_tokens: 1009, finish: :stop, chars: 2255, amounts: 13, of: 13 },
     [ :rx5950xt, :vips, "impact_scanned" ] => { pages: 2, output_tokens: 2064, finish: :stop, chars: 4095, amounts: 21, of: 21 },
+    [ :rx5950xt_special, :pdftoppm, "bac_ocr" ] => { pages: 1, output_tokens: 1009, finish: :stop, chars: 3169, amounts: 13, of: 13 },
+    [ :rx5950xt_special, :pdftoppm, "impact_scanned" ] => { pages: 2, output_tokens: 2064, finish: :stop, chars: 6604, amounts: 21, of: 21 },
     [ :wevisone, :pdftoppm, "bac_ocr" ] => { pages: 1, output_tokens: 1078, finish: :stop, chars: 3788, amounts: 13, of: 13 },
     [ :wevisone, :vips, "bac_ocr" ] => { pages: 1, output_tokens: 1048, finish: :stop, chars: 3691, amounts: 11, of: 13 }
   }.freeze
@@ -39,24 +41,24 @@ class Ai::OcrLiveTest < ActiveSupport::TestCase
   # so Qwen dated ten rows from their descriptions: every amount and sign
   # right, and one run still reconciles, so reconciling can't catch dates.
   EXPECTED_EXTRACTIONS = {
-    [ :atomicchat, :pdftoppm, "bac_ocr" ] => { matched: 13, of: 13, extra: 1, balances: true, reconciles: true },
-    [ :atomicchat, :pdftoppm, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true },
-    [ :atomicchat, :vips, "bac_ocr" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true },
-    [ :atomicchat, :vips, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true },
-    [ :rx5950xt, :pdftoppm, "bac_ocr" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true },
-    [ :rx5950xt, :pdftoppm, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true },
-    [ :rx5950xt, :vips, "bac_ocr" ] => { matched: 13, of: 13, extra: 1, balances: true, reconciles: true },
-    [ :rx5950xt, :vips, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true },
-    [ :wevisone, :pdftoppm, "bac_ocr" ] => { matched: 3, of: 13, extra: 10, balances: true, reconciles: true },
-    [ :wevisone, :vips, "bac_ocr" ] => { matched: 3, of: 13, extra: 10, balances: true, reconciles: false }
+    [ :atomicchat, :pdftoppm, "bac_ocr" ] => { matched: 13, of: 13, extra: 1, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.77, passed: true } },
+    [ :atomicchat, :pdftoppm, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.62, passed: true } },
+    [ :atomicchat, :vips, "bac_ocr" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.77, passed: true } },
+    [ :atomicchat, :vips, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.62, passed: true } },
+    [ :rx5950xt, :pdftoppm, "bac_ocr" ] => { matched: 13, of: 13, extra: 0, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.77, passed: true } },
+    [ :rx5950xt, :pdftoppm, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.62, passed: true } },
+    [ :rx5950xt, :vips, "bac_ocr" ] => { matched: 13, of: 13, extra: 1, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.77, passed: true } },
+    [ :rx5950xt, :vips, "impact_scanned" ] => { matched: 21, of: 21, extra: 0, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.62, passed: true } },
+    [ :wevisone, :pdftoppm, "bac_ocr" ] => { matched: 3, of: 13, extra: 10, balances: true, reconciles: true, checks: { reconciles: true, amounts_in_source: true, dates_anchored: 0.08, passed: false } },
+    [ :wevisone, :vips, "bac_ocr" ] => { matched: 3, of: 13, extra: 10, balances: true, reconciles: false, checks: { reconciles: false, amounts_in_source: false, dates_anchored: 0.15, passed: false } }
   }.freeze
   # WeVisOne straight to JSON: grounding tags in the descriptions, invented
   # years, and loops to the token cap at 7.9 tokens a second, so the BAC run
   # took 26 minutes over the auto chain's three attempts.
   EXPECTED_DIRECT = {
     [ :wevisone, :pdftoppm, "bac_ocr" ] => "InvalidOutput: none: unparseable output",
-    [ :wevisone, :pdftoppm, "impact_scanned" ] => { matched: 0, of: 21, extra: 0, balances: true, reconciles: false },
-    [ :wevisone, :vips, "impact_scanned" ] => { matched: 0, of: 21, extra: 0, balances: true, reconciles: false }
+    [ :wevisone, :pdftoppm, "impact_scanned" ] => { matched: 0, of: 21, extra: 0, balances: true, reconciles: false, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } },
+    [ :wevisone, :vips, "impact_scanned" ] => { matched: 0, of: 21, extra: 0, balances: true, reconciles: false, checks: { reconciles: false, amounts_in_source: nil, dates_anchored: nil, passed: false } }
   }.freeze
 
   def recorded?(name) = Rails.root.join("test/vcr_cassettes/ai/#{name}.yml").exist?
@@ -107,6 +109,19 @@ class Ai::OcrLiveTest < ActiveSupport::TestCase
 
   def report(line) = (puts "\n  #{line}" if recording? || ENV["SPIKE_PRINT"])
 
+  # Without --special, llama-server drops the model's table tags, so cells
+  # run together ("24.5039,975.50"). With it, the same tokens (1,009 and
+  # 2,064 either way) arrive as HTML, and so does the end-of-sequence token.
+  test "--special keeps the table tags, and the end-of-sequence token" do
+    without, with = %i[rx5950xt rx5950xt_special].map { recorded_transcription(_1, :pdftoppm, "bac_ocr") }
+
+    assert_equal [ 0, 84 ], [ without, with ].map { _1.scan("</td>").size }
+    assert_includes without, "24.5039,975.50"
+    assert_includes with, "<td>24.50</td><td></td><td>39,975.50</td>"
+    assert with.end_with?("<｜end▁of▁sentence｜>"), "Sure has to strip it"
+    assert_not_includes without, "end▁of▁sentence"
+  end
+
   Ai::Spike::Presets::OCR.each_key do |variant|
     RENDERERS.each do |renderer|
       STATEMENTS.each do |statement, truth|
@@ -136,13 +151,13 @@ class Ai::OcrLiveTest < ActiveSupport::TestCase
             route = Ai::Spike::Route.new(model: Ai::Spike::Model.new(endpoint:, name: Ai::Spike::Presets::OCR.fetch(variant)[:model], max_output_tokens: 6000))
             with_spike_cassette(cassette(variant, renderer, statement, :direct)) do
               @result, @seconds = timed do
-                Ai::Generations::ExtractBankStatement.new(files:).call(route:)
+                (@generation = Ai::Generations::ExtractBankStatement.new(files:)).call(route:)
               rescue Ai::Error::Base => e
                 e
               end
             end
 
-            @summary = @result.is_a?(Exception) ? "#{@result.class.name.demodulize}: #{@result.message.truncate(120)}" : score(@result.value, truth)
+            @summary = @result.is_a?(Exception) ? "#{@result.class.name.demodulize}: #{@result.message.truncate(120)}" : score(@result.value, truth).merge(checks: checked(@generation, @result.value))
             report "#{variant} #{renderer} #{statement} direct: #{@summary.inspect} requests=#{WebMock::RequestRegistry.instance.requested_signatures.hash.values.sum} #{@seconds}s"
             assert_equal EXPECTED_DIRECT.fetch([ variant, renderer, statement ]), @summary unless recording?
           end
@@ -156,13 +171,13 @@ class Ai::OcrLiveTest < ActiveSupport::TestCase
           text = recorded_transcription(variant, renderer, statement)
           with_spike_cassette(cassette(variant, renderer, statement, :extract)) do
             @result, @seconds = timed do
-              Ai::Generations::ExtractBankStatement.new(text:).call(route: llama_route(endpoint: Ai::Spike::Presets.llama_cpp(timeout_seconds: 900)))
+              (@generation = Ai::Generations::ExtractBankStatement.new(text:)).call(route: llama_route(endpoint: Ai::Spike::Presets.llama_cpp(timeout_seconds: 900)))
             rescue Ai::Error::Base => e
               e
             end
           end
 
-          @summary = @result.is_a?(Exception) ? "#{@result.class.name.demodulize}: #{@result.message.truncate(120)}" : score(@result.value, truth)
+          @summary = @result.is_a?(Exception) ? "#{@result.class.name.demodulize}: #{@result.message.truncate(120)}" : score(@result.value, truth).merge(checks: checked(@generation, @result.value))
           report "#{variant} #{renderer} #{statement} extract: #{@summary.inspect} #{@seconds}s"
           assert_equal EXPECTED_EXTRACTIONS.fetch([ variant, renderer, statement ]), @summary unless recording?
         end

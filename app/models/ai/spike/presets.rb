@@ -41,6 +41,9 @@ module Ai::Spike::Presets
   OCR = {
     atomicchat: { gguf: "Unlimited-OCR-2-AD-Q4_K.gguf", model: "unlimited-ocr-2", prompt: :template },
     rx5950xt: { gguf: "RX5950XT-Unlimited-OCR-2-Q4_K_M.gguf", model: "unlimited-ocr-2-rx5950xt", prompt: :sent },
+    # The same, with llama-server started with --special, which keeps
+    # special tokens (the model's table tags) in the text.
+    rx5950xt_special: { gguf: "RX5950XT-Unlimited-OCR-2-Q4_K_M.gguf", model: "unlimited-ocr-2-rx5950xt", prompt: :sent },
     wevisone: { gguf: "WeVisOne-VL-4B.Q4_K_M.gguf", model: "wevisone-vl-4b", prompt: :instruction }
   }.freeze
 

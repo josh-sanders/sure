@@ -66,6 +66,25 @@ class Ai::ExtractStatementStubbedTest < ActiveSupport::TestCase
     assert_equal [ { filename: "bac_ocr.pdf", bytes: 256_826 } ], events.sole.payload[:prompt][:attachments], "the event names the file; it never carries it"
   end
 
+  test "for_pdf: without a vision model, the text layer, or unavailable for a scan" do
+    generation = Ai::Generations::ExtractBankStatement.for_pdf(FILES.join("bac_ocr.pdf").binread, vision: false)
+    assert_empty generation.attachments
+    assert_match "--- Page 1 ---", generation.input
+    assert_match "MonthlyApartmentRent", generation.input, "the OCR'd text layer, as printed"
+
+    error = assert_raises(Ai::Error::Unavailable) { Ai::Generations::ExtractBankStatement.for_pdf(FILES.join("impact_scanned.pdf").binread, vision: false) }
+    assert_equal "no_text_layer", error.reason
+  end
+
+  test "for_pdf: with a vision model, page images, at most MAX_PAGES" do
+    skip "pdftoppm isn't installed" unless system("pdftoppm", "-v", out: File::NULL, err: File::NULL)
+
+    generation = Ai::Generations::ExtractBankStatement.for_pdf(FILES.join("impact_scanned.pdf").binread, vision: true)
+    assert_equal %w[page-1.png page-2.png], generation.attachments.map(&:filename)
+    assert_equal "The bank statement is attached.", generation.input
+    assert_equal 1, Ai::Generations::ExtractBankStatement.for_pdf(FILES.join("impact_scanned.pdf").binread, vision: true, max_pages: 1).attachments.size
+  end
+
   test "the hand-written transports refuse attachments rather than drop them" do
     assert_raises(Ai::Error::Refused) { statement([ attachment("bac_ocr.pdf") ]).call(route: anthropic_route, hand_written: true) }
     assert_raises(Ai::Error::Refused) { statement([ attachment("bac_ocr.pdf") ]).call(route: llama_route, hand_written: true) }
