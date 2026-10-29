@@ -1,0 +1,216 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"nvidia/nemotron-3.5-lightning:free","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_tokens":8192,"response_format":{"type":"json_schema","json_schema":{"name":"extract_pdf","schema":{"type":"object","properties":{"currency":{"type":["string","null"]},"period_start":{"type":["string","null"]},"period_end":{"type":["string","null"]},"opening_balance":{"type":["number","null"]},"closing_balance":{"type":["number","null"]},"transactions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string"},"description":{"type":"string"},"amount":{"type":"number"}},"required":["date","description","amount"],"additionalProperties":false}}},"required":["currency","period_start","period_end","opening_balance","closing_balance","transactions"],"additionalProperties":false},"strict":true}},"reasoning":{"effort":"none"},"plugins":[{"id":"file-parser","pdf":{"engine":"pdf-text"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Http-Referer:
+      - https://sure.am
+      X-Openrouter-Title:
+      - Sure
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 08:55:15 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Generation-Id:
+      - gen-1793264115-bttGqJzl2wUa5sUjEEqd
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      Set-Cookie:
+      - __cf_bm=xPpRrxVf1eQhJ.P3DHa7hMcIQNJWdIDADsrfHjBn7OE-1793264115.111452-1.0.1.1-Hdbm6_Vo6AoWirZv.kTDRkSIibX2Yd2MK2mdU963yw.4fdywghdVPZym9Dn5EItheeq2gKr6xnPNgoCeQtZkpq8eEGY7RZc.nbKTXcKofzTsVN3W7Yryojc7tVEWvtfQ;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu,
+        29 Oct 2026 09:25:15 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a520f5cf7a87d734-BNE
+    body:
+      encoding: ASCII-8BIT
+      string: "\n         \n{\"id\":\"gen-1793264115-bttGqJzl2wUa5sUjEEqd\",\"object\":\"chat.completion\",\"created\":1793264115,\"model\":\"nvidia/nemotron-3.5-lightning:free\",\"provider\":\"Nvidia\",\"system_fingerprint\":null,\"service_tier\":null,\"choices\":[{\"index\":0,\"logprobs\":null,\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\n
+        \ \\\"currency\\\": null,\\n  \\\"period_start\\\": null,\\n  \\\"period_end\\\":
+        null,\\n  \\\"opening_balance\\\": null,\\n  \\\"closing_balance\\\": null,\\n
+        \ \\\"transactions\\\": []\\n}\",\"refusal\":null,\"reasoning\":null}}],\"usage\":{\"prompt_tokens\":165,\"completion_tokens\":42,\"total_tokens\":207,\"cost\":0,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0,\"upstream_inference_prompt_cost\":0,\"upstream_inference_completions_cost\":0},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}"
+  recorded_at: Thu, 29 Oct 2026 08:55:15 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"nvidia/nemotron-3.5-lightning:free","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_tokens":8192,"reasoning":{"effort":"none"},"plugins":[{"id":"file-parser","pdf":{"engine":"pdf-text"}}],"response_format":{"type":"json_object"}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Http-Referer:
+      - https://sure.am
+      X-Openrouter-Title:
+      - Sure
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 08:55:16 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Generation-Id:
+      - gen-1793264115-0x5nueaJ5fTCJkPTer6H
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      Set-Cookie:
+      - __cf_bm=sSFqNwowtcfr_MJ25dU8rwrixEK_FIOct7U2O8Islug-1793264115.9901216-1.0.1.1-nDScrnrd_lkPLiEzTp.8Z.xYSy.BwGsXC214mQ4mPgEv2MSLqAW.Od7uDzwNRc3ImHksZkzzDZuS1mXCSBk7pNI65xK.LKFg.8Fw6cg1oAq3r2FhQOfOn5lcrSSN1FP2;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu,
+        29 Oct 2026 09:25:16 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a520f5d4ea7c7820-BNE
+    body:
+      encoding: ASCII-8BIT
+      string: "\n         \n{\"id\":\"gen-1793264115-0x5nueaJ5fTCJkPTer6H\",\"object\":\"chat.completion\",\"created\":1793264115,\"model\":\"nvidia/nemotron-3.5-lightning:free\",\"provider\":\"Nvidia\",\"system_fingerprint\":null,\"service_tier\":null,\"choices\":[{\"index\":0,\"logprobs\":null,\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\n
+        \ \\\"opening_balance\\\": null,\\n  \\\"closing_balance\\\": null,\\n  \\\"transactions\\\":
+        []\\n}\",\"refusal\":null,\"reasoning\":null}}],\"usage\":{\"prompt_tokens\":165,\"completion_tokens\":22,\"total_tokens\":187,\"cost\":0,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0,\"upstream_inference_prompt_cost\":0,\"upstream_inference_completions_cost\":0},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}"
+  recorded_at: Thu, 29 Oct 2026 08:55:16 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"nvidia/nemotron-3.5-lightning:free","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess.\n\nRespond
+        with JSON only, no markdown, in exactly this shape:\n{\"currency\":\"string\",\"period_start\":\"string\",\"period_end\":\"string\",\"opening_balance\":\"number\",\"closing_balance\":\"number\",\"transactions\":\"array\"}"},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_tokens":8192,"reasoning":{"effort":"none"},"plugins":[{"id":"file-parser","pdf":{"engine":"pdf-text"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Http-Referer:
+      - https://sure.am
+      X-Openrouter-Title:
+      - Sure
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 08:55:17 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Generation-Id:
+      - gen-1793264116-WvFPLcRZSBECKYsThM0l
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      Set-Cookie:
+      - __cf_bm=Hu4oA6O6eKtn9B2W_oXvcv62tcP49Og26RXo6EBHz3I-1793264116.9565415-1.0.1.1-Z60toe9FM9QnhDF8XL0jlybed.Gd6EoiK1J2PmsIhg3yGu3cj2RQCBX8Yyd6ZmwTbbn3cYgR_1dALosVwHWqbvqELRb.N35txzGoVQv5SMf450fgEO8K2v21xpIVVs8t;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu,
+        29 Oct 2026 09:25:17 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a520f5dafa237820-BNE
+    body:
+      encoding: ASCII-8BIT
+      string: "\n         \n{\"id\":\"gen-1793264116-WvFPLcRZSBECKYsThM0l\",\"object\":\"chat.completion\",\"created\":1793264116,\"model\":\"nvidia/nemotron-3.5-lightning:free\",\"provider\":\"Nvidia\",\"system_fingerprint\":null,\"service_tier\":null,\"choices\":[{\"index\":0,\"logprobs\":null,\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\n
+        \ \\\"currency\\\": \\\"\\\",\\n  \\\"period_start\\\": \\\"\\\",\\n  \\\"period_end\\\":
+        \\\"\\\",\\n  \\\"opening_balance\\\": null,\\n  \\\"closing_balance\\\":
+        null,\\n  \\\"transactions\\\": []\\n}\",\"refusal\":null,\"reasoning\":null}}],\"usage\":{\"prompt_tokens\":208,\"completion_tokens\":39,\"total_tokens\":247,\"cost\":0,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0,\"upstream_inference_prompt_cost\":0,\"upstream_inference_completions_cost\":0},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}"
+  recorded_at: Thu, 29 Oct 2026 08:55:17 GMT
+recorded_with: VCR 6.3.1

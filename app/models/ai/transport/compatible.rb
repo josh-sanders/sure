@@ -6,7 +6,7 @@ class Ai::Transport::Compatible < Ai::Transport::Base
   include Ai::Transport::RubyLlmAdapter
 
   def generate(request)
-    instrument("generate", model: request.model, request: request.to_h.except(:model)) do
+    instrument("generate", model: request.model, request: event_request(request)) do
       # The Responses API always takes a strict schema (section 7).
       generate_with_json_mode(request, json_mode: endpoint.responses_api ? "strict" : request.json_mode || endpoint.json_mode)
     end
@@ -56,7 +56,7 @@ class Ai::Transport::Compatible < Ai::Transport::Base
       chat.with_schema(name: request.schema_name, schema: request.schema, strict: true) if mode == "strict"
       chat.with_provider_options(endpoint.extra_body.merge(mode == "json_object" ? { response_format: { type: "json_object" } } : {}))
       chat.with_thinking(effort:) if effort
-      chat.add_message(role: :user, content: request.input)
+      chat.add_message(role: :user, content: request.input, attachments: ruby_llm_attachments(request.attachments))
 
       message = mapping_errors { chat.generate }
       [ message.content, usage_of(message), raw_id(message) ]

@@ -26,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (160 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (187 runs, 1 skip:
 the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -361,6 +361,90 @@ So Sure can keep the loop and its bounds while RubyLLM runs the tools. The spike
   than Sure's own loop. Without those features, Sure's loop is shorter and doesn't depend on
   RubyLLM's tool semantics, such as its denial message and its unknown-tool error, which lists
   every tool name.
+
+### Bank statements as PDFs (`extract_pdf`), outside the criteria
+
+The plan moves PDF import onto `Ai::Generation` in PR 2, so the statement's file goes through
+RubyLLM's `generate`. Today Sure prepares it differently per provider:
+- the OpenAI path sends the text layer from `Pdf::TextExtractor`, then for a scan the first five
+  pages as images rendered by `pdftoppm`;
+- the Anthropic path sends the PDF itself.
+
+The spike sent `Ai::Generations::ExtractBankStatement` three ways: the text layer, the PDF as
+RubyLLM's file part, and page images at 150 dpi, as Sure renders them.
+
+It used two public sample statements (`test/fixtures/files/statements/`):
+- **BAC:** one page, with a machine-OCR'd text layer full of errors (`£44.079.83`, words run
+  together) and 13 transactions. Its own "Total money in" is wrong by £1.
+- **Impact:** two pages, a scan with no text layer. It lists the same 21 transactions twice, by
+  date and then by type, and the two pages disagree on one of them.
+
+Results are scored on date and signed amount. "Reconciles" means the opening balance plus every
+transaction makes the closing balance. Tests: `extract_statement_live_test`, cassettes under
+`statements/`.
+
+| Server (model) | Text layer | PDF as a file part | Page images |
+|---|---|---|---|
+| llama.cpp (Qwen3.6, no vision) | BAC 13/13, reconciles. Scan: empty, as the prompt asks | 400 "unsupported content[].type" → `Refused` | 500 "image input is not supported" → `Upstream` |
+| Gemini (`gemini-3.5-flash-lite`, compatible API) | BAC 13/13, reconciles. Scan: empty | 400 "Invalid content part type: file" → `Refused` | BAC 13/13 and scan 21/21, both reconcile, no duplicates |
+| OpenRouter Nemotron Lightning (text only, effort none) | BAC 9/13 and 4 wrong; doesn't reconcile | Free `pdf-text` engine: BAC 2/13; scan: empty | 404 "No endpoints found that support image input" → `Refused` |
+| OpenRouter Nemotron Super VL (vision, effort none) | not run | Free `pdf-text` engine: BAC 5/13; scan: empty | BAC 13/13 (plus a zero "balance brought forward" row) and scan 21/21, both reconcile |
+
+- **Only OpenRouter takes RubyLLM's file part.** RubyLLM sends a PDF as a `file` part to every
+  OpenAI-compatible server. llama.cpp and Gemini's compatible API reject it with a 400.
+  `convert_unsupported_attachments` never runs for them, because RubyLLM thinks the protocol
+  supports PDFs. Sure has to decide what to send from the model's capabilities.
+- **Page images are what works for a vision model.** Gemini and Super VL read the scan
+  completely. They didn't count the twice-listed transactions twice, and they took page 1's
+  version of the disputed row, the one the running balances agree with. Today's `pdftoppm`
+  fallback is the right shape, but its five-page limit stays a limit.
+- **The text layer works for a capable model**, even with OCR errors: llama.cpp's Qwen3.6 and
+  Gemini both got 13/13. On the scan's empty text layer both returned an empty statement rather
+  than making one up.
+- **Wrong answers look right, and reconciling catches them.** Lightning booked "Balance brought
+  forward" as a −£40,000 transaction, merged two rows into −£118.34 and flipped a sign, while
+  reporting both balances correctly. Every wrong extraction in the matrix fails to reconcile,
+  and every right one reconciles. Sure can run that check on any import without knowing the
+  answer, and hold back or flag one that fails.
+- **OpenRouter bills PDF parsing, even for free models.** With no engine named, OpenRouter
+  OCR'd the scan for the text-only Lightning, and the model saw every amount. The cost was
+  $0.002 a page, once for every request. The `auto` chain sent each file three times, so the
+  spike's first run spent $0.018 (cassettes `openrouter_default_engine_*`, kept and never
+  re-recorded). Naming the free `pdf-text` engine
+  (`plugins: [{id: "file-parser", pdf: {engine: "pdf-text"}}]`) costs nothing, but reads only a
+  text layer, and less well than Sure's own: 1,216 input tokens against 825, and 2/13 against
+  9/13 on Lightning. OpenRouter returns the parsed file as an annotation, to be sent back so it
+  isn't parsed again. RubyLLM doesn't send it back.
+- **Two error-path fixes:**
+  - **A 500 that isn't an outage.** llama.cpp answers images it can't read with a 500, which
+    section 9 treats as an outage (failover and a down mark). Checking the route's `vision`
+    need before sending avoids it.
+  - **The `auto` chain retries a 400 that isn't about the JSON mode.** It resends the whole
+    file twice more on a 400 like "unsupported content[].type", on Gemini and llama.cpp.
+- **The `auto` chain and empty answers.** A statement that really is empty is "mostly null", so
+  `auto` asks twice more. It also rescued Super VL, whose strict-mode answer for the scan was the
+  prompt's empty "can't read it" statement, and whose `json_object` answer was complete. Sure
+  knows when the text layer is empty, so it shouldn't send an empty text layer at all.
+- **Large files stay inline.** RubyLLM uploads a file over Anthropic's 24 MB inline limit, or
+  over 50 MB on the `:openai` provider, to the provider's Files API, where it stays until
+  deleted. On local servers that means posting to `/v1/files`. Sure's adapter sets
+  `auto_upload_large_files = false` (`extract_statement_stubbed_test`).
+- **The rest:**
+  - the `.ai` event carries each file's name and size, never its bytes;
+  - Anthropic gets a base64 `document` block for the PDF and `image` blocks for pages (stubbed);
+  - the hand-written transports refuse attachments rather than drop them;
+  - these cassettes add 10.5 MB, because the retries resend the base64 file.
+- **Not tested:**
+  - OpenAI direct (the Responses API's `input_file`) and Anthropic live, which had no key;
+  - a local vision model: venus has no vision projector (mmproj) for its GGUFs;
+  - statements over five pages.
+
+**Conclusion.** RubyLLM carries the bytes well, but the choice of what to send stays Sure's: one
+small step before `generate` in place of today's three classes. With a vision model, send page
+images. Without one, send the text layer. If the text layer is empty and there's no vision
+model, the feature is unavailable ("no model can read scanned PDFs"). Send the PDF itself only
+to providers that read it natively (Anthropic, OpenAI) or to OpenRouter with a named engine.
+Reconcile every result.
 
 ### Tracing modes: content and metadata, outside the criteria
 

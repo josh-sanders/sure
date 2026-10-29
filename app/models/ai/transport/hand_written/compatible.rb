@@ -4,7 +4,10 @@ class Ai::Transport::HandWritten::Compatible < Ai::Transport::Base
   include Ai::Transport::JsonMode
 
   def generate(request)
-    instrument("generate", model: request.model, request: request.to_h.except(:model)) do
+    # The spike didn't port today's per-provider PDF handling here.
+    raise Ai::Error::Refused, "the hand-written transport doesn't send attachments" if request.attachments.any?
+
+    instrument("generate", model: request.model, request: event_request(request)) do
       generate_with_json_mode(request, json_mode: request.json_mode || endpoint.json_mode)
     end
   end

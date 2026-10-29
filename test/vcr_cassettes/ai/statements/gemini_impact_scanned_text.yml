@@ -1,0 +1,210 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_completion_tokens":8192,"response_format":{"type":"json_schema","json_schema":{"name":"extract_pdf","schema":{"type":"object","properties":{"currency":{"type":["string","null"]},"period_start":{"type":["string","null"]},"period_end":{"type":["string","null"]},"opening_balance":{"type":["number","null"]},"closing_balance":{"type":["number","null"]},"transactions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string"},"description":{"type":"string"},"amount":{"type":"number"}},"required":["date","description","amount"],"additionalProperties":false}}},"required":["currency","period_start","period_end","opening_balance","closing_balance","transactions"],"additionalProperties":false},"strict":true}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 08:30:31 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=3413
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl3lm6v5ku6jVKGKOFIitOcqB2bubSBjcM_Ufs304mNXSXfcq5kIa8XzgaQFUl5nV8UFjUhOKDIiVqz6v02sFG0CJdSKiEepGN5QFTOvhqaQyUzj03iB9XdFn1oIOTr8ciE4-LKNdt6EQYOQivrWcfCWTo6S22Ga3J59i2SCA-AX7E-P-_PX4OCgBMkUBcEpCzzdFzEoesyGAnsXKHV_lc9_b4zi-MWg_EqKR94OfMJd5tV25-8XSEfmd2X8pCVwn9KfUx4rPrpcYL3vzcvfC_wQ;
+        expires=Fri, 30-Apr-2027 08:30:28 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 08:30:31 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"{\n  \"currency\":
+        null,\n  \"period_start\": null,\n  \"period_end\": null,\n  \"opening_balance\":
+        null,\n  \"closing_balance\": null,\n  \"transactions\": []\n}","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TLVm4tT/vccmfEw4WuOd/d0p58coa2c3//t+ixz8u7fRefiVgGfSTz+89wCBNlbVmErdaoKoJrB/F1NfdMpmveOcLm0dbkuzBtDKQL9agbAsKC8GnnRkj0mc="}},"role":"assistant"}}],"created":1793262631,"id":"JATjapSlK-np1e8PvIuI0Aw","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":52,"prompt_tokens":161,"total_tokens":213}}'
+  recorded_at: Thu, 29 Oct 2026 08:30:31 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_completion_tokens":8192,"response_format":{"type":"json_object"}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 08:32:10 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=98166
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl-y4RfKw3alz2dY_XoUulOmyw7WSo38ycfo6KUVU4aW7nNAt0nB8Wz_3FW9n7GMSY1umyzWR56rjExJlK1NlH0N4tUg01YgEMlOxrvdRUiT9wGDHTtsx3Gb2KMcf-rpP2sRi41m0S-Wk4dcmUfkErAxrviJBIlaoqYWi9k2x4Pb4eNdeX_lLuCgBMkUBcEpCz-LJAl6MXkHmoMM9v4KURRXSlCVMK1HcoDjU6OIrWEzE9wAkdNcqH1crUrejAfM5tKledJmBCMTTKC1NuGGkKQo;
+        expires=Fri, 30-Apr-2027 08:30:32 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 08:32:10 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"{\n  \"account_holder\":
+        null,\n  \"account_number\": null,\n  \"bank_name\": null,\n  \"statement_period\":
+        {\n    \"start_date\": null,\n    \"end_date\": null\n  },\n  \"opening_balance\":
+        null,\n  \"closing_balance\": null,\n  \"transactions\": []\n}","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TqKHJplqbVxoQVUjuO6HUCbky0mhwwt9mrQn0ILbqqwLcUw60PZ27K4IQ/i/DIJE/oVj0vMyd+KSDgFEgVhn10O50ynOFo5sniMdTsleK3WT5w+FHkY2dSr4="}},"role":"assistant"}}],"created":1793262730,"id":"KATjauH8EMTarfcP5sTI2QI","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":82,"prompt_tokens":161,"total_tokens":243}}'
+  recorded_at: Thu, 29 Oct 2026 08:32:10 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess.\n\nRespond
+        with JSON only, no markdown, in exactly this shape:\n{\"currency\":\"string\",\"period_start\":\"string\",\"period_end\":\"string\",\"opening_balance\":\"number\",\"closing_balance\":\"number\",\"transactions\":\"array\"}"},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_completion_tokens":8192}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 08:32:11 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1196
+      Set-Cookie:
+      - NID=CtkBCAESiwEBM9Agl5jLizJTYMrGj73QNrCshREHHe5AGhrM0dsiMwKCONTLOkww-uJ7iVenHPc_-9CzKZC6PZnpjfpJU-8u5JmuL8gKKHQtW9UwkfR4q8sW0KGDIoakwqRfnJDsXBn6cNYtYe05DmksuhpAuLMNxiLqQ10_BWlw27BwlG41eJWU0fVqpiz_uEs3KAEyRQFwSkLPIkm7G0dpEQcwUXKgKZihcoEywFvvhtGpktXjBc-BjBmdmh3PMnYSA0d1cUWCJu7gYoaWVaEudAq-po9OyviZBw;
+        expires=Fri, 30-Apr-2027 08:32:10 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 08:32:11 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"{\"currency\":null,\"period_start\":null,\"period_end\":null,\"opening_balance\":null,\"closing_balance\":null,\"transactions\":[]}","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0THCKAGsxakhoKiX5o+352s700ow5V+1TNo5oN08F+RJgQLEr93qg8M74Z4kHJgOWxERKXzFepwdsKa8UMwwhweakSoRpk6BA6j+1XqRdzEr28SzM6YN6YAJA="}},"role":"assistant"}}],"created":1793262731,"id":"igTjaoSbJ_vdvr0PlMCdEQ","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":32,"prompt_tokens":209,"total_tokens":241}}'
+  recorded_at: Thu, 29 Oct 2026 08:32:11 GMT
+recorded_with: VCR 6.3.1

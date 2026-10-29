@@ -5,7 +5,7 @@ class Ai::Transport::Anthropic < Ai::Transport::Base
   include Ai::Transport::RubyLlmAdapter
 
   def generate(request)
-    instrument("generate", model: request.model, request: request.to_h.except(:model)) do
+    instrument("generate", model: request.model, request: event_request(request)) do
       forced = Provider::Anthropic.forced_tool_choice_supported?(request.model.name)
       tool = request.schema_name
       chat = chat_for(request.model)
@@ -13,7 +13,7 @@ class Ai::Transport::Anthropic < Ai::Transport::Base
       chat.with_tools(DeclaredTool.new(ToolSpec.new(name: tool, description: "Report the result.", schema: request.schema)))
       chat.with_tool_options(choice: forced ? tool.to_sym : :auto, calls: :one)
       chat.with_max_output_tokens(request.max_tokens || 4096)
-      chat.add_message(role: :user, content: request.input)
+      chat.add_message(role: :user, content: request.input, attachments: ruby_llm_attachments(request.attachments))
 
       message = mapping_errors { chat.generate }
       usage = usage_of(message)

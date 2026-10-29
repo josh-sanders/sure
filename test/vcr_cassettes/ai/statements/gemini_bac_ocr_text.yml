@@ -1,0 +1,110 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gemini-3.5-flash-lite","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n                                  Bank
+        Statement Example\n\n\n\nYourBank                                                                 Accountname:Mr
+        JohnSmith\n16HighStreet.Anytown, Anyshire YZ991XY                                   AccountType:Checking\n                                                                         Accountnumber:99988877\nMrJohnSmith\n5AnyRoad                                                                 Yourcurrent
+        account statement:\nRandomford                                                               1
+        February to 1March,2019\nAnyshire\nYZ985XY\n                                                                                                   Page1
+        of1\n\n\n\n\n\n\n    Your account summary\n\n\n    Balanceat 1February: £40,000,00\n\n         Totalmoneyin:   £5,474.00\n         Totalmoneyout:
+        £1,395.17\n    Balanceat1 March: £44.079.83\n\n\n                                                                                        Money\n     Date                           Description                            Money                    Balance\n                                                                            out            In\n               Balance
+        brought forward                                                              40,000.00\n\n  1
+        February   Cardpayment-HighStPetrolStation                             24.50                    39,975.50\n               Directdebit-GreenMobilePhoneBill                            20.00                    39,955.50\n\n
+        3 February     CashWithdrawal -YourBank,Anytown                           30.00                    39,925.50\n                HighStreet,timed17:3031Jan\n
+        4 February     YourJobBiWeeklyPayment                                                   2,575.00   42,500.50\n\n
+        11 February   DirectDeposit-YourBank,AnytownHigh                                        300.00     42,800.50\n               Street,timed17:3031Jan\n                                                                                                    42,750.50\n
+        16 February    CashWithdrawal-RandomBank,Randomford,                       50.00\n                timed9.5214Feb\n  17
+        February  Cardpayment-HighStPetrolStation                              40.00                   42,710.50\n                DirectDebit-HomeInsurance\n                                                                            78.34                   42,632.16\n  18
+        February                                                                            2,575.00   45,207.16\n               YourJobBiWeeklyPayment\n\n
+        18 February    Randomford''sDeli                                            15.00                   45,195.16\n\n
+        24 February    Anytown''sJewelers                                           150.00                 45,042.16\n                DirectDeposit\n                                                                                         25.00     45,067.16\n\n
+        28 February    MonthlyApartmentRent                                        987.33                 44.079.83\n\n\n\n                                                                                                    £44.079.83"}],"stream":false,"max_completion_tokens":8192,"response_format":{"type":"json_schema","json_schema":{"name":"extract_pdf","schema":{"type":"object","properties":{"currency":{"type":["string","null"]},"period_start":{"type":["string","null"]},"period_end":{"type":["string","null"]},"opening_balance":{"type":["number","null"]},"closing_balance":{"type":["number","null"]},"transactions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string"},"description":{"type":"string"},"amount":{"type":"number"}},"required":["date","description","amount"],"additionalProperties":false}}},"required":["currency","period_start","period_end","opening_balance","closing_balance","transactions"],"additionalProperties":false},"strict":true}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_GEMINI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      P3p:
+      - CP="This is not a P3P policy! See g.co/p3phelp for more info."
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 08:38:37 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=5289
+      Set-Cookie:
+      - NID=CtoBCAESjAEBM9Agl2LzyLilEhEMyCw0S490MtLwWlo9N1SRuWofqiRNbTjQwoXGERaBhR8GGx5ojncrhsuAndt-UsraZGE7RcqobPeLz9bBFZQrhBzy3FUiS4_BsfutaUJum14Is508tDpmjj_3IGjfyaI1MuklmYI5pX0XJaE-ZYtzhFhCyk1S8NzFpP690YvjfigBMkUBcEpCzw736IhdrtgM59K_QPYh49VLCOrHFRFUy4iC3pN5da2INlm16BiPvrcr8mHk8MtVbM5EG3mPYNPtyPTeWicOHAM;
+        expires=Fri, 30-Apr-2027 08:38:32 GMT; path=/; domain=.generativelanguage.googleapis.com;
+        HttpOnly
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Expires:
+      - Thu, 29 Oct 2026 08:38:37 GMT
+      Cache-Control:
+      - private
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"{\n  \"currency\":
+        \"GBP\",\n  \"period_start\": \"2019-02-01\",\n  \"period_end\": \"2019-03-01\",\n  \"opening_balance\":
+        40000.00,\n  \"closing_balance\": 44079.83,\n  \"transactions\": [\n    {\n      \"date\":
+        \"2019-02-01\",\n      \"description\": \"Card payment - High St Petrol Station\",\n      \"amount\":
+        -24.50\n    },\n    {\n      \"date\": \"2019-02-01\",\n      \"description\":
+        \"Direct debit - Green Mobile Phone Bill\",\n      \"amount\": -20.00\n    },\n    {\n      \"date\":
+        \"2019-02-03\",\n      \"description\": \"Cash Withdrawal - YourBank, Anytown
+        High Street, timed 17:30 31 Jan\",\n      \"amount\": -30.00\n    },\n    {\n      \"date\":
+        \"2019-02-04\",\n      \"description\": \"Your Job Bi Weekly Payment\",\n      \"amount\":
+        2575.00\n    },\n    {\n      \"date\": \"2019-02-11\",\n      \"description\":
+        \"Direct Deposit - YourBank, Anytown High Street, timed 17:30 31 Jan\",\n      \"amount\":
+        300.00\n    },\n    {\n      \"date\": \"2019-02-16\",\n      \"description\":
+        \"Cash Withdrawal - RandomBank, Randomford, timed 9.52 14 Feb\",\n      \"amount\":
+        -50.00\n    },\n    {\n      \"date\": \"2019-02-17\",\n      \"description\":
+        \"Card payment - High St Petrol Station\",\n      \"amount\": -40.00\n    },\n    {\n      \"date\":
+        \"2019-02-17\",\n      \"description\": \"Direct Debit - Home Insurance\",\n      \"amount\":
+        -78.34\n    },\n    {\n      \"date\": \"2019-02-18\",\n      \"description\":
+        \"Your Job Bi Weekly Payment\",\n      \"amount\": 2575.00\n    },\n    {\n      \"date\":
+        \"2019-02-18\",\n      \"description\": \"Randomford''s Deli\",\n      \"amount\":
+        -15.00\n    },\n    {\n      \"date\": \"2019-02-24\",\n      \"description\":
+        \"Anytown''s Jewelers\",\n      \"amount\": -150.00\n    },\n    {\n      \"date\":
+        \"2019-02-24\",\n      \"description\": \"Direct Deposit\",\n      \"amount\":
+        25.00\n    },\n    {\n      \"date\": \"2019-02-28\",\n      \"description\":
+        \"Monthly Apartment Rent\",\n      \"amount\": -987.33\n    }\n  ]\n}","extra_content":{"google":{"thought_signature":"EmAKXgFpFH0TVqlcWiAiv0iNlyy4DWpj3BLrfzt1MjUKzr1F5S8ZxGFH7B9UGCmQqoXSZ+q3s+8s+W9hggsXkoO0kyvrDu3uaXdJGpvCcmasaKD1pFufxMW5JM/uR3r/bes="}},"role":"assistant"}}],"created":1793263117,"id":"CAbjatH_Fo6bvr0Pv--X4Q0","model":"gemini-3.5-flash-lite","object":"chat.completion","usage":{"completion_tokens":749,"prompt_tokens":805,"total_tokens":1554}}'
+  recorded_at: Thu, 29 Oct 2026 08:38:37 GMT
+recorded_with: VCR 6.3.1

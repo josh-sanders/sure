@@ -1,0 +1,89 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"nvidia/nemotron-3.5-lightning:free","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n                                  Bank
+        Statement Example\n\n\n\nYourBank                                                                 Accountname:Mr
+        JohnSmith\n16HighStreet.Anytown, Anyshire YZ991XY                                   AccountType:Checking\n                                                                         Accountnumber:99988877\nMrJohnSmith\n5AnyRoad                                                                 Yourcurrent
+        account statement:\nRandomford                                                               1
+        February to 1March,2019\nAnyshire\nYZ985XY\n                                                                                                   Page1
+        of1\n\n\n\n\n\n\n    Your account summary\n\n\n    Balanceat 1February: £40,000,00\n\n         Totalmoneyin:   £5,474.00\n         Totalmoneyout:
+        £1,395.17\n    Balanceat1 March: £44.079.83\n\n\n                                                                                        Money\n     Date                           Description                            Money                    Balance\n                                                                            out            In\n               Balance
+        brought forward                                                              40,000.00\n\n  1
+        February   Cardpayment-HighStPetrolStation                             24.50                    39,975.50\n               Directdebit-GreenMobilePhoneBill                            20.00                    39,955.50\n\n
+        3 February     CashWithdrawal -YourBank,Anytown                           30.00                    39,925.50\n                HighStreet,timed17:3031Jan\n
+        4 February     YourJobBiWeeklyPayment                                                   2,575.00   42,500.50\n\n
+        11 February   DirectDeposit-YourBank,AnytownHigh                                        300.00     42,800.50\n               Street,timed17:3031Jan\n                                                                                                    42,750.50\n
+        16 February    CashWithdrawal-RandomBank,Randomford,                       50.00\n                timed9.5214Feb\n  17
+        February  Cardpayment-HighStPetrolStation                              40.00                   42,710.50\n                DirectDebit-HomeInsurance\n                                                                            78.34                   42,632.16\n  18
+        February                                                                            2,575.00   45,207.16\n               YourJobBiWeeklyPayment\n\n
+        18 February    Randomford''sDeli                                            15.00                   45,195.16\n\n
+        24 February    Anytown''sJewelers                                           150.00                 45,042.16\n                DirectDeposit\n                                                                                         25.00     45,067.16\n\n
+        28 February    MonthlyApartmentRent                                        987.33                 44.079.83\n\n\n\n                                                                                                    £44.079.83"}],"stream":false,"max_tokens":8192,"response_format":{"type":"json_schema","json_schema":{"name":"extract_pdf","schema":{"type":"object","properties":{"currency":{"type":["string","null"]},"period_start":{"type":["string","null"]},"period_end":{"type":["string","null"]},"opening_balance":{"type":["number","null"]},"closing_balance":{"type":["number","null"]},"transactions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string"},"description":{"type":"string"},"amount":{"type":"number"}},"required":["date","description","amount"],"additionalProperties":false}}},"required":["currency","period_start","period_end","opening_balance","closing_balance","transactions"],"additionalProperties":false},"strict":true}},"reasoning":{"effort":"none"},"plugins":[{"id":"file-parser","pdf":{"engine":"pdf-text"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_OPENROUTER_API_KEY>
+      Http-Referer:
+      - https://sure.am
+      X-Openrouter-Title:
+      - Sure
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 08:55:23 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Generation-Id:
+      - gen-1793264123-02AlUGhc6yEBQJio1jmz
+      Access-Control-Expose-Headers:
+      - X-Generation-Id,X-Provider-Name,request-id,cf-ray
+      Set-Cookie:
+      - __cf_bm=IwiFNqIghEOj3As9kTbyDE8s4O_DFIS.OcOZ8hg0etQ-1793264123.5030704-1.0.1.1-AE5qrdTA3jcyXRebh.BOh1i4R8EqHWl9zhCkXBxrPv.QXei1gl19R2VZWy9hldrSkumklOB.wTVbak68Dg0B8i52Fu8ByfbVywvCCd4yjTpw8u2NDMjUk35FEeSS7hQn;
+        HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu,
+        29 Oct 2026 09:25:23 GMT
+      Permissions-Policy:
+      - payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com"
+        "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")
+      Referrer-Policy:
+      - no-referrer, strict-origin-when-cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a520f603eeb9d71f-BNE
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        CiAgICAgICAgIAoKICAgICAgICAgCgogICAgICAgICAKCiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc5MzI2NDEyMy0wMkFsVUdoYzZ5RUJRSmlvMWpteiIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3OTMyNjQxMjMsIm1vZGVsIjoibnZpZGlhL25lbW90cm9uLTMuNS1saWdodG5pbmc6ZnJlZSIsInByb3ZpZGVyIjoiTnZpZGlhIiwic3lzdGVtX2ZpbmdlcnByaW50IjpudWxsLCJzZXJ2aWNlX3RpZXIiOm51bGwsImNob2ljZXMiOlt7ImluZGV4IjowLCJsb2dwcm9icyI6bnVsbCwiZmluaXNoX3JlYXNvbiI6InN0b3AiLCJuYXRpdmVfZmluaXNoX3JlYXNvbiI6InN0b3AiLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoie1xuICBcImN1cnJlbmN5XCI6IFwiwqNcIixcbiAgXCJwZXJpb2Rfc3RhcnRcIjogXCIyMDE5LTAyLTAxXCIsXG4gIFwicGVyaW9kX2VuZFwiOiBcIjIwMTktMDMtMDFcIixcbiAgXCJvcGVuaW5nX2JhbGFuY2VcIjogNDAwMDAuMDAsXG4gIFwiY2xvc2luZ19iYWxhbmNlXCI6IDQ0MDc5LjgzLFxuICBcInRyYW5zYWN0aW9uc1wiOiBbXG4gICAge1xuICAgICAgXCJkYXRlXCI6IFwiMjAxOS0wMi0wMVwiLFxuICAgICAgXCJkZXNjcmlwdGlvblwiOiBcIkJhbGFuY2UgYnJvdWdodCBmb3J3YXJkXCIsXG4gICAgICBcImFtb3VudFwiOiAtNDAwMDAuMDBcbiAgICB9LFxuICAgIHtcbiAgICAgIFwiZGF0ZVwiOiBcIjIwMTktMDItMDFcIixcbiAgICAgIFwiZGVzY3JpcHRpb25cIjogXCJDYXJkcGF5bWVudC1IaWdoU3RQZXRyb2xTdGF0aW9uXCIsXG4gICAgICBcImFtb3VudFwiOiAtMjQuNTBcbiAgICB9LFxuICAgIHtcbiAgICAgIFwiZGF0ZVwiOiBcIjIwMTktMDItMDFcIixcbiAgICAgIFwiZGVzY3JpcHRpb25cIjogXCJEaXJlY3RkZWJpdC1HcmVlbk1vYmlsZVBob25lQmlsbFwiLFxuICAgICAgXCJhbW91bnRcIjogLTIwLjAwXG4gICAgfSxcbiAgICB7XG4gICAgICBcImRhdGVcIjogXCIyMDE5LTAyLTAzXCIsXG4gICAgICBcImRlc2NyaXB0aW9uXCI6IFwiQ2FzaFdpdGhkcmF3YWwgLVlvdXJCYW5rLEFueXRvd24gSGlnaFN0cmVldCx0aW1lZDE3OjMwMzFKYW5cIixcbiAgICAgIFwiYW1vdW50XCI6IC0zMC4wMFxuICAgIH0sXG4gICAge1xuICAgICAgXCJkYXRlXCI6IFwiMjAxOS0wMi0wNFwiLFxuICAgICAgXCJkZXNjcmlwdGlvblwiOiBcIllvdXJKb2JCaVdlZWtseVBheW1lbnRcIixcbiAgICAgIFwiYW1vdW50XCI6IDI1NzUuMDBcbiAgICB9LFxuICAgIHtcbiAgICAgIFwiZGF0ZVwiOiBcIjIwMTktMDItMTFcIixcbiAgICAgIFwiZGVzY3JpcHRpb25cIjogXCJEaXJlY3REZXBvc2l0LVlvdXJCYW5rLEFueXRvd25IaWdoIFN0cmVldCx0aW1lZDE3OjMwMzFKYW5cIixcbiAgICAgIFwiYW1vdW50XCI6IDMwMC4wMFxuICAgIH0sXG4gICAge1xuICAgICAgXCJkYXRlXCI6IFwiMjAxOS0wMi0xNlwiLFxuICAgICAgXCJkZXNjcmlwdGlvblwiOiBcIkNhc2hXaXRoZHJhd2FsLVJhbmRvbUJhbmssUmFuZG9tZm9yZCwgdGltZWQ5LjUyMTRGZWJcIixcbiAgICAgIFwiYW1vdW50XCI6IC01MC4wMFxuICAgIH0sXG4gICAge1xuICAgICAgXCJkYXRlXCI6IFwiMjAxOS0wMi0xN1wiLFxuICAgICAgXCJkZXNjcmlwdGlvblwiOiBcIkNhcmRwYXltZW50LUhpZ2hTdFBldHJvbFN0YXRpb24gRGlyZWN0RGViaXQtSG9tZUluc3VyYW5jZVwiLFxuICAgICAgXCJhbW91bnRcIjogLTExOC4zNFxuICAgIH0sXG4gICAge1xuICAgICAgXCJkYXRlXCI6IFwiMjAxOS0wMi0xOFwiLFxuICAgICAgXCJkZXNjcmlwdGlvblwiOiBcIllvdXJKb2JCaVdlZWtseVBheW1lbnRcIixcbiAgICAgIFwiYW1vdW50XCI6IDI1NzUuMDBcbiAgICB9LFxuICAgIHtcbiAgICAgIFwiZGF0ZVwiOiBcIjIwMTktMDItMThcIixcbiAgICAgIFwiZGVzY3JpcHRpb25cIjogXCJSYW5kb21mb3JkJ3NEZWxpXCIsXG4gICAgICBcImFtb3VudFwiOiAtMTUuMDBcbiAgICB9LFxuICAgIHtcbiAgICAgIFwiZGF0ZVwiOiBcIjIwMTktMDItMjRcIixcbiAgICAgIFwiZGVzY3JpcHRpb25cIjogXCJBbnl0b3duJ3NKZXdlbGVycyBEaXJlY3REZXBvc2l0XCIsXG4gICAgICBcImFtb3VudFwiOiAxMzUuMDBcbiAgICB9LFxuICAgIHtcbiAgICAgIFwiZGF0ZVwiOiBcIjIwMTktMDItMjRcIixcbiAgICAgIFwiZGVzY3JpcHRpb25cIjogXCIyNS4wMFwiLFxuICAgICAgXCJhbW91bnRcIjogLTI1LjAwXG4gICAgfSxcbiAgICB7XG4gICAgICBcImRhdGVcIjogXCIyMDE5LTAyLTI4XCIsXG4gICAgICBcImRlc2NyaXB0aW9uXCI6IFwiTW9udGhseUFwYXJ0bWVudFJlbnRcIixcbiAgICAgIFwiYW1vdW50XCI6IC05ODcuMzNcbiAgICB9XG4gIF1cbn0iLCJyZWZ1c2FsIjpudWxsLCJyZWFzb25pbmciOm51bGx9fV0sInVzYWdlIjp7InByb21wdF90b2tlbnMiOjgyNSwiY29tcGxldGlvbl90b2tlbnMiOjcwOCwidG90YWxfdG9rZW5zIjoxNTMzLCJjb3N0IjowLCJpc19ieW9rIjpmYWxzZSwicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjAsImNhY2hlX3dyaXRlX3Rva2VucyI6MCwiYXVkaW9fdG9rZW5zIjowLCJ2aWRlb190b2tlbnMiOjB9LCJjb3N0X2RldGFpbHMiOnsidXBzdHJlYW1faW5mZXJlbmNlX2Nvc3QiOjAsInVwc3RyZWFtX2luZmVyZW5jZV9wcm9tcHRfY29zdCI6MCwidXBzdHJlYW1faW5mZXJlbmNlX2NvbXBsZXRpb25zX2Nvc3QiOjB9LCJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjp7InJlYXNvbmluZ190b2tlbnMiOjAsImltYWdlX3Rva2VucyI6MCwiYXVkaW9fdG9rZW5zIjowfX19
+  recorded_at: Thu, 29 Oct 2026 08:55:36 GMT
+recorded_with: VCR 6.3.1

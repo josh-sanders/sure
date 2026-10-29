@@ -22,6 +22,10 @@ module Ai::Transport::RubyLlmAdapter
         config.request_timeout = endpoint.timeout_seconds
         config.max_retries = endpoint.max_retries
         config.http_proxy = Ai::Transport::Http.proxy_for(endpoint.base_url)
+        # RubyLLM otherwise uploads a large file to the provider's Files API
+        # (Anthropic over 24 MB, the :openai provider over 50 MB), where it
+        # stays until deleted, and posts to /v1/files on local servers too.
+        config.auto_upload_large_files = false
       end
     end
 
@@ -49,6 +53,10 @@ module Ai::Transport::RubyLlmAdapter
     end
 
     def raw_id(message) = message.raw.respond_to?(:body) && message.raw.body.is_a?(Hash) ? message.raw.body["id"] : nil
+
+    def ruby_llm_attachments(attachments)
+      attachments.map { RubyLLM::Attachment.new(StringIO.new(_1.data), filename: _1.filename) }
+    end
 
     def ruby_llm_messages(messages)
       messages.map do |message|

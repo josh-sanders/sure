@@ -1,0 +1,148 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_completion_tokens":4096,"response_format":{"type":"json_schema","json_schema":{"name":"extract_pdf","schema":{"type":"object","properties":{"currency":{"type":["string","null"]},"period_start":{"type":["string","null"]},"period_end":{"type":["string","null"]},"opening_balance":{"type":["number","null"]},"closing_balance":{"type":["number","null"]},"transactions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string"},"description":{"type":"string"},"amount":{"type":"number"}},"required":["date","description","amount"],"additionalProperties":false}}},"required":["currency","period_start","period_end","opening_balance","closing_balance","transactions"],"additionalProperties":false},"strict":true}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Length:
+      - '832'
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      Date:
+      - Thu, 29 Oct 2026 08:38:43 GMT
+    body:
+      encoding: UTF-8
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"{\n  \"currency\":
+        null,\n  \"period_start\": null,\n  \"period_end\": null,\n  \"opening_balance\":
+        null,\n  \"closing_balance\": null,\n  \"transactions\": []\n}"}}],"created":1793263123,"model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion","usage":{"completion_tokens":49,"prompt_tokens":169,"total_tokens":218,"prompt_tokens_details":{"cached_tokens":0}},"id":"chatcmpl-HbfQg5MhWylQ28MYFPuZhkLTX78f7WIH","timings":{"cache_n":0,"prompt_n":169,"prompt_ms":2009.497,"prompt_per_token_ms":11.890514792899408,"prompt_per_second":84.10064807262712,"predicted_n":49,"predicted_ms":3542.794,"predicted_per_token_ms":73.80820833333333,"predicted_per_second":13.548628568299485,"draft_n":25,"draft_n_accepted":24}}'
+  recorded_at: Thu, 29 Oct 2026 08:38:43 GMT
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_completion_tokens":4096,"response_format":{"type":"json_object"}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Length:
+      - '747'
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      Date:
+      - Thu, 29 Oct 2026 08:38:44 GMT
+    body:
+      encoding: UTF-8
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"{\n  \"transactions\":
+        [],\n  \"opening_balance\": null,\n  \"closing_balance\": null\n}"}}],"created":1793263124,"model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion","usage":{"completion_tokens":25,"prompt_tokens":169,"total_tokens":194,"prompt_tokens_details":{"cached_tokens":165}},"id":"chatcmpl-3ukbZl3GyRaserV0EY8dqhU4nCxpDQkK","timings":{"cache_n":165,"prompt_n":4,"prompt_ms":181.63,"prompt_per_token_ms":45.4075,"prompt_per_second":22.022793591367066,"predicted_n":25,"predicted_ms":1778.024,"predicted_per_token_ms":74.08433333333333,"predicted_per_second":13.498130508924515,"draft_n":12,"draft_n_accepted":12}}'
+  recorded_at: Thu, 29 Oct 2026 08:38:44 GMT
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess.\n\nRespond
+        with JSON only, no markdown, in exactly this shape:\n{\"currency\":\"string\",\"period_start\":\"string\",\"period_end\":\"string\",\"opening_balance\":\"number\",\"closing_balance\":\"number\",\"transactions\":\"array\"}"},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n--- Page 1 ---\n\n\n\n--- Page 2 ---\n\n"}],"stream":false,"max_completion_tokens":4096}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Length:
+      - '800'
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      Date:
+      - Thu, 29 Oct 2026 08:38:50 GMT
+    body:
+      encoding: UTF-8
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"{\"currency\":null,\"period_start\":null,\"period_end\":null,\"opening_balance\":null,\"closing_balance\":null,\"transactions\":[]}"}}],"created":1793263130,"model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion","usage":{"completion_tokens":29,"prompt_tokens":213,"total_tokens":242,"prompt_tokens_details":{"cached_tokens":0}},"id":"chatcmpl-hbkdkjdPrnXiT7ejwBGUFMnwwJPG9Mt4","timings":{"cache_n":0,"prompt_n":213,"prompt_ms":3146.946,"prompt_per_token_ms":14.774394366197182,"prompt_per_second":67.68466951768477,"predicted_n":29,"predicted_ms":2001.269,"predicted_per_token_ms":71.47389285714286,"predicted_per_second":13.991122632689558,"draft_n":14,"draft_n_accepted":14}}'
+  recorded_at: Thu, 29 Oct 2026 08:38:50 GMT
+recorded_with: VCR 6.3.1

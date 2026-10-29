@@ -2,7 +2,10 @@
 # plus one retry for models that can't be forced (#4513).
 class Ai::Transport::HandWritten::Anthropic < Ai::Transport::Base
   def generate(request)
-    instrument("generate", model: request.model, request: request.to_h.except(:model)) do
+    # The spike didn't port today's per-provider PDF handling here.
+    raise Ai::Error::Refused, "the hand-written transport doesn't send attachments" if request.attachments.any?
+
+    instrument("generate", model: request.model, request: event_request(request)) do
       tool = request.schema_name
       forced = Provider::Anthropic.forced_tool_choice_supported?(request.model.name)
       params = {

@@ -11,12 +11,13 @@ class Ai::Generation
   end
 
   def prompt_locals = {}
+  def attachments = []
 
   def call(route:, hand_written: false)
     request = Ai::Transport::Base::Request.new(
       model: route.model, instructions: rendered_prompt, input:, schema: output_schema, schema_name: feature_key.to_s,
       max_tokens: route.model.max_output_tokens, reasoning_effort: route.reasoning_effort, json_mode: route.json_mode,
-      metadata: { feature: feature_key, route: route.to_h }
+      attachments:, metadata: { feature: feature_key, route: route.to_h }
     )
     response = Ai::Transport.for(route.endpoint, hand_written:).generate(request)
     Result.new(value: Ai::Schema.coerce(response.json, output_schema), usage: response.usage, route:)

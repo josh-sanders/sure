@@ -10,6 +10,8 @@ class Ai::Transport::Base
   end
 
   Response = Data.define(:json, :usage, :raw_id)
+  # A file sent with the input: a PDF, or an image of a page.
+  Attachment = Data.define(:data, :filename)
 
   # converse: section 7 gives only `converse(request, &on_chunk)`. A chat
   # round needs the history (with tool results) and the tools, and returns
@@ -38,6 +40,11 @@ class Ai::Transport::Base
   def embed(texts, model:)         = raise NotImplementedError
 
   private
+    # A generate request for an .ai event: files by name and size, never their bytes.
+    def event_request(request)
+      request.to_h.except(:model).merge(attachments: request.attachments.map { { filename: _1.filename, bytes: _1.data.bytesize } })
+    end
+
     # One .ai event per wire call (section 10). Subscribers get the prompt,
     # the output, the usage and the error class; tool rounds are one event each.
     def instrument(name, model:, request:, **payload)
