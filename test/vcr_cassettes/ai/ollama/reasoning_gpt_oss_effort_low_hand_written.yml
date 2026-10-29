@@ -1,0 +1,62 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://ollama.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-oss-20b","messages":[{"role":"system","content":"You
+        configure recurring-bill records for a personal finance app. Given the dated\ncharge
+        history for one obligation, propose the bill''s configuration.\n\nRules:\n-
+        Infer the cadence from the gaps between the dates, never from the row count.\n  frequency
+        is one of: monthly, weekly, biweekly, semimonthly, quarterly, semiannual,
+        annual.\n- amount is the typical recent charge as a positive number; when
+        amounts drift,\n  prefer the most recent ones.\n- day_of_month is the modal
+        charge day (monthly-style cadences only); weekday\n  (0=Sunday) only for weekly/biweekly;
+        month_of_year only for annual.\n- category_name must EXACTLY match one of
+        the provided categories, or null.\n- bill_type: \"subscription\" for digital
+        services and memberships, \"installment\"\n  for finite payment plans, otherwise
+        \"bill\".\n- autopay true only when the history shows automatic-payment markers
+        (ACH, AUTOPAY).\n- Set any field the history cannot support to null. Never
+        guess.\n- confidence is 0 to 1 for the proposal overall; rationale is one
+        short sentence."},{"role":"user","content":"CHARGE HISTORY (date amount description):\n-
+        2026-05-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-06-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-07-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-08-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-09-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-10-15 15.49 NETFLIX.COM AUTOPAY\n\nAVAILABLE
+        CATEGORIES: Entertainment, Utilities, Groceries\n\n"}],"max_tokens":6000,"reasoning_effort":"low","response_format":{"type":"json_schema","json_schema":{"name":"bill_setup","schema":{"type":"object","properties":{"name":{"type":["string","null"]},"amount":{"type":["number","null"]},"frequency":{"type":["string","null"],"enum":["monthly","weekly","biweekly","semimonthly","quarterly","semiannual","annual",null]},"day_of_month":{"type":["integer","null"],"minimum":1,"maximum":31},"weekday":{"type":["integer","null"],"minimum":0,"maximum":6},"month_of_year":{"type":["integer","null"],"minimum":1,"maximum":12},"category_name":{"type":["string","null"]},"bill_type":{"type":["string","null"],"enum":["bill","subscription","installment",null]},"autopay":{"type":["boolean","null"]},"confidence":{"type":["number","null"],"minimum":0,"maximum":1},"rationale":{"type":["string","null"]}},"required":["name","amount","frequency","day_of_month","weekday","month_of_year","category_name","bill_type","autopay","confidence","rationale"],"additionalProperties":false},"strict":true}}}'
+    headers:
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer none
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Oct 2026 04:02:17 GMT
+      Content-Length:
+      - '880'
+    body:
+      encoding: UTF-8
+      string: '{"id":"chatcmpl-686","object":"chat.completion","created":1793246537,"model":"gpt-oss-20b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\n  \"amount\":
+        15.49,\n  \"autopay\": true,\n  \"bill_type\": \"subscription\",\n  \"category_name\":
+        \"Entertainment\",\n  \"confidence\": 1,\n  \"day_of_month\": 15,\n  \"frequency\":
+        \"monthly\",\n  \"month_of_year\": null,\n  \"name\": null,\n  \"rationale\":
+        \"Monthly Netflix charges on the 15th with autopay; consistent amount and
+        category fits Entertainment. 1.0 confidence. \",\n  \"weekday\": null\n}","reasoning":"Need
+        configure. Frequent monthly, day 15, amount 15.49 subscription, autopay true,
+        category Entertainment. confidence 1."},"finish_reason":"stop"}],"usage":{"prompt_tokens":441,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":151,"total_tokens":592}}
+
+        '
+  recorded_at: Thu, 29 Oct 2026 04:02:17 GMT
+recorded_with: VCR 6.3.1

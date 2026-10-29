@@ -1,0 +1,60 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        configure recurring-bill records for a personal finance app. Given the dated\ncharge
+        history for one obligation, propose the bill''s configuration.\n\nRules:\n-
+        Infer the cadence from the gaps between the dates, never from the row count.\n  frequency
+        is one of: monthly, weekly, biweekly, semimonthly, quarterly, semiannual,
+        annual.\n- amount is the typical recent charge as a positive number; when
+        amounts drift,\n  prefer the most recent ones.\n- day_of_month is the modal
+        charge day (monthly-style cadences only); weekday\n  (0=Sunday) only for weekly/biweekly;
+        month_of_year only for annual.\n- category_name must EXACTLY match one of
+        the provided categories, or null.\n- bill_type: \"subscription\" for digital
+        services and memberships, \"installment\"\n  for finite payment plans, otherwise
+        \"bill\".\n- autopay true only when the history shows automatic-payment markers
+        (ACH, AUTOPAY).\n- Set any field the history cannot support to null. Never
+        guess.\n- confidence is 0 to 1 for the proposal overall; rationale is one
+        short sentence."},{"role":"user","content":"CHARGE HISTORY (date amount description):\n-
+        2026-05-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-06-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-07-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-08-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-09-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-10-15 15.49 NETFLIX.COM AUTOPAY\n\nAVAILABLE
+        CATEGORIES: Entertainment, Utilities, Groceries\n\n"}],"stream":false,"max_completion_tokens":6000,"response_format":{"type":"json_schema","json_schema":{"name":"bill_setup","schema":{"type":"object","properties":{"name":{"type":["string","null"]},"amount":{"type":["number","null"]},"frequency":{"type":["string","null"],"enum":["monthly","weekly","biweekly","semimonthly","quarterly","semiannual","annual",null]},"day_of_month":{"type":["integer","null"],"minimum":1,"maximum":31},"weekday":{"type":["integer","null"],"minimum":0,"maximum":6},"month_of_year":{"type":["integer","null"],"minimum":1,"maximum":12},"category_name":{"type":["string","null"]},"bill_type":{"type":["string","null"],"enum":["bill","subscription","installment",null]},"autopay":{"type":["boolean","null"]},"confidence":{"type":["number","null"],"minimum":0,"maximum":1},"rationale":{"type":["string","null"]}},"required":["name","amount","frequency","day_of_month","weekday","month_of_year","category_name","bill_type","autopay","confidence","rationale"],"additionalProperties":false},"strict":true}},"reasoning_effort":"none","chat_template_kwargs":{"enable_thinking":true}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Length:
+      - '6105'
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      Date:
+      - Thu, 29 Oct 2026 03:33:41 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJjaG9pY2VzIjpbeyJmaW5pc2hfcmVhc29uIjoic3RvcCIsImluZGV4IjowLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50Ijoie1xuICBcIm5hbWVcIjogXCJOZXRmbGl4XCIsXG4gIFwiYW1vdW50XCI6IDE1LjQ5LFxuICBcImZyZXF1ZW5jeVwiOiBcIm1vbnRobHlcIixcbiAgXCJkYXlfb2ZfbW9udGhcIjogMTUsXG4gIFwid2Vla2RheVwiOiBudWxsLFxuICBcIm1vbnRoX29mX3llYXJcIjogbnVsbCxcbiAgXCJjYXRlZ29yeV9uYW1lXCI6IFwiRW50ZXJ0YWlubWVudFwiLFxuICBcImJpbGxfdHlwZVwiOiBcInN1YnNjcmlwdGlvblwiLFxuICBcImF1dG9wYXlcIjogdHJ1ZSxcbiAgXCJjb25maWRlbmNlXCI6IDEuMCxcbiAgXCJyYXRpb25hbGVcIjogXCJDb25zaXN0ZW50IG1vbnRobHkgY2hhcmdlcyBvbiB0aGUgMTV0aCB3aXRoIGV4cGxpY2l0IEFVVE9QQVkgbWFya2VycyBjb25maXJtIGEgc3RhbmRhcmQgTmV0ZmxpeCBzdWJzY3JpcHRpb24uXCJcbn0iLCJyZWFzb25pbmdfY29udGVudCI6IkhlcmUncyBhIHRoaW5raW5nIHByb2Nlc3M6XG5cbjEuICAqKkFuYWx5emUgVXNlciBJbnB1dDoqKlxuICAgLSBDaGFyZ2UgSGlzdG9yeTpcbiAgICAgLSAyMDI2LTA1LTE1IDE1LjQ5IE5FVEZMSVguQ09NIEFVVE9QQVlcbiAgICAgLSAyMDI2LTA2LTE1IDE1LjQ5IE5FVEZMSVguQ09NIEFVVE9QQVlcbiAgICAgLSAyMDI2LTA3LTE1IDE1LjQ5IE5FVEZMSVguQ09NIEFVVE9QQVlcbiAgICAgLSAyMDI2LTA4LTE1IDE1LjQ5IE5FVEZMSVguQ09NIEFVVE9QQVlcbiAgICAgLSAyMDI2LTA5LTE1IDE1LjQ5IE5FVEZMSVguQ09NIEFVVE9QQVlcbiAgICAgLSAyMDI2LTEwLTE1IDE1LjQ5IE5FVEZMSVguQ09NIEFVVE9QQVlcbiAgIC0gQXZhaWxhYmxlIENhdGVnb3JpZXM6IEVudGVydGFpbm1lbnQsIFV0aWxpdGllcywgR3JvY2VyaWVzXG5cbjIuICAqKkFwcGx5IFJ1bGVzOioqXG4gICAtICpDYWRlbmNlL0ZyZXF1ZW5jeSo6IEdhcHMgYmV0d2VlbiBkYXRlcyBhcmUgZXhhY3RseSAxIG1vbnRoIGVhY2ggKE1heSAxNSAtPiBKdW4gMTUgLT4gSnVsIDE1IC0+IEF1ZyAxNSAtPiBTZXAgMTUgLT4gT2N0IDE1KS4gU28gZnJlcXVlbmN5ID0gXCJtb250aGx5XCIuXG4gICAtICpBbW91bnQqOiBBbGwgYW1vdW50cyBhcmUgMTUuNDkuIEl0J3MgY29uc2lzdGVudC4gU28gYW1vdW50ID0gMTUuNDkuXG4gICAtICpkYXlfb2ZfbW9udGgqOiBGb3IgbW9udGhseSBjYWRlbmNlcywgdXNlIHRoZSBtb2RhbCBjaGFyZ2UgZGF5LiBBbGwgY2hhcmdlcyBhcmUgb24gdGhlIDE1dGguIFNvIGRheV9vZl9tb250aCA9IDE1LlxuICAgLSAqd2Vla2RheS9tb250aF9vZl95ZWFyKjogTm90IGFwcGxpY2FibGUgZm9yIG1vbnRobHkuIFNldCB0byBudWxsLlxuICAgLSAqY2F0ZWdvcnlfbmFtZSo6IE11c3QgZXhhY3RseSBtYXRjaCBvbmUgb2YgcHJvdmlkZWQ6IEVudGVydGFpbm1lbnQsIFV0aWxpdGllcywgR3JvY2VyaWVzLiBOZXRmbGl4IGlzIGFuIGVudGVydGFpbm1lbnQgc2VydmljZS4gU28gY2F0ZWdvcnlfbmFtZSA9IFwiRW50ZXJ0YWlubWVudFwiLlxuICAgLSAqYmlsbF90eXBlKjogXCJzdWJzY3JpcHRpb25cIiBmb3IgZGlnaXRhbCBzZXJ2aWNlcyBhbmQgbWVtYmVyc2hpcHMuIE5ldGZsaXggaXMgYSBkaWdpdGFsIHN1YnNjcmlwdGlvbi4gU28gYmlsbF90eXBlID0gXCJzdWJzY3JpcHRpb25cIi5cbiAgIC0gKmF1dG9wYXkqOiBIaXN0b3J5IHNob3dzIFwiQVVUT1BBWVwiIGluIHRoZSBkZXNjcmlwdGlvbi4gU28gYXV0b3BheSA9IHRydWUuXG4gICAtICpOdWxsIGZpZWxkcyo6IEFueSBmaWVsZCBoaXN0b3J5IGNhbid0IHN1cHBvcnQgZ2V0cyBudWxsLiAod2Vla2RheSwgbW9udGhfb2ZfeWVhciBhcmUgbnVsbCBieSBydWxlKS5cbiAgIC0gKmNvbmZpZGVuY2UqOiBIaWdoIGNvbmZpZGVuY2Ugc2luY2UgcGF0dGVybiBpcyBwZXJmZWN0bHkgY29uc2lzdGVudCBhbmQgZXhwbGljaXQuIDAuOSBvciAxLjAuIEknbGwgZ28gd2l0aCAwLjk1IG9yIDEuMC4gTGV0J3Mgc2F5IDEuMC5cbiAgIC0gKnJhdGlvbmFsZSo6IE9uZSBzaG9ydCBzZW50ZW5jZSBleHBsYWluaW5nIHRoZSBpbmZlcmVuY2UuXG5cbjMuICAqKkNvbnN0cnVjdCBPdXRwdXQ6KipcbiAgIEZvcm1hdCBhcyBhIHN0cnVjdHVyZWQgcHJvcG9zYWwgKEpTT04gb3Iga2V5LXZhbHVlIHBhaXJzLCBidXQgdGhlIHByb21wdCBkb2Vzbid0IHNwZWNpZnkgZm9ybWF0LCBzbyBJJ2xsIHVzZSBhIGNsZWFyIGtleS12YWx1ZSBsaXN0IG9yIEpTT04pLiBJJ2xsIHN0aWNrIHRvIGEgY2xlYW4gc3RydWN0dXJlIG1hdGNoaW5nIHRoZSByZXF1ZXN0ZWQgZmllbGRzLlxuICAgRmllbGRzOiBmcmVxdWVuY3ksIGFtb3VudCwgZGF5X29mX21vbnRoLCB3ZWVrZGF5LCBtb250aF9vZl95ZWFyLCBjYXRlZ29yeV9uYW1lLCBiaWxsX3R5cGUsIGF1dG9wYXksIGNvbmZpZGVuY2UsIHJhdGlvbmFsZS5cblxuICAgTGV0J3MgZHJhZnQ6XG4gICAtIGZyZXF1ZW5jeTogXCJtb250aGx5XCJcbiAgIC0gYW1vdW50OiAxNS40OVxuICAgLSBkYXlfb2ZfbW9udGg6IDE1XG4gICAtIHdlZWtkYXk6IG51bGxcbiAgIC0gbW9udGhfb2ZfeWVhcjogbnVsbFxuICAgLSBjYXRlZ29yeV9uYW1lOiBcIkVudGVydGFpbm1lbnRcIlxuICAgLSBiaWxsX3R5cGU6IFwic3Vic2NyaXB0aW9uXCJcbiAgIC0gYXV0b3BheTogdHJ1ZVxuICAgLSBjb25maWRlbmNlOiAxLjBcbiAgIC0gcmF0aW9uYWxlOiBDb25zaXN0ZW50IG1vbnRobHkgY2hhcmdlcyBvbiB0aGUgMTV0aCB3aXRoIGV4cGxpY2l0IEFVVE9QQVkgbWFya2VycyBjb25maXJtIGEgc3RhbmRhcmQgTmV0ZmxpeCBzdWJzY3JpcHRpb24uXG5cbjQuICAqKkNoZWNrIGFnYWluc3QgUnVsZXM6KipcbiAgIC0gSW5mZXIgY2FkZW5jZSBmcm9tIGdhcHM/IFllcywgMSBtb250aCBnYXAgLT4gbW9udGhseS5cbiAgIC0gZnJlcXVlbmN5IG9wdGlvbnMgbWF0Y2g/IFllcy5cbiAgIC0gYW1vdW50IHR5cGljYWwgcmVjZW50PyBZZXMsIDE1LjQ5LlxuICAgLSBkYXlfb2ZfbW9udGggbW9kYWwgZm9yIG1vbnRobHk/IFllcywgMTUuXG4gICAtIHdlZWtkYXkvbW9udGhfb2ZfeWVhciBudWxsPyBZZXMuXG4gICAtIGNhdGVnb3J5X25hbWUgZXhhY3QgbWF0Y2g/IFwiRW50ZXJ0YWlubWVudFwiIG1hdGNoZXMuXG4gICAtIGJpbGxfdHlwZTogc3Vic2NyaXB0aW9uPyBZZXMuXG4gICAtIGF1dG9wYXkgdHJ1ZSB3aGVuIEFVVE9QQVkgbWFya2VyPyBZZXMuXG4gICAtIGNvbmZpZGVuY2UgMC0xLCByYXRpb25hbGUgb25lIHNlbnRlbmNlPyBZZXMuXG5cbiAgIEFsbCBjb25zdHJhaW50cyBtZXQuIE91dHB1dCBtYXRjaGVzIHJlcXVlc3QuIEkgd2lsbCBwcmVzZW50IGl0IGNsZWFybHkuIE9wdGlvbmFsbHkgYXMgSlNPTiBmb3IgcHJvZ3JhbW1hdGljIHVzZSwgYnV0IGtleS12YWx1ZSBpcyBmaW5lLiBJJ2xsIG91dHB1dCBhIGNsZWFuIHN0cnVjdHVyZWQgZm9ybWF0LlxuXG4gICBPbmUgbWlub3IgcG9pbnQ6IFRoZSBwcm9tcHQgc2F5cyBcImRheV9vZl9tb250aCBpcyB0aGUgbW9kYWwgY2hhcmdlIGRheSAobW9udGhseS1zdHlsZSBjYWRlbmNlcyBvbmx5KTsgd2Vla2RheSAoMD1TdW5kYXkpIG9ubHkgZm9yIHdlZWtseS9iaXdlZWtseTsgbW9udGhfb2ZfeWVhciBvbmx5IGZvciBhbm51YWwuXCIgU28gSSBzaG91bGQgZXhwbGljaXRseSBzZXQgd2Vla2RheSBhbmQgbW9udGhfb2ZfeWVhciB0byBudWxsLCBvciBqdXN0IG9taXQgdGhlbSBpZiBub3QgbmVlZGVkLCBidXQgSSdsbCBpbmNsdWRlIHRoZW0gYXMgbnVsbCB0byBiZSBzYWZlLlxuXG4gICBMZXQncyBwcm9kdWNlIHRoZSByZXNwb25zZS4gXG4gICBTdHJ1Y3R1cmU6XG4gICB7XG4gICAgIFwiZnJlcXVlbmN5XCI6IFwibW9udGhseVwiLFxuICAgICBcImFtb3VudFwiOiAxNS40OSxcbiAgICAgXCJkYXlfb2ZfbW9udGhcIjogMTUsXG4gICAgIFwid2Vla2RheVwiOiBudWxsLFxuICAgICBcIm1vbnRoX29mX3llYXJcIjogbnVsbCxcbiAgICAgXCJjYXRlZ29yeV9uYW1lXCI6IFwiRW50ZXJ0YWlubWVudFwiLFxuICAgICBcImJpbGxfdHlwZVwiOiBcInN1YnNjcmlwdGlvblwiLFxuICAgICBcImF1dG9wYXlcIjogdHJ1ZSxcbiAgICAgXCJjb25maWRlbmNlXCI6IDEuMCxcbiAgICAgXCJyYXRpb25hbGVcIjogXCJDb25zaXN0ZW50IG1vbnRobHkgY2hhcmdlcyBvbiB0aGUgMTV0aCB3aXRoIGV4cGxpY2l0IEFVVE9QQVkgbWFya2VycyBjb25maXJtIGEgc3RhbmRhcmQgTmV0ZmxpeCBzdWJzY3JpcHRpb24uXCJcbiAgIH1cbiAgIE1hdGNoZXMgYWxsIHJ1bGVzLiBSZWFkeS7inIVcbiAgIFNlbGYtQ29ycmVjdGlvbi9SZWZpbmVtZW50IGR1cmluZyB0aG91Z2h0OiBcbiAgIENoZWNrIHJ1bGU6IFwiZGF5X29mX21vbnRoIGlzIHRoZSBtb2RhbCBjaGFyZ2UgZGF5IChtb250aGx5LXN0eWxlIGNhZGVuY2VzIG9ubHkpOyB3ZWVrZGF5ICgwPVN1bmRheSkgb25seSBmb3Igd2Vla2x5L2Jpd2Vla2x5OyBtb250aF9vZl95ZWFyIG9ubHkgZm9yIGFubnVhbC5cIiAtPiBJIHdpbGwgc2V0IHRoZW0gdG8gbnVsbCBhcyBpbnN0cnVjdGVkIGJ5IFwiU2V0IGFueSBmaWVsZCB0aGUgaGlzdG9yeSBjYW5ub3Qgc3VwcG9ydCB0byBudWxsLlwiXG4gICBDb25maWRlbmNlOiAxLjAgaXMgZmluZS5cbiAgIFJhdGlvbmFsZTogT25lIHNob3J0IHNlbnRlbmNlLiBDaGVja2VkLlxuICAgQWxsIGdvb2QuIE91dHB1dCBtYXRjaGVzLiBcbiAgIFByb2NlZWRzLiBcbiAgIE91dHB1dCBHZW5lcmF0aW9uLiBcbiAgIFtPdXRwdXQgR2VuZXJhdGlvbl0gLT4gKlByb2NlZWRzKlxuICAgKihTZWxmLUNvcnJlY3Rpb24vVmVyaWZpY2F0aW9uIGR1cmluZyBkcmFmdGluZykqOiBcbiAgIFdhaXQsIHNob3VsZCBJIG91dHB1dCBKU09OIG9yIGp1c3QgdGV4dD8gVGhlIHByb21wdCBzYXlzIFwicHJvcG9zZSB0aGUgYmlsbCdzIGNvbmZpZ3VyYXRpb24uXCIgSSdsbCB1c2UgYSBjbGVhciBrZXktdmFsdWUgZm9ybWF0LiBJdCdzIGZpbmUuXG4gICBDaGVjayBjYXRlZ29yeTogXCJFbnRlcnRhaW5tZW50XCIgaXMgZXhhY3QgbWF0Y2guXG4gICBDaGVjayBiaWxsX3R5cGU6IFwic3Vic2NyaXB0aW9uXCIgbWF0Y2hlcyBOZXRmbGl4LlxuICAgQ2hlY2sgYXV0b3BheTogdHJ1ZSBiZWNhdXNlIG9mIEFVVE9QQVkgdGFnLlxuICAgQ2hlY2sgZnJlcXVlbmN5OiBtb250aGx5LlxuICAgQ2hlY2sgYW1vdW50OiAxNS40OS5cbiAgIENoZWNrIGRheV9vZl9tb250aDogMTUuXG4gICBBbGwgY29ycmVjdC7inIVcbiAgIE91dHB1dCBtYXRjaGVzIHJlc3BvbnNlLiBcbiAgIFtGaW5hbCBDaGVjayBvZiB0aGUgUHJvbXB0XTogXCJjb25maWRlbmNlIGlzIDAgdG8gMSBmb3IgdGhlIHByb3Bvc2FsIG92ZXJhbGw7IHJhdGlvbmFsZSBpcyBvbmUgc2hvcnQgc2VudGVuY2UuXCIgLT4gSSdsbCBpbmNsdWRlIHRoZXNlIGF0IHRoZSBlbmQgb3IgYXMgZmllbGRzLiBJJ2xsIHN0cnVjdHVyZSBpdCBjbGVhcmx5LlxuICAgUmVhZHkuIFxuICAgT3V0cHV0IEdlbmVyYXRpb24uIFxuICAgKihEb25lLikqXG4ifX1dLCJjcmVhdGVkIjoxNzkzMjQ0ODIxLCJtb2RlbCI6InF3ZW4zLjYtMzViLWEzYi1tdHAiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJiMS1kODEyMzUwIiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uIiwidXNhZ2UiOnsiY29tcGxldGlvbl90b2tlbnMiOjE1NTEsInByb21wdF90b2tlbnMiOjQzMiwidG90YWxfdG9rZW5zIjoxOTgzLCJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOnsiY2FjaGVkX3Rva2VucyI6NDI4fX0sImlkIjoiY2hhdGNtcGwtNk1oS2JvUjZqR0VINVhHcmx1TlptU1poSnlCTG5SMVMiLCJ0aW1pbmdzIjp7ImNhY2hlX24iOjQyOCwicHJvbXB0X24iOjQsInByb21wdF9tcyI6MTY3LjA0NSwicHJvbXB0X3Blcl90b2tlbl9tcyI6NDEuNzYxMjUsInByb21wdF9wZXJfc2Vjb25kIjoyMy45NDU2NDMzODk1MDU4MjIsInByZWRpY3RlZF9uIjoxNTUxLCJwcmVkaWN0ZWRfbXMiOjEwNTU3MC44NjQsInByZWRpY3RlZF9wZXJfdG9rZW5fbXMiOjY4LjExMDIzNDgzODcwOTY3LCJwcmVkaWN0ZWRfcGVyX3NlY29uZCI6MTQuNjgyMDgxMjIyNzEzMTE2LCJkcmFmdF9uIjo4MDksImRyYWZ0X25fYWNjZXB0ZWQiOjc0MX19
+  recorded_at: Thu, 29 Oct 2026 03:33:41 GMT
+recorded_with: VCR 6.3.1

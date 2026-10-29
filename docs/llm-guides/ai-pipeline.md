@@ -26,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (121 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (147 runs, 1 skip:
 the live-only timeout test). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
@@ -179,12 +179,40 @@ through RubyLLM's `:openrouter` provider, with Sure's app headers.
   hand-written one a top-level `reasoning_effort`. So `none` is the setting that saves tokens, on
   the models that allow it. OpenRouter's own switch, `reasoning: {enabled: false}` in the
   endpoint's `extra_body`, behaves the same on both models and both transports: Nemotron 0
-  reasoning tokens (116–119 in all, answer correct), Flint the same 400. A route needs no
-  separate on/off setting; effort `none` covers it. Where a model refuses it, a strict route gets `Refused` with that
+  reasoning tokens (116–119 in all, answer correct), Flint the same 400. On OpenRouter a route
+  needs no separate on/off setting; effort `none` covers it. The local servers differ; see
+  "Turning reasoning off, server by server". Where a model refuses it, a strict route gets `Refused` with that
   message; an `auto` route would read the 400 as a JSON-mode rejection, drop the effort with
   `response_format` and retry (`JsonMode`, not run live), which works but blames the wrong thing.
   Section 7 should let a route's effort be checked like its JSON mode, and the routes need a
   `max_output_tokens` well above the answer's size.
+
+### Turning reasoning off, server by server
+
+`reasoning_switches_live_test` sends each setting in strict mode with both transports, so a
+refusal would surface. The venus llama.cpp server runs with thinking off, so its rows force it
+on with `chat_template_kwargs: {enable_thinking: true}` first. Ollama 0.40.13 ran in a temporary
+container with Qwen3.6-35B-A3B and gpt-oss-20b from local GGUFs. Completion tokens per bill
+setup, one run per transport; the OpenRouter rows from "OpenRouter chat on free models" count
+reasoning tokens.
+
+| Setting | llama.cpp, Qwen3.6 | Ollama, Qwen3.6 | Ollama, gpt-oss | OpenRouter, Nemotron | OpenRouter, Flint |
+|---|---|---|---|---|---|
+| Default | 1,659–2,106 | 1,946–2,199 | 186–215 | 1,517 | 519–1,077 |
+| Effort `low` | Ignored | Ignored | Shorter (151–176), and one field missed per run | About the same | About the same |
+| Effort `none` | Ignored | **Off** (134–137) | Ignored | **Off** | 400 |
+| `reasoning: {enabled: false}` | Ignored | Ignored | Ignored | **Off** | 400 |
+| `thinking_budget_tokens: 0` | **Off** (133–134) | — | — | — | — |
+
+- **Ignored means accepted without an error.** Only OpenRouter refuses a setting a model can't
+  honour, so a health check can't tell from the status whether a setting worked; it has to
+  look for reasoning in the answer.
+- **There's no one switch.** Effort `none` works on OpenRouter and on Ollama's hybrid models.
+  llama.cpp ignores the OpenAI-style settings and needs its own `thinking_budget_tokens: 0` or
+  `chat_template_kwargs: {enable_thinking: false}`. Section 7 should map a route's effort `none`
+  per preset (llama.cpp to those fields) rather than send `reasoning_effort` everywhere.
+- **gpt-oss can't stop reasoning** but reasons briefly anyway. At effort `low` it lost a field
+  in each run: one left the category null ("no category matches Netflix"), the other the name.
 
 ### `judge` (Jev's protocol), outside the criteria
 

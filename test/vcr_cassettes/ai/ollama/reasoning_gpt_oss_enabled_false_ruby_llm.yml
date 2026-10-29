@@ -1,0 +1,54 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://ollama.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-oss-20b","messages":[{"role":"system","content":"You
+        configure recurring-bill records for a personal finance app. Given the dated\ncharge
+        history for one obligation, propose the bill''s configuration.\n\nRules:\n-
+        Infer the cadence from the gaps between the dates, never from the row count.\n  frequency
+        is one of: monthly, weekly, biweekly, semimonthly, quarterly, semiannual,
+        annual.\n- amount is the typical recent charge as a positive number; when
+        amounts drift,\n  prefer the most recent ones.\n- day_of_month is the modal
+        charge day (monthly-style cadences only); weekday\n  (0=Sunday) only for weekly/biweekly;
+        month_of_year only for annual.\n- category_name must EXACTLY match one of
+        the provided categories, or null.\n- bill_type: \"subscription\" for digital
+        services and memberships, \"installment\"\n  for finite payment plans, otherwise
+        \"bill\".\n- autopay true only when the history shows automatic-payment markers
+        (ACH, AUTOPAY).\n- Set any field the history cannot support to null. Never
+        guess.\n- confidence is 0 to 1 for the proposal overall; rationale is one
+        short sentence."},{"role":"user","content":"CHARGE HISTORY (date amount description):\n-
+        2026-05-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-06-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-07-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-08-15 15.49 NETFLIX.COM AUTOPAY\n-
+        2026-09-15 15.49 NETFLIX.COM AUTOPAY\n- 2026-10-15 15.49 NETFLIX.COM AUTOPAY\n\nAVAILABLE
+        CATEGORIES: Entertainment, Utilities, Groceries\n\n"}],"stream":false,"max_completion_tokens":6000,"response_format":{"type":"json_schema","json_schema":{"name":"bill_setup","schema":{"type":"object","properties":{"name":{"type":["string","null"]},"amount":{"type":["number","null"]},"frequency":{"type":["string","null"],"enum":["monthly","weekly","biweekly","semimonthly","quarterly","semiannual","annual",null]},"day_of_month":{"type":["integer","null"],"minimum":1,"maximum":31},"weekday":{"type":["integer","null"],"minimum":0,"maximum":6},"month_of_year":{"type":["integer","null"],"minimum":1,"maximum":12},"category_name":{"type":["string","null"]},"bill_type":{"type":["string","null"],"enum":["bill","subscription","installment",null]},"autopay":{"type":["boolean","null"]},"confidence":{"type":["number","null"],"minimum":0,"maximum":1},"rationale":{"type":["string","null"]}},"required":["name","amount","frequency","day_of_month","weekday","month_of_year","category_name","bill_type","autopay","confidence","rationale"],"additionalProperties":false},"strict":true}},"reasoning":{"enabled":false}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer none
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Oct 2026 04:12:47 GMT
+      Content-Length:
+      - '1158'
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6ImNoYXRjbXBsLTIyNyIsIm9iamVjdCI6ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3OTMyNDcxNjcsIm1vZGVsIjoiZ3B0LW9zcy0yMGIiLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF9vbGxhbWEiLCJjaG9pY2VzIjpbeyJpbmRleCI6MCwibWVzc2FnZSI6eyJyb2xlIjoiYXNzaXN0YW50IiwiY29udGVudCI6IntcImFtb3VudFwiOjE1LjQ5LFwiYXV0b3BheVwiOnRydWUsXCJiaWxsX3R5cGVcIjpcInN1YnNjcmlwdGlvblwiLFwiY2F0ZWdvcnlfbmFtZVwiOlwiRW50ZXJ0YWlubWVudFwiLFwiY29uZmlkZW5jZVwiOjEsXCJkYXlfb2ZfbW9udGhcIjoxNSxcImZyZXF1ZW5jeVwiOlwibW9udGhseVwiLFwibW9udGhfb2ZfeWVhclwiOm51bGwsXCJuYW1lXCI6XCJOZXRmbGl4XCIsXCJyYXRpb25hbGVcIjpcIk1vbnRobHkgJDE1LjQ5IE5ldGZsaXggc3Vic2NyaXB0aW9uIHdpdGggQVVUT1BBWSBtYXJrZXJzLlwiLFwid2Vla2RheVwiOm51bGx9IiwicmVhc29uaW5nIjoiV2UgbmVlZCBpbmZlciBjYWRlbmNlOiBtb250aGx5LCBzYW1lIGRhdGVzIDE1dGggZWFjaCBtb250aCDihpIgbW9udGhseS4gYW1vdW50OiByZWNlbnQgaXMgMTUuNDkuIGRheV9vZl9tb250aDogMTUuIGNhdGVnb3J5X25hbWU6IGF2YWlsYWJsZSBjYXRlZ29yaWVzIGFyZSBFbnRlcnRhaW5tZW50LCBVdGlsaXRpZXMsIEdyb2Nlcmllcy4gTmV0ZmxpeCBpcyBlbnRlcnRhaW5tZW50LiBTbyBjYXRlZ29yeV9uYW1lOiBcIkVudGVydGFpbm1lbnRcIi4gYmlsbF90eXBlOiBzdWJzY3JpcHRpb24gZm9yIGRpZ2l0YWwgc2VydmljZXMg4oaSIHN1YnNjcmlwdGlvbi4gYXV0b3BheSB0cnVlIChBVVRPUEFZIHByZXNlbnQpLiBtb250aF9vZl95ZWFyIG5vdCByZWxldmFudC4gd2Vla2RheSBub3QgbmVlZGVkLiBTbyBiaWxsX3R5cGUgXCJzdWJzY3JpcHRpb25cIi4gYXV0b3BheSB0cnVlLiBjb25maWRlbmNlIG1heWJlIDEuMC4gUHJvdmlkZSByYXRpb25hbGUgc2VudGVuY2UuXG5cblJldHVybiBKU09OLiJ9LCJmaW5pc2hfcmVhc29uIjoic3RvcCJ9XSwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6NDQxLCJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOnsiY2FjaGVkX3Rva2VucyI6MH0sImNvbXBsZXRpb25fdG9rZW5zIjoxODgsInRvdGFsX3Rva2VucyI6NjI5fX0K
+  recorded_at: Thu, 29 Oct 2026 04:12:47 GMT
+recorded_with: VCR 6.3.1
