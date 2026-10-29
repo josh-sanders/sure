@@ -8,6 +8,7 @@ module Ai::Spike::Presets
     lmstudio: "http://lmstudio.test",
     openrouter: "https://openrouter.ai/api/v1",
     gemini: "https://generativelanguage.googleapis.com/v1beta/openai",
+    gemini_native: "https://generativelanguage.googleapis.com/v1beta",
     anthropic: "https://api.anthropic.com",
     openai: "https://api.openai.com/v1",
     openclaw: "http://openclaw.test:18789/v1/chat/completions"
@@ -83,6 +84,13 @@ module Ai::Spike::Presets
     Ai::Spike::Endpoint.new(name: "OpenAI", protocol: :compatible, preset: :openai,
                             base_url: PLACEHOLDERS[:openai], api_key: ENV["SPIKE_OPENAI_API_KEY"],
                             json_mode: "strict", responses_api: true, timeout_seconds: 120, **overrides)
+  end
+
+  # Spike: Gemini through RubyLLM's native provider, not the OpenAI-compatible API.
+  def gemini_native(**overrides)
+    Ai::Spike::Endpoint.new(name: "Gemini (native)", protocol: :compatible, preset: :gemini_native,
+                            base_url: PLACEHOLDERS[:gemini_native], api_key: ENV["SPIKE_GEMINI_API_KEY"],
+                            json_mode: "auto", timeout_seconds: 120, **overrides)
   end
 
   def anthropic(**overrides)

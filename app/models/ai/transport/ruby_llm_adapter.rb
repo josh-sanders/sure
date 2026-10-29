@@ -15,6 +15,18 @@ module Ai::Transport::RubyLlmAdapter
     RubyLLM::CancelledError => Ai::Error::Cancelled
   }.freeze
 
+  # Spike knobs for the provider-switch test, both off by default:
+  # - restore_producers: give each rebuilt assistant message the usage entry
+  #   RubyLLM's own history would carry (provider and model that produced
+  #   it, from provider_state[:producer]), so RubyLLM drops another
+  #   provider's native content. Uses RubyLLM's private API (Message.new's
+  #   usage_entries:, Accounting::Usage::Entry, both :nodoc:).
+  # - gemini_placeholder: on Gemini's OpenAI-compatible API, give a tool call
+  #   another model made Google's placeholder signature, as RubyLLM's native
+  #   Gemini protocol does (protocols/gemini/tools.rb:15).
+  GEMINI_PLACEHOLDER_SIGNATURE = "skip_thought_signature_validator".freeze
+  singleton_class.attr_accessor :restore_producers, :gemini_placeholder
+
   private
     def ruby_llm_context
       @ruby_llm_context ||= RubyLLM.context do |config|
@@ -64,11 +76,29 @@ module Ai::Transport::RubyLlmAdapter
         when :tool then RubyLLM::Message.new(role: :tool, content: message.content, tool_call_id: message.tool_call_id)
         when :assistant
           state = message.provider_state.to_h
-          RubyLLM::Message.new(role: :assistant, content: message.content.to_s, **state.except(:tool_calls),
-                               tool_calls: state[:tool_calls] || ruby_llm_tool_calls(message.tool_calls))
+          RubyLLM::Message.new(role: :assistant, content: message.content.to_s, **state.except(:tool_calls, :producer),
+                               tool_calls: placeholder_signature(state[:tool_calls] || ruby_llm_tool_calls(message.tool_calls)),
+                               **producer_entries(state[:producer]))
         else RubyLLM::Message.new(role: message.role, content: message.content, attachments: ruby_llm_attachments(message.attachments))
         end
       end
+    end
+
+    def producer_entries(producer)
+      return {} unless Ai::Transport::RubyLlmAdapter.restore_producers && producer
+
+      { usage_entries: [ RubyLLM::Accounting::Usage::Entry.new(operation: :chat, provider: producer[:provider], model: producer[:model], status: :succeeded) ] }
+    end
+
+    # Gemini checks only the first call of a round for a signature.
+    def placeholder_signature(tool_calls)
+      return tool_calls unless Ai::Transport::RubyLlmAdapter.gemini_placeholder && endpoint.preset == :gemini && tool_calls.present?
+
+      calls = tool_calls.transform_values { _1.is_a?(Hash) ? _1 : _1.to_h }
+      first_id, first = calls.first
+      return calls if first[:thought_signature]
+
+      calls.merge(first_id => first.merge(thought_signature: GEMINI_PLACEHOLDER_SIGNATURE))
     end
 
     def ruby_llm_tool_calls(tool_calls)
@@ -110,7 +140,13 @@ module Ai::Transport::RubyLlmAdapter
       message.tool_calls.to_h.values.map { Ai::Transport::Base::ToolCall.new(id: _1.id, name: _1.name, arguments: _1.arguments) }
     end
 
-    def provider_state(message) = message.to_h.slice(:thinking, :thinking_signature, :raw_reasoning, :tool_calls).presence
+    # producer: the provider and model that made the message, which RubyLLM's
+    # own history keeps in its usage ledger and Sure's doesn't.
+    def provider_state(message)
+      entry = message.ruby_llm_usage_entries.reverse.find(&:succeeded?)
+      message.to_h.slice(:thinking, :thinking_signature, :raw_reasoning, :tool_calls)
+             .merge(producer: entry && { provider: entry.provider, model: entry.model }).compact.presence
+    end
 
     # RubyLLM's history back into Sure's messages, which Sure stores.
     def sure_messages(messages)

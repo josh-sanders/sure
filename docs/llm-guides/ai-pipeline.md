@@ -27,7 +27,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (252 runs, 12 skips:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (264 runs, 12 skips:
 the live-only timeout test and OCR combinations not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -458,6 +458,77 @@ So Sure can keep the loop and its bounds while RubyLLM runs the tools. The spike
   than Sure's own loop. Without those features, Sure's loop is shorter and doesn't depend on
   RubyLLM's tool semantics, such as its denial message and its unknown-tool error, which lists
   every tool name.
+
+### Switching providers partway through a chat, outside the criteria
+
+A chat changes provider when a family changes its chat model, when routing differs by task, or
+on a failover. Sure stores the history and rebuilds RubyLLM messages from it each turn, carrying
+each message's `provider_state`: Gemini's thought signatures, reasoning text and
+`reasoning_details`. `provider_switch_live_test` (cassettes under `switch/`) ran Gemini
+(`gemini-3.5-flash-lite`, effort low) against gpt-oss-20b on the venus llama.cpp, which always
+reasons, in both directions. The test covered two cases:
+- **Across turns:** turn 1 runs a tool round on provider A, then turn 2 runs on B with A's stored
+  history.
+- **Mid-turn:** A asks for `get_accounts`, Sure runs it, and B answers. That's a failover between
+  rounds, or a turn resumed on another route.
+
+Nemotron on OpenRouter wasn't run: the key had used its 50 free requests for the day.
+
+| Variant | Across turns, both ways | Mid-turn, Gemini → gpt-oss | Mid-turn, gpt-oss → Gemini | Sent to the second provider |
+|---|---|---|---|---|
+| Today | Works | Works | **400** "Function call is missing a thought_signature" → `Refused` | Gemini's `extra_content` to llama.cpp; gpt-oss's `reasoning` and `reasoning_content` to Gemini, both ignored |
+| Producer restored | Works | Works | **400**, the same | Nothing foreign |
+| Google's placeholder signature, compatible API | — | — | Works | gpt-oss's reasoning, ignored |
+| RubyLLM's native Gemini provider | Works (gpt-oss → Gemini) | Works | Works | Native Gemini sent its `extra_content` and `reasoning_signature` to llama.cpp, ignored |
+
+- **Leftovers travel, but here they did no harm.** RubyLLM 2.1 drops another provider's native
+  content only when a message carries RubyLLM's usage record of who produced it. "A message with
+  no known producer replays as it is" (`lib/ruby_llm/protocol.rb:589-597`), and Sure's rebuilt
+  messages have none. So gpt-oss's reasoning text went to Google, and Gemini's signatures went to
+  llama.cpp. Both providers ignored them. Still, a local model's reasoning, which can quote the
+  family's data, is sent to a cloud provider that never needed it.
+- **What breaks is Gemini continuing another model's tool round.** Gemini checks the signature on
+  the current turn's function calls. A call gpt-oss made has none, so it gets a 400, which
+  section 9 treats as `Refused`. Across turns it doesn't matter, because Gemini checks only the
+  current turn.
+- **Restoring the producer** is what RubyLLM's own history would do: each rebuilt assistant
+  message gets a `usage_entries:` record of the provider and model that made it, stored in
+  `provider_state[:producer]`. RubyLLM then strips every foreign field. It doesn't fix the 400:
+  the placeholder lives in RubyLLM's native Gemini protocol, not in the history. It also uses
+  RubyLLM's private API (`Message.new(usage_entries:)` and `Accounting::Usage::Entry`, both
+  `:nodoc:`).
+- **Google's placeholder fixes the 400 on the compatible API.** Google documents
+  `skip_thought_signature_validator` for a call Gemini didn't make, and RubyLLM's native Gemini
+  protocol sends it (`protocols/gemini/tools.rb:15`). Sure setting it on the first tool call of a
+  rebuilt round worked on the OpenAI-compatible API too. The same value went out in the native
+  run.
+- **RubyLLM's native Gemini provider** handled every case without Sure's help. Moving off
+  Google's OpenAI-compatible API would change the plan's Gemini preset (section 4.2). The
+  compatible API is what makes Gemini one more compatible server today.
+- **RubyLLM's own chat history,** `acts_as_chat`, `acts_as_message` and its tables, would carry the
+  producer for free. Judged from its 2.1.1 install templates rather than run, because it needs
+  migrations:
+  - `messages` needs `role`, `thinking_text`, `thinking_signature`, `raw_content`, `raw_reasoning`,
+    `citations`, `server_tool_calls`, `finish_reason` and `cache_until_here`. Sure's are
+    single-table-inheritance `UserMessage` and `AssistantMessage` with `status` and `ai_model`.
+  - `chats` needs a not-null `ruby_llm_model_id`, pointing at a `ruby_llm_models` registry table.
+    Sure's router picks the model per turn.
+  - Tool calls go in `ruby_llm_tool_calls`, beside Sure's `tool_calls`.
+  - The producer comes from the `ruby_llm_usages` ledger, the table this note says not to create,
+    because RubyLLM records usage on every call once it exists.
+
+  That's a redesign of chat storage and of who runs the loop, not an adapter fix.
+- **For the plan:**
+  - Store each assistant message's producer: route, endpoint and model. Section 8.4 already
+    stores the serving route on the message.
+  - Drop `provider_state` when the next turn's endpoint or model differs. That's Sure's own
+    version of RubyLLM's rule, with no private API.
+  - On a Gemini route, give a foreign tool call Google's placeholder signature, so a turn can
+    continue on Gemini after a failover or a resume.
+  - Choose between those two and RubyLLM's native Gemini provider; RubyLLM's history isn't worth
+    adopting for this alone.
+  - The spike's `restore_producers` and `gemini_placeholder` switches on
+    `Ai::Transport::RubyLlmAdapter` are off by default.
 
 ### Bank statements as PDFs (`extract_pdf`), outside the criteria
 

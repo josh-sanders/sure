@@ -74,16 +74,24 @@ class Ai::Transport::Compatible < Ai::Transport::Base
       chat
     end
 
-    def chat_for(model) =ruby_llm_chat(model, provider: ruby_llm_provider, protocol: endpoint.responses_api ? :responses : :chat_completions)
+    def chat_for(model)
+      protocol = ruby_llm_provider == :gemini ? nil : (endpoint.responses_api ? :responses : :chat_completions)
+      ruby_llm_chat(model, provider: ruby_llm_provider, protocol:)
+    end
 
     # OpenRouter keeps its own provider: only it round-trips reasoning_details
-    # (Gemini's thought signatures). Every other compatible server is :openai.
-    def ruby_llm_provider = endpoint.preset == :openrouter ? :openrouter : :openai
+    # (Gemini's thought signatures). Spike: gemini_native uses RubyLLM's
+    # native Gemini provider instead of Google's OpenAI-compatible API.
+    # Every other compatible server is :openai.
+    def ruby_llm_provider = { openrouter: :openrouter, gemini_native: :gemini }.fetch(endpoint.preset, :openai)
 
     def configure_provider(config)
       base = Ai::Transport::Http.compatible_base(endpoint.base_url)
       config.openai_use_system_role = true   # both providers send system prompts as "developer" otherwise
-      if ruby_llm_provider == :openrouter
+      if ruby_llm_provider == :gemini
+        config.gemini_api_key = endpoint.api_key
+        config.gemini_api_base = endpoint.base_url
+      elsif ruby_llm_provider == :openrouter
         config.openrouter_api_key = endpoint.api_key
         config.openrouter_api_base = base
         config.openrouter_app_name = "Sure"   # RubyLLM otherwise sends "RubyLLM" and https://rubyllm.com
