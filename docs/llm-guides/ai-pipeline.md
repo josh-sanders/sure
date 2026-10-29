@@ -27,7 +27,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf` (206 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (207 runs, 1 skip:
 the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -49,7 +49,7 @@ is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`
 | Gemini thought signatures survive gateways | Pass, live through Gemini's OpenAI-compatible API; OpenRouter's `reasoning_details` round trip live with Nemotron, Gemini on OpenRouter stubbed (paid) | `gemini_live_test` (live, `gemini/converse_two_rounds`, `gemini-3.5-flash-lite`, effort `low`): three rounds. Round 2 sends one tool call's `extra_content.google.thought_signature` back and round 3 sends both (`protocols/chat_completions/tools.rb:59-61, 117`). Without them Gemini answers 400 "Function call is missing a thought_signature" (`gemini/round_two_without_signatures`). On OpenRouter, `converse_stubbed_test` "OpenRouter Gemini…" sends `reasoning_details` back on rounds 2 and 3. Small fix: the OpenRouter preset must use RubyLLM's `:openrouter` provider (`providers/openrouter/chat.rb:90-102`); the generic `:openai` provider drops them |
 | Every client honours the resolved proxy | Pass | `test/models/ai/live/proxy_check.rb` through a logging forward proxy: RubyLLM's compatible, embed, Anthropic and OpenRouter clients go through it with `HTTPS_PROXY` only and with `HTTP_PROXY` only, and skip it for `NO_PROXY` hosts. The hand-written Anthropic transport (the `anthropic` gem) ignores `HTTPS_PROXY`: Net::HTTP reads only `http_proxy` even for TLS, and the gem takes no proxy option. Also live on Ollama, LM Studio and OpenClaw (see "The proxy with local servers"), where Sure proxies loopback addresses that Ruby's own lookup would not |
 | Every error maps onto `Ai::Error` | Pass | `errors_test`. Live on llama.cpp: bad key → `Unauthorized` ("Invalid API Key"), oversized prompt → `ContextTooLong` ("request (287168 tokens) exceeds the available context size (65536 tokens)"), refused port → `Unreachable`. Live on Ollama: an unknown model → 404 → `Refused`; an oversized prompt → `ContextTooLong`. Live on LM Studio: an oversized prompt → `ContextTooLong` (its llama.cpp engine's 400, wrapped as "Engine protocol predict request returned 400: …"). LM Studio's errors are `{"error": "<string>"}`, not OpenAI's `{"error": {"message": …}}`: RubyLLM parses them, and the hand-written transport crashed with a `TypeError` until it was fixed. Live on OpenClaw: a wrong gateway token → 401 → `Unauthorized`, after one attempt. Live on Anthropic, both transports: no credits → 400 → `Refused`, and a wrong key → 401 → `Unauthorized`, each after one request. Live on OpenAI: no credits → 429 `insufficient_quota` → `RateLimited`, sent three times by RubyLLM (`max_retries: 2`) and once by `ruby-openai`; a wrong key → 401 → `Unauthorized`. Live on OpenRouter: a wrong key → 401 → `Unauthorized`; a paid model on a key without credits → 402 → `Refused`, after one request; a free model's shared upstream limit → 429 → `RateLimited` (seen three times, not recorded). WebMock: 429, 5xx, 529, OpenAI/OpenRouter, LM Studio and Anthropic context-length wording, and a connect timeout → `Unreachable` |
-| The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`; not tested live past the error path (the key has no credits; see "Anthropic and OpenAI on keys without credits") | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
+| The Responses API and vector stores work through it, or the `responses_api` path stays hand-written | Small fix: Responses `generate` goes through RubyLLM; vector stores stay on `ruby-openai`. Responses ran live only to its error path (the key has no credits); vector stores ran live (see "OpenAI vector stores with the sample statements") | `generate_stubbed_test` "an endpoint with responses_api…": `text.format` strict JSON schema, `reasoning.effort`, `store: false`. RubyLLM's Responses protocol is stateless by design (`lib/ruby_llm/protocols/responses.rb:5-8`) and never sends `previous_response_id`. It has no vector store calls, only the `file_search` server tool, so `VectorStore::Openai` keeps `ruby-openai` |
 | Lines removed for `bill_setup` against the hand-written version | Reported below | RubyLLM's `generate` is 26 lines longer than the hand-written one |
 
 Chatwoot's #16078 kept audio transcription and embeddings on their dedicated OpenAI endpoints
@@ -262,8 +262,55 @@ reasoning tokens.
   `max_retries` stays 0 for OpenAI and Sure retries, or the spent balance costs two wasted
   requests a call.
 - **A wrong key** is a 401 → `Unauthorized` after one request on both transports.
-- **Not covered:** a vector store's create, upload and search, which stay on `ruby-openai`
-  (`VectorStore::Openai`). Listing works on this key; the rest would write to the account.
+- **Vector stores work on this key:** see the next section.
+
+### OpenAI vector stores with the sample statements, outside the criteria
+
+Vector stores stay on `ruby-openai`: RubyLLM has no vector store calls. The spike ran Sure's own
+`VectorStore::Openai` live, on the key with no credits, with the two sample statements
+(`test/models/vector_store/openai_live_test.rb`, cassette `openai/vector_store_statements`). It
+created a store, uploaded both PDFs, polled until OpenAI had indexed them, ran three searches,
+then called Sure's `remove_file` and `delete_store`. At the end it deleted everything it had
+created.
+
+- **No credits needed.** Creating, uploading, indexing and searching all answered 200 on a key
+  whose chat, Responses and embedding calls get a 429. So a document search that works says
+  nothing about whether chat on the same key will.
+- **Indexing is asynchronous, and Sure doesn't wait.** Attaching a file answers `in_progress`;
+  each statement took about three polls, around 6 seconds, to reach `completed`.
+  `Family#upload_document` records the document as `ready` as soon as the upload returns, so a
+  search in that window finds nothing, and a file that fails to index stays `ready` too.
+- **A scan indexes as empty, without an error.** The scanned Impact statement finished
+  `completed` with `usage_bytes: 0` and no `last_error`. OpenAI's file search reads text layers
+  only, so the statement can't be found. Sure can tell, from `usage_bytes` or the text layer it
+  can already read with `pdf-reader`, and should say so instead of showing it as ready.
+- **Every search returns something.** The BAC statement is a single chunk. It came back for all
+  three queries:
+  - "monthly apartment rent payment", at score 0.84;
+  - "payroll preauthorized credit", at 0.14;
+  - "check 1239 amount", at 0.17.
+
+  The last two answer from the scan's lines, which aren't indexed. Neither OpenAI's search nor
+  `SearchFamilyFiles` applies a score threshold, so chat gets the wrong statement as context for
+  a question about the other one.
+- **Results name Sure's temp file.** `upload_file` uploads a `Tempfile`, so OpenAI stores and
+  returns names like `bac_ocr20261029-2988578-6rl3ct.pdf`, and `SearchFamilyFiles` passes that
+  name to the model. Uploading with the original filename, or mapping `file_id` back to
+  `family_documents`, would fix it.
+- **Removing doesn't delete.** Sure's `remove_file` only detaches a file from the store, and
+  `delete_store` deletes the store but not its files. After both had succeeded, both statements
+  were still in OpenAI's Files API (`GET /v1/files/{id}` answered 200) until the spike deleted
+  them. Nothing in the app calls `remove_document`, and `delete_store` runs only when saving the
+  store's id fails. So every statement a family uploads stays on OpenAI after it's removed, and
+  after the family is deleted.
+- **It skips Sure's HTTP stack.** `VectorStore::Openai` builds its own `OpenAI::Client`, without
+  `Ai::Transport::Http`'s proxy, TLS settings and headers.
+- **For the plan** (section 5.5, the `embed` route with `vector_store`):
+  - wait for indexing, and record `failed`, and an empty index, as the document's status;
+  - delete the file from the Files API when a document, or the family, goes;
+  - keep the original filename;
+  - set a score threshold for `search_documents`;
+  - build the client through `Ai::Transport::Http`.
 
 ### Jev: hand-written, RubyLLM or a Jev gem, outside the criteria
 
@@ -678,8 +725,8 @@ measurement.
 
 ### Not judged in the spike
 
-- Anthropic's and OpenAI's successful paths live, including the Responses API and vector
-  stores (both keys have no credits), and OpenRouter's paid chat models, such as Gemini, which
+- Anthropic's and OpenAI's successful paths live, including the Responses API (both keys have
+  no credits; vector stores ran, see "OpenAI vector stores with the sample statements"), and OpenRouter's paid chat models, such as Gemini, which
   need credits.
 - The `auto` fallback chain against a live server that rejects strict schemas: none of the three
   local servers does any more.
