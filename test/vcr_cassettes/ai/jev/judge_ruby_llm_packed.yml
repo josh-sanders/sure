@@ -1,0 +1,63 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://opencode.ai/zen/v1/systemone
+    body:
+      encoding: UTF-8
+      string: '{"model":"jev-1.13-free","state":{"t1":{"description":"NETFLIX.COM
+        AUTOPAY","amount":"25.00","classification":"expense"},"t2":{"description":"PG&E
+        WEB ONLINE PAYMENT","amount":"25.00","classification":"expense"},"t3":{"description":"WHOLE
+        FOODS MARKET #10233","amount":"25.00","classification":"expense"},"t4":{"description":"UBER
+        *TRIP HELP.UBER.COM","amount":"25.00","classification":"expense"},"t5":{"description":"SPOTIFY
+        USA","amount":"25.00","classification":"expense"},"t6":{"description":"COMCAST
+        XFINITY","amount":"25.00","classification":"expense"},"t7":{"description":"TRADER
+        JOE''S #552","amount":"25.00","classification":"expense"},"t8":{"description":"SHELL
+        OIL 57444","amount":"25.00","classification":"expense"}},"questions":{"t1":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t1 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}},"t2":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t2 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}},"t3":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t3 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}},"t4":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t4 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}},"t5":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t5 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}},"t6":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t6 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}},"t7":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t7 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}},"t8":{"type":"choice","instructions":"Which
+        spending category best fits bank transaction t8 in the state?","criteria":{"Entertainment":null,"Utilities":null,"Groceries":null,"Transport":null}}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer public
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 29 Oct 2026 05:06:04 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Placement:
+      - remote-IAD
+      X-Opencode-Log-Id:
+      - 01a1860d-0cbd-7ab0-acf0-dc57ee88af53
+      X-Zen-Model:
+      - jev-1.13-free
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a51fa61a7c18b1c2-PDX
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"jev-1.13-free","answers":{"t1":{"type":"choice","choice":"Entertainment","confidence":1,"probabilities":{"Entertainment":1,"Utilities":0,"Groceries":0,"Transport":0}},"t2":{"type":"choice","choice":"Utilities","confidence":1,"probabilities":{"Entertainment":0,"Utilities":1,"Groceries":0,"Transport":0}},"t3":{"type":"choice","choice":"Groceries","confidence":1,"probabilities":{"Entertainment":0,"Utilities":0,"Groceries":1,"Transport":0}},"t4":{"type":"choice","choice":"Transport","confidence":1,"probabilities":{"Entertainment":0,"Utilities":0,"Groceries":0,"Transport":1}},"t5":{"type":"choice","choice":"Entertainment","confidence":1,"probabilities":{"Entertainment":1,"Utilities":0,"Groceries":0,"Transport":0}},"t6":{"type":"choice","choice":"Utilities","confidence":1,"probabilities":{"Entertainment":0,"Utilities":1,"Groceries":0,"Transport":0}},"t7":{"type":"choice","choice":"Groceries","confidence":1,"probabilities":{"Entertainment":0,"Utilities":0,"Groceries":1,"Transport":0}},"t8":{"type":"choice","choice":"Transport","confidence":1,"probabilities":{"Entertainment":0,"Utilities":0,"Groceries":0,"Transport":1}}},"usage":{"input_tokens":1016,"output_tokens":397,"cost":0,"opencode":{"billing_source":"free","list_cost":0,"tokens":{"input":1016,"output":397,"reasoning":0,"cache_read":0,"cache_write_5m":0,"cache_write_1h":0}}}}'
+  recorded_at: Thu, 29 Oct 2026 05:06:04 GMT
+recorded_with: VCR 6.3.1

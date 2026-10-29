@@ -48,4 +48,29 @@ class Ai::JudgeJevLiveTest < ActiveSupport::TestCase
     assert @response.success?, @response.error&.message
     assert_equal "Entertainment", @response.data[:category].value
   end
+
+  # Packing: several transactions in one state, one choice question each.
+  # judge takes any Hash as the state and any number of questions, so this
+  # needs no support from RubyLLM beyond what it has; it has no helper for it.
+  test "RubyLLM's judge answers eight transactions packed into one request (live)" do
+    truth = { "t1" => [ "NETFLIX.COM AUTOPAY", "Entertainment" ], "t2" => [ "PG&E WEB ONLINE PAYMENT", "Utilities" ],
+              "t3" => [ "WHOLE FOODS MARKET #10233", "Groceries" ], "t4" => [ "UBER *TRIP HELP.UBER.COM", "Transport" ],
+              "t5" => [ "SPOTIFY USA", "Entertainment" ], "t6" => [ "COMCAST XFINITY", "Utilities" ],
+              "t7" => [ "TRADER JOE'S #552", "Groceries" ], "t8" => [ "SHELL OIL 57444", "Transport" ] }
+    options = %w[Entertainment Utilities Groceries Transport].to_h { [ _1, nil ] }
+    state = truth.transform_values { |(description, _)| { description:, amount: "25.00", classification: "expense" } }
+    questions = truth.keys.to_h do |id|
+      [ id.to_sym, { type: :choice, instructions: "Which spending category best fits bank transaction #{id} in the state?", options: } ]
+    end
+    context = RubyLLM.context { |c| c.typesafe_api_key = "public"; c.typesafe_api_base = BASE; c.max_retries = 0 }
+
+    with_spike_cassette("jev/judge_ruby_llm_packed") do
+      @judgment = context.judge(state, questions:, model: MODEL, provider: :typesafe, assume_model_exists: true)
+    end
+
+    assert_equal truth.transform_values(&:last), @judgment.answers.to_h { |name, answer| [ name.to_s, answer.choice ] }
+    body = request_bodies(%r{opencode.ai}).sole
+    assert_equal truth.keys, body["state"].keys
+    assert_equal 8, body["questions"].size
+  end
 end

@@ -26,7 +26,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (147 runs, 1 skip:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai` (148 runs, 1 skip:
 the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -240,6 +240,11 @@ decision models (59 stars, 20,528 downloads, 0.3.0 from 2026-10-12, no runtime d
   path can't be reached; Sure's `JEV_ENDPOINT` takes any full URL.
 - **No batching or concurrency for judgments.** RubyLLM's batch API covers chats and embeddings
   only, and its fiber concurrency is for tool calls. No issue or PR asks for either.
+- **Packing works, with no helper.** `judge` takes any Hash as the state and any number of
+  questions, so Sure builds the packed state and one `choice` per transaction itself, and reads
+  the answers back by name. Eight transactions in one request: all eight right, 1,016 input
+  tokens (`judge_jev_live_test`, live, `jev/judge_ruby_llm_packed`). The questions have to go in
+  `questions:` per call; a `RubyLLM::Judge` subclass declares a fixed set.
 
 **The `ruby_decision_model` gem** (`Provider::JevGem`, 54 code lines, replacing the 72).
 
