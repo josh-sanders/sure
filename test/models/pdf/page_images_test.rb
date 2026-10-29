@@ -19,6 +19,16 @@ class Pdf::PageImagesTest < ActiveSupport::TestCase
     assert_equal [ [ 612, 792 ] ], pages.map { size(_1) }
   end
 
+  test "pdftoppm renders the same pages, give or take a pixel" do
+    skip "pdftoppm isn't installed" unless system("pdftoppm", "-v", out: File::NULL, err: File::NULL)
+
+    { "impact_scanned" => [ [ 1275, 1650 ] ] * 2, "bac_ocr" => [ [ 933, 1219 ] ] }.each do |name, sizes|
+      assert_equal sizes, Pdf::PageImages.pages(statement(name), renderer: :pdftoppm).map { size(_1) }
+    end
+    assert_equal [ [ 932, 1218 ] ], Pdf::PageImages.pages(statement("bac_ocr")).map { size(_1) }, "vips rounds the odd page size down"
+    assert_raises(Pdf::PageImages::Error) { Pdf::PageImages.pages("not a pdf", renderer: :pdftoppm) }
+  end
+
   test "a file that isn't a PDF raises Vips::Error" do
     assert_raises(Vips::Error) { Pdf::PageImages.pages("not a pdf") }
   end

@@ -1,0 +1,129 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n<PAGE><BLOCK>header[87, 46, 191, 64]<FORK>SAMPLE\n<BLOCK>header[87,
+        68, 333, 86]<FORK>Statement of Account\n<BLOCK>header[89, 88, 193, 106]<FORK>12345678\n<BLOCK>text[190,
+        208, 361, 222]<FORK>JAMES C. MORRISON\n<BLOCK>text[192, 223, 367, 236]<FORK>1765
+        SHERIDAN DRIVE\n<BLOCK>text[192, 237, 367, 251]<FORK>YOUR CITY, USA 03087\n<BLOCK>page_number[805,
+        247, 890, 262]<FORK>Page 1 of 2\n<BLOCK>text[105, 344, 718, 381]<FORK>You
+        have successfully opened a sample statement in PDF format. Please continue
+        with your e-Statement enrollment.\n<BLOCK>other[366, 420, 614, 438]<FORK>Summary
+        of Your Account\n<BLOCK>table[88, 442, 891, 616]<FORK><table>Average Balance$043.24Beginning
+        balance on October 10$69.96Avg Collected Balance$643.24+ Deposits and other
+        credits$1,876.02Interest Paid YTD$3.13+ Interest paid$0.26- Withdrawals and
+        other debits$1,320.02- Service Charges and Fees$12.00Interest-bearing Days30Ending
+        balance on November 9$586.71Average Balance for APY$643.24Interest Earned$0.26</table>\n<BLOCK>title<LEVEL1>[225,
+        633, 750, 651]<FORK>Activity for Relationship Checking - Account #12345678\n<BLOCK>other[101,
+        666, 557, 682]<FORK>Account Transactions by date with daily balance information\n<BLOCK>table[88,
+        687, 891, 969]<FORK><table>DateDescriptionDebitCreditBalance10/02POS PURCHASE4.2365.7310/03PREAUTHORIZED
+        CREDIT763.01828.7410/04POS PURCHASE11.68817.0610/05CHECK 12349.98807.0810/05POS
+        PURCHASE25.50781.5810/08POS PURCHASE59.08722.5010/12CHECK 123669.00653.5010/14CHECK
+        1237180.63472.8710/14POS PURCHASE18.96453.9110/16PREAUTHORIZED CREDIT763.011216.9210/22ATM
+        WITHDRAWAL140.001076.9210/28CHECK 123891.06985.8610/30CHECK 1239451.20534.6610/30CHECK
+        124637.07497.5910/30POS PURCHASE18.67478.9210/31CHECK 1247100.00378.9210/31CHECK
+        124878.24300.6810/31PREAUTHORIZED CREDIT350.00650.6811/02CHECK 124952.23598.4511/09INTEREST
+        CREDIT.26598.7111/09SERVICE CHARGE12.00586.71</table>\n<PAGE><BLOCK>header[740,
+        42, 891, 56]<FORK>Account # 12345678\n<BLOCK>page_number[806, 57, 891, 71]<FORK>Page
+        2 of 2\n<BLOCK>title<LEVEL1>[177, 96, 802, 114]<FORK>Activity for Relationship
+        Checking - Account #12345678 continued\n<BLOCK>other[100, 133, 536, 150]<FORK>Account
+        Transactions by type with detailed description\n<BLOCK>table[85, 151, 889,
+        297]<FORK><table><td colspan=\"4\">Deposits and Other CreditsDateDescriptionAmount10/03PREAUTHORIZED
+        CREDITPAYROLL 0987654 678990763.0110/16PREAUTHORIZED CREDITUS TREASURY 310
+        SOC SEC 020802 509499853A SSA763.0110/31PREAUTHORIZED CREDITDEPOSIT TERMINAL
+        S097094 09809 5:23 PM 097083740597380032350.0011/09INTEREST CREDIT0.26</table>\n<BLOCK>other[100,
+        326, 292, 338]<FORK>Withdrawals and Other Debits\n<BLOCK>table[85, 340, 889,
+        440]<FORK><table>DateDescriptionAmount10/02POS PURCHASETERMINAL 24349201 WAL-MART
+        #3492 WICHITA KS 00-00-00 00:00 PM 0000000000000000010/04POS PURCHASETERMINAL
+        443565 PLAYERS SPORTS BAR AND GRILL WICHITA KS 00-00-00 00:00 PM 0000000000000000010/05POS
+        PURCHASETERMINAL 422443 KWAN COURT WICHITA KS 00-00-00 00:00 PM 0000000000000000010/07POS
+        PURCHASETERMINAL 098765 THE HOME DEPOT 2204 WICHITA KS 00-00-00 00:00 AM 0000000000000000010/14POS
+        PURCHASETERMINAL 098765 0000 000 WICHITA KS 00-00-00 00:00 PM 0000000000000000010/22ATM
+        WITHDRAWALCASH WITHDRAWAL TERMINAL 578476 3216 EAST HARRY WICHITA KS 00-00-00
+        00:00 AM 0000000000000000010/30POS PURCHASETERMINAL 098765 DILLONS 0000 000
+        WICHITA KS 00-00-00 00:00 PM 00000000000000000</table>\n<BLOCK>other[100,
+        471, 324, 484]<FORK>Account Service Charges and Fees\n<BLOCK>table[85, 486,
+        889, 513]<FORK><table>DateDescriptionAmount11/09SERVICE CHARGE12.00</table>\n<BLOCK>table[85,
+        560, 889, 634]<FORK><table><td colspan=\"5\">Checks Paid<td colspan=\"3\">(*indicates
+        out of sequence)Check #DateAmountCheck #DateAmountCheck #Date123410/05$9.98123810/28$91.06124710/311236*10/12$69.00123910/30$451.20124810/31123710/14$180.631246*10/30$37.07124911/02</table>\n<BLOCK>title<LEVEL2>[100,
+        654, 519, 668]<FORK>Check Images for Relationship Checking - Account #12345678\n<BLOCK>text[101,
+        681, 767, 695]<FORK>Check images are not shown for this sample statement.
+        Your statement will Include check images, if applicable."}],"stream":false,"max_completion_tokens":4096,"response_format":{"type":"json_schema","json_schema":{"name":"extract_pdf","schema":{"type":"object","properties":{"currency":{"type":["string","null"]},"period_start":{"type":["string","null"]},"period_end":{"type":["string","null"]},"opening_balance":{"type":["number","null"]},"closing_balance":{"type":["number","null"]},"transactions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string"},"description":{"type":"string"},"amount":{"type":"number"}},"required":["date","description","amount"],"additionalProperties":false}}},"required":["currency","period_start","period_end","opening_balance","closing_balance","transactions"],"additionalProperties":false},"strict":true}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Length:
+      - '3304'
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      Date:
+      - Thu, 29 Oct 2026 13:17:57 GMT
+    body:
+      encoding: UTF-8
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"{\n  \"currency\":
+        \"USD\",\n  \"period_start\": null,\n  \"period_end\": null,\n  \"opening_balance\":
+        69.96,\n  \"closing_balance\": 586.71,\n  \"transactions\": [\n    {\n      \"date\":
+        \"2024-10-02\",\n      \"description\": \"POS PURCHASE\",\n      \"amount\":
+        -4.23\n    },\n    {\n      \"date\": \"2024-10-03\",\n      \"description\":
+        \"PREAUTHORIZED CREDIT\",\n      \"amount\": 763.01\n    },\n    {\n      \"date\":
+        \"2024-10-04\",\n      \"description\": \"POS PURCHASE\",\n      \"amount\":
+        -11.68\n    },\n    {\n      \"date\": \"2024-10-05\",\n      \"description\":
+        \"CHECK 1234\",\n      \"amount\": -9.98\n    },\n    {\n      \"date\": \"2024-10-05\",\n      \"description\":
+        \"POS PURCHASE\",\n      \"amount\": -25.50\n    },\n    {\n      \"date\":
+        \"2024-10-08\",\n      \"description\": \"POS PURCHASE\",\n      \"amount\":
+        -59.08\n    },\n    {\n      \"date\": \"2024-10-12\",\n      \"description\":
+        \"CHECK 1236\",\n      \"amount\": -69.00\n    },\n    {\n      \"date\":
+        \"2024-10-14\",\n      \"description\": \"CHECK 1237\",\n      \"amount\":
+        -180.63\n    },\n    {\n      \"date\": \"2024-10-14\",\n      \"description\":
+        \"POS PURCHASE\",\n      \"amount\": -18.96\n    },\n    {\n      \"date\":
+        \"2024-10-16\",\n      \"description\": \"PREAUTHORIZED CREDIT\",\n      \"amount\":
+        763.01\n    },\n    {\n      \"date\": \"2024-10-22\",\n      \"description\":
+        \"ATM WITHDRAWAL\",\n      \"amount\": -140.00\n    },\n    {\n      \"date\":
+        \"2024-10-28\",\n      \"description\": \"CHECK 1238\",\n      \"amount\":
+        -91.06\n    },\n    {\n      \"date\": \"2024-10-30\",\n      \"description\":
+        \"CHECK 1239\",\n      \"amount\": -451.20\n    },\n    {\n      \"date\":
+        \"2024-10-30\",\n      \"description\": \"CHECK 1246\",\n      \"amount\":
+        -37.07\n    },\n    {\n      \"date\": \"2024-10-30\",\n      \"description\":
+        \"POS PURCHASE\",\n      \"amount\": -18.67\n    },\n    {\n      \"date\":
+        \"2024-10-31\",\n      \"description\": \"CHECK 1247\",\n      \"amount\":
+        -100.00\n    },\n    {\n      \"date\": \"2024-10-31\",\n      \"description\":
+        \"CHECK 1248\",\n      \"amount\": -78.24\n    },\n    {\n      \"date\":
+        \"2024-10-31\",\n      \"description\": \"PREAUTHORIZED CREDIT\",\n      \"amount\":
+        350.00\n    },\n    {\n      \"date\": \"2024-11-02\",\n      \"description\":
+        \"CHECK 1249\",\n      \"amount\": -52.23\n    },\n    {\n      \"date\":
+        \"2024-11-09\",\n      \"description\": \"INTEREST CREDIT\",\n      \"amount\":
+        0.26\n    },\n    {\n      \"date\": \"2024-11-09\",\n      \"description\":
+        \"SERVICE CHARGE\",\n      \"amount\": -12.00\n    }\n  ]\n}"}}],"created":1793279877,"model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion","usage":{"completion_tokens":1025,"prompt_tokens":2414,"total_tokens":3439,"prompt_tokens_details":{"cached_tokens":139}},"id":"chatcmpl-QL66qnnUh12tDjP30OBlkCB4T0XTjnQc","timings":{"cache_n":139,"prompt_n":2275,"prompt_ms":35370.041,"prompt_per_token_ms":15.547270769230767,"prompt_per_second":64.31997067800968,"predicted_n":1025,"predicted_ms":80683.665,"predicted_per_token_ms":78.7926416015625,"predicted_per_second":12.691540474766486,"draft_n":513,"draft_n_accepted":512}}'
+  recorded_at: Thu, 29 Oct 2026 13:17:57 GMT
+recorded_with: VCR 6.3.1

@@ -1,0 +1,110 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://llama-cpp.test/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"qwen3.6-35b-a3b-mtp","messages":[{"role":"system","content":"You
+        read a bank statement and return its contents as JSON.\n\n- List every transaction
+        exactly once. A statement may list the same transactions in more than one
+        section, for example by date and again by type; don''t repeat them.\n- amount:
+        negative for money out, positive for money in.\n- date: YYYY-MM-DD. If no
+        year is printed, use the current year.\n- opening_balance and closing_balance:
+        the balances at the start and end of the statement period, as printed.\n-
+        If you can''t read the statement, or it has no transactions, return an empty
+        transactions list and null for every other field. Never guess."},{"role":"user","content":"BANK
+        STATEMENT TEXT:\n<ref>Bank Statement Example</ref><box><326><15><646><35></box>,
+        <ref>Your Bank</ref><box><79><48><358><84></box>, <ref>16 High Street. Anytown,
+        Anyshire YZ99 1XY</ref><box><74><92><388><107></box>, <ref>Account name: Mr
+        John Smith</ref><box><620><82><830><94></box>, <ref>Account Type: Checking</ref><box><621><95><791><110></box>,
+        <ref>Account number: 99988877</ref><box><621><109><813><121></box>, <ref>Your
+        current account statement:</ref><box><622><136><856><148></box>, <ref>1 February
+        to 1 March, 2019</ref><box><623><150><822><164></box>, <ref>Page 1 of 1</ref><box><816><191><892><205></box>,
+        <ref>Your account summary</ref><box><99><286><288><301></box>, <ref>Balance
+        at 1 February: £40,000.00</ref><box><100><334><331><349></box>, <ref>Total
+        money in: £5,474.00</ref><box><140><356><325><370></box>, <ref>Total money
+        out: £1,395.17</ref><box><139><375><329><389></box>, <ref>Balance at 1 March:
+        £44.079.83</ref><box><104><391><366><405></box>, <ref>Date</ref><box><109><445><142><458></box>,
+        <ref>Description</ref><box><346><444><448><459></box>, <ref>Money</ref><box><633><437><698><454>,<737><436><797><453></box>,
+        <ref>Balance brought forward</ref><box><186><480><381><493></box>, <ref>40,000.00</ref><box><822><479><886><492></box>,
+        <ref>Cardpayment - High St Petrol Station</ref><box><188><501><421><516></box>,
+        <ref>24.50</ref><box><638><500><674><512></box>, <ref>39,975.50</ref><box><823><501><882><515></box>,
+        <ref>Directdebit - Green Mobile Phone Bill</ref><box><188><517><422><530></box>,
+        <ref>20.00</ref><box><636><518><673><530></box>, <ref>39,955.50</ref><box><825><519><892><531></box>,
+        <ref>Cash Withdrawal - YourBank, Anytown</ref><box><189><546><438><560></box>,
+        <ref>30.00</ref><box><638><543><676><556></box>, <ref>39,925.50</ref><box><826><542><893><554></box>,
+        <ref>High Street, timed 17:30 31 Jan</ref><box><188><562><393><576></box>,
+        <ref>YourJob BiWeekly Payment</ref><box><189><579><369><594></box>, <ref>2,575.00</ref><box><740><574><795><587></box>,
+        <ref>42,500.50</ref><box><824><578><888><591></box>, <ref>Direct Deposit -
+        YourBank, Anytown High</ref><box><188><601><449><616></box>, <ref>300.00</ref><box><738><599><782><612></box>,
+        <ref>42,800.50</ref><box><825><600><890><614></box>, <ref>Street, timed 17:30
+        31 Jan</ref><box><188><618><356><632></box>, <ref>Cash Withdrawal - RandomBank,
+        Randomford,</ref><box><189><639><489><654></box>, <ref>42,750.50</ref><box><827><638><892><651></box>,
+        <ref>timed 9.52 14 Feb</ref><box><188><656><304><669></box>, <ref>Card payment
+        - High St Petrol Station</ref><box><188><678><427><692></box>, <ref>42,710.50</ref><box><824><679><889><692></box>,
+        <ref>Direct Debit - Home Insurance</ref><box><189><695><382><707></box>, <ref>78.34</ref><box><641><699><676><710></box>,
+        <ref>42,632.16</ref><box><823><700><890><712></box>, <ref>YourJob BiWeekly
+        Payment</ref><box><188><722><368><737></box>, <ref>2,575.00</ref><box><740><721><799><735></box>,
+        <ref>45,207.16</ref><box><820><721><887><734></box>, <ref>Randomford''s Deli</ref><box><189><759><306><772></box>,
+        <ref>45,195.16</ref><box><821><756><888><769></box>, <ref>Anytown''s Jewelers</ref><box><188><791><313><805></box>,
+        <ref>150.00</ref><box><644><790><686><802></box>, <ref>45,042.16</ref><box><820><787><886><800></box>,
+        <ref>Direct Deposit</ref><box><189><806><279><819></box>, <ref>25.00</ref><box><740><810><776><821></box>,
+        <ref>45,067.16</ref><box><820><809><884><822></box>, <ref>28 February</ref><box><80><840><169><854></box>,
+        <ref>Monthly Apartment Rent</ref><box><190><841><345><855></box>, <ref>987.33</ref><box><641><839><686><852></box>,
+        <ref>44,079.83</ref><box><818><839><882><853></box>, <ref>Signature</ref><box><525><930><625><979></box>"}],"stream":false,"max_completion_tokens":4096,"response_format":{"type":"json_schema","json_schema":{"name":"extract_pdf","schema":{"type":"object","properties":{"currency":{"type":["string","null"]},"period_start":{"type":["string","null"]},"period_end":{"type":["string","null"]},"opening_balance":{"type":["number","null"]},"closing_balance":{"type":["number","null"]},"transactions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string"},"description":{"type":"string"},"amount":{"type":"number"}},"required":["date","description","amount"],"additionalProperties":false}}},"required":["currency","period_start","period_end","opening_balance","closing_balance","transactions"],"additionalProperties":false},"strict":true}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Authorization:
+      - Bearer <SPIKE_LLAMA_CPP_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Origin:
+      - ''
+      Content-Length:
+      - '2612'
+      Content-Type:
+      - application/json; charset=utf-8
+      Server:
+      - llama.cpp
+      Via:
+      - 1.1 Caddy
+      Date:
+      - Thu, 29 Oct 2026 13:14:47 GMT
+    body:
+      encoding: UTF-8
+      string: '{"choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"{\n  \"currency\":
+        \"GBP\",\n  \"period_start\": \"2019-02-01\",\n  \"period_end\": \"2019-03-01\",\n  \"opening_balance\":
+        40000.00,\n  \"closing_balance\": 44079.83,\n  \"transactions\": [\n    {\n      \"date\":
+        \"2019-02-01\",\n      \"description\": \"Cardpayment - High St Petrol Station\",\n      \"amount\":
+        -24.50\n    },\n    {\n      \"date\": \"2019-02-01\",\n      \"description\":
+        \"Directdebit - Green Mobile Phone Bill\",\n      \"amount\": -20.00\n    },\n    {\n      \"date\":
+        \"2019-02-01\",\n      \"description\": \"Cash Withdrawal - YourBank, Anytown\",\n      \"amount\":
+        -30.00\n    },\n    {\n      \"date\": \"2019-01-31\",\n      \"description\":
+        \"YourJob BiWeekly Payment\",\n      \"amount\": 2575.00\n    },\n    {\n      \"date\":
+        \"2019-01-31\",\n      \"description\": \"Direct Deposit - YourBank, Anytown
+        High Street\",\n      \"amount\": 300.00\n    },\n    {\n      \"date\": \"2019-02-14\",\n      \"description\":
+        \"Cash Withdrawal - RandomBank, Randomford\",\n      \"amount\": -50.00\n    },\n    {\n      \"date\":
+        \"2019-02-14\",\n      \"description\": \"Card payment - High St Petrol Station\",\n      \"amount\":
+        -40.00\n    },\n    {\n      \"date\": \"2019-02-14\",\n      \"description\":
+        \"Direct Debit - Home Insurance\",\n      \"amount\": -78.34\n    },\n    {\n      \"date\":
+        \"2019-02-14\",\n      \"description\": \"YourJob BiWeekly Payment\",\n      \"amount\":
+        2575.00\n    },\n    {\n      \"date\": \"2019-02-14\",\n      \"description\":
+        \"Randomford''s Deli\",\n      \"amount\": -12.00\n    },\n    {\n      \"date\":
+        \"2019-02-15\",\n      \"description\": \"Anytown''s Jewelers\",\n      \"amount\":
+        -150.00\n    },\n    {\n      \"date\": \"2019-02-15\",\n      \"description\":
+        \"Direct Deposit\",\n      \"amount\": 25.00\n    },\n    {\n      \"date\":
+        \"2019-02-28\",\n      \"description\": \"Monthly Apartment Rent\",\n      \"amount\":
+        -987.33\n    }\n  ]\n}"}}],"created":1793279687,"model":"qwen3.6-35b-a3b-mtp","system_fingerprint":"b1-d812350","object":"chat.completion","usage":{"completion_tokens":710,"prompt_tokens":2154,"total_tokens":2864,"prompt_tokens_details":{"cached_tokens":139}},"id":"chatcmpl-T2oN7dqqWyvv7PpJ3uJ1kcq8Uxau3wkk","timings":{"cache_n":139,"prompt_n":2015,"prompt_ms":31318.703,"prompt_per_token_ms":15.54278064516129,"prompt_per_second":64.33855195089018,"predicted_n":710,"predicted_ms":55614.252,"predicted_per_token_ms":78.44041184767278,"predicted_per_second":12.748530718348958,"draft_n":356,"draft_n_accepted":353}}'
+  recorded_at: Thu, 29 Oct 2026 13:14:47 GMT
+recorded_with: VCR 6.3.1

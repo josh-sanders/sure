@@ -66,7 +66,7 @@ module Ai::Transport::RubyLlmAdapter
           state = message.provider_state.to_h
           RubyLLM::Message.new(role: :assistant, content: message.content.to_s, **state.except(:tool_calls),
                                tool_calls: state[:tool_calls] || ruby_llm_tool_calls(message.tool_calls))
-        else RubyLLM::Message.new(role: message.role, content: message.content)
+        else RubyLLM::Message.new(role: message.role, content: message.content, attachments: ruby_llm_attachments(message.attachments))
         end
       end
     end

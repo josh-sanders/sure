@@ -33,6 +33,17 @@ module Ai::Spike::Presets
     )
   end
 
+  # Unlimited-OCR-2 (baidu, 3.3B MoE) with its vision projector, from two
+  # GGUF conversions, each loaded in turn on the main llama.cpp server.
+  # prompt: AtomicChat's chat template writes the model card's prompt
+  # itself; RX5950XT's only joins the messages' content, so Sure sends it.
+  # WeVisOne-VL-4B is a general vision model, so it gets an instruction.
+  OCR = {
+    atomicchat: { gguf: "Unlimited-OCR-2-AD-Q4_K.gguf", model: "unlimited-ocr-2", prompt: :template },
+    rx5950xt: { gguf: "RX5950XT-Unlimited-OCR-2-Q4_K_M.gguf", model: "unlimited-ocr-2-rx5950xt", prompt: :sent },
+    wevisone: { gguf: "WeVisOne-VL-4B.Q4_K_M.gguf", model: "wevisone-vl-4b", prompt: :instruction }
+  }.freeze
+
   def ollama(**overrides)
     Ai::Spike::Endpoint.new(name: "Ollama", protocol: :compatible, preset: :ollama,
                             base_url: url(:ollama, "SPIKE_OLLAMA_URL"), api_key: nil, **overrides)

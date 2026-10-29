@@ -33,7 +33,7 @@ class Ai::Transport::Anthropic < Ai::Transport::Base
   end
 
   def converse(request, &on_chunk)
-    instrument("converse", model: request.model, request: request.to_h.except(:model), tools: request.tools.map(&:name)) do
+    instrument("converse", model: request.model, request: event_conversation(request), tools: request.tools.map(&:name)) do
       converse_with(chat_for(request.model), request, &on_chunk)
     end
   end

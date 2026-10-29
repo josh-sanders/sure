@@ -16,8 +16,9 @@ class Ai::Transport::Base
   # converse: section 7 gives only `converse(request, &on_chunk)`. A chat
   # round needs the history (with tool results) and the tools, and returns
   # the model's tool calls rather than running them (section 5.5).
-  Message = Data.define(:role, :content, :tool_calls, :tool_call_id, :provider_state) do
-    def initialize(content: nil, tool_calls: [], tool_call_id: nil, provider_state: nil, **rest) = super
+  # attachments: files a user sends with a message (Attachment values).
+  Message = Data.define(:role, :content, :tool_calls, :tool_call_id, :provider_state, :attachments) do
+    def initialize(content: nil, tool_calls: [], tool_call_id: nil, provider_state: nil, attachments: [], **rest) = super
   end
   ToolCall = Data.define(:id, :name, :arguments)
   ToolSpec = Data.define(:name, :description, :schema)
@@ -42,8 +43,15 @@ class Ai::Transport::Base
   private
     # A generate request for an .ai event: files by name and size, never their bytes.
     def event_request(request)
-      request.to_h.except(:model).merge(attachments: request.attachments.map { { filename: _1.filename, bytes: _1.data.bytesize } })
+      request.to_h.except(:model).merge(attachments: event_attachments(request.attachments))
     end
+
+    # A converse request for an .ai event, its messages' files likewise.
+    def event_conversation(request)
+      request.to_h.except(:model).merge(messages: request.messages.map { _1.to_h.merge(attachments: event_attachments(_1.attachments)) })
+    end
+
+    def event_attachments(attachments) = attachments.map { { filename: _1.filename, bytes: _1.data.bytesize } }
 
     # One .ai event per wire call (section 10). Subscribers get the prompt,
     # the output, the usage and the error class; tool rounds are one event each.

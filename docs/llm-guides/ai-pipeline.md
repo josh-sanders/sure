@@ -27,8 +27,8 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (207 runs, 1 skip:
-the live-only timeout test), and for Jev `bin/rails test test/models/provider/jev_test.rb
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (236 runs, 6 skips:
+the live-only timeout test and five OCR runs not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
@@ -505,7 +505,8 @@ transaction makes the closing balance. Tests: `extract_statement_live_test`, cas
   forward" as a −£40,000 transaction, merged two rows into −£118.34 and flipped a sign, while
   reporting both balances correctly. Every wrong extraction in the matrix fails to reconcile,
   and every right one reconciles. Sure can run that check on any import without knowing the
-  answer, and hold back or flag one that fails.
+  answer, and hold back or flag one that fails. It checks amounts and signs, not dates: in the
+  OCR runs below, an extraction with every amount right and ten dates wrong still reconciled.
 - **OpenRouter bills PDF parsing, even for free models.** With no engine named, OpenRouter
   OCR'd the scan for the text-only Lightning, and the model saw every amount. The cost was
   $0.002 a page, once for every request. The `auto` chain sent each file three times, so the
@@ -536,7 +537,7 @@ transaction makes the closing balance. Tests: `extract_statement_live_test`, cas
   - these cassettes add 10.5 MB, because the retries resend the base64 file.
 - **Not tested:**
   - OpenAI direct (the Responses API's `input_file`) and Anthropic live, whose keys have no credits;
-  - a local vision model: venus has no vision projector (mmproj) for its GGUFs;
+  - a local vision model for direct extraction: see "OCR on llama.cpp" below for local OCR;
   - statements over five pages.
 
 **Conclusion.** RubyLLM carries the bytes well, but the choice of what to send stays Sure's: one
@@ -615,6 +616,85 @@ process:
   - `ruby-vips` in a child process keeps both properties, for more code.
 
   The spike uses the in-process unblock to show that it works; the choice belongs to the plan.
+
+`Pdf::PageImages` takes `renderer: :vips` (the default) or `renderer: :pdftoppm`. The `pdftoppm`
+path is Sure's call today, plus `-l` for a page limit. At 150 dpi `pdftoppm` gives BAC's page as
+933×1219 and `vips` as 932×1218; the Letter pages match exactly.
+
+#### OCR on llama.cpp: Unlimited-OCR-2 and WeVisOne-VL-4B
+
+`ocr_live_test`, cassettes under `ocr/`. Three vision models ran, each loaded in turn on the venus
+llama.cpp (CPU only), on both statements, with pages from both renderers at 150 dpi. Requests ran
+one at a time. Each run had two steps, recorded apart, because the server holds one model at a
+time:
+1. **Transcribe:** the vision model turns the page images into text. Chat messages now carry
+   attachments for this, and the `.ai` event records only each file's name and size.
+2. **Extract:** Qwen3.6 extracts the statement from that text with `ExtractBankStatement`,
+   scored like the matrix above.
+
+The three models:
+- **Unlimited-OCR-2** (baidu, 3.3B MoE) in two GGUF conversions:
+  - AtomicChat's (`Unlimited-OCR-2-AD-Q4_K`);
+  - RX5950XT's (`Q4_K_M`).
+
+  The model card's prompt is `<PAGE><image>` per page, then "Multi page parsing.".
+  AtomicChat's chat template writes it around images sent alone. RX5950XT's only joins the
+  messages, so the request sends one user message per page (`"<PAGE>"` and its image) and a
+  last one with the instruction. RubyLLM puts a message's text before its files, so this is the
+  only way to get that order.
+- **WeVisOne-VL-4B** (`Q4_K_M`), a general vision model, asked to transcribe to Markdown.
+
+| Model · renderer | BAC: amounts read · extraction | Impact scan: amounts read · extraction | Time per page |
+|---|---|---|---|
+| OCR-2 AtomicChat · `pdftoppm` | 13/13 · 13/13, reconciles | 21/21 · 21/21, reconciles | 43–47 s |
+| OCR-2 AtomicChat · `vips` | 13/13 · 13/13, reconciles | 21/21 · 21/21, reconciles | 47–48 s |
+| OCR-2 RX5950XT · `pdftoppm` | 13/13 · 13/13, reconciles | 21/21 · 21/21, reconciles | 44–48 s |
+| OCR-2 RX5950XT · `vips` | 13/13 · 13/13, reconciles | 21/21 · 21/21, reconciles | 45–48 s |
+| WeVisOne · `pdftoppm` | 13/13 · 3/13, reconciles | not run | 115 s |
+| WeVisOne · `vips` | 11/13 · 3/13, doesn't reconcile | not run | 113 s |
+
+Qwen3.6's extraction took 73–123 s more per statement. Two BAC extractions added a zero
+"Balance brought forward" row, which does no harm.
+
+- **Unlimited-OCR-2 then Qwen3.6 read both statements completely,** the scan included, on CPU,
+  with either conversion and either renderer. It fixed the BAC text layer's OCR errors. It kept
+  the printed figures (`£44.079.83`), and the extraction step read them correctly. The two
+  conversions gave almost the same text, and so did the two renderers. It's the first
+  local path in the spike that reads a scanned statement.
+- **Table cells come out joined.** The OCR model writes tables as HTML. Every `<tr>`, `<td>` and
+  `</td>` is missing from llama-server's output; only `<td rowspan="2">`, which the tokenizer
+  spells out, survives. So `24.50` and `39,975.50` arrive as `24.5039,975.50`. The tags are
+  probably special tokens, which llama-server leaves out of text by default; its `--special`
+  flag wasn't tried. Qwen3.6 split the joined values correctly every time, but a weaker model
+  might not.
+- **WeVisOne isn't a transcriber or an extractor.**
+  - **Transcribing:** it ignored the Markdown instruction and answered with grounding pairs
+    (`<ref>24.50</ref><box>…</box>`). It quietly corrected printed errors (`£44,079.83`) and
+    left out all but one of BAC's date cells. Qwen then dated ten rows from their
+    descriptions: every amount and sign right, ten dates wrong, and one of the two runs still
+    reconciles.
+  - **Extracting straight to JSON** (`EXPECTED_DIRECT`, three runs):
+    - grounding tags in the descriptions;
+    - invented years;
+    - loops until the 6,000-token cap at 7.9 tokens a second, so BAC took 26 minutes over the
+      `auto` chain's three attempts;
+    - on the scan, both balances right and no transactions.
+- **For the plan:**
+  - **Local OCR works for PDF import:** an OCR model to transcribe, then the extraction
+    generation on any text model. That needs two models on a route (`needs: vision` for the
+    transcribe step), or a dedicated OCR endpoint, since one llama.cpp server holds one model
+    at a time.
+  - **A prompt per model:** the request has to match each model's prompt and chat template,
+    so the OCR step needs one per model, not a generic instruction.
+  - **Time budgets:** `auto`'s retries multiply a slow local model's time, so a route needs
+    a budget for each attempt as well as for the turn.
+  - **Dates:** reconciling doesn't check them. A check that every date falls inside the
+    statement's period would have caught WeVisOne's.
+- **Not run:**
+  - WeVisOne's two scan transcriptions, because the server stopped mid-run for a model change;
+  - its `vips` BAC direct extraction, which would likely take another 26 minutes;
+  - 300 dpi, the model card's recommendation;
+  - `--special`.
 
 ### Tracing modes: content and metadata, outside the criteria
 
