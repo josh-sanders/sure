@@ -2,8 +2,10 @@
 
 ## Transports: RubyLLM spike
 
-**Decision: adopted, pinned to `ruby_llm` 2.1.1** (released 2026-10-11, the latest at the start
-of the spike). Every criterion in section 19 of the plan passes or has a small fix. None fails.
+**Recommendation: adopt, pinned to `ruby_llm` 2.1.1** (released 2026-10-11, the latest at the
+start of the spike). Every criterion in section 19 of the plan passes or has a small fix. None
+fails. Adopting it is a product decision, and like every other one it stays open: the evidence
+on both sides is in the decisions register below.
 Live runs: llama.cpp on venus; Ollama, LM Studio and OpenClaw in temporary containers (see
 "Local servers in containers"); Gemini through Google's OpenAI-compatible API
 (`gemini-3.5-flash-lite`); OpenRouter's chat completions with free models (see "OpenRouter chat
@@ -85,7 +87,7 @@ here is final, and that includes scope: an "out of scope" line is a product deci
 | Answer-free checks on extractions, `dates_anchored` ≥ 0.5 | Separated all 14 right from all 12 wrong recordings | Threshold tuned on two statements | "Checks on an extraction" |
 | OpenAI vector stores vs pgvector (§5.5) | No embedding model to run | Indexing isn't awaited; scans index empty; no score threshold; files outlive removal | `openai/vector_store_statements` |
 | Tracing: `content` vs `metadata` (§10) | `metadata` sends no financial data | It loses route, prompt key, Sure's error class | "Tracing modes" |
-| Sure is an MCP server, not a client (§20, proposal 04) | No third-party server gets family data | RubyLLM 2.1 has an MCP client built in | Pending: MCP client test |
+| Sure is an MCP server, not a client (§20, proposal 04) | No third-party server gets family data | RubyLLM's client worked against Sure's own `/mcp` in process, negotiating down to 2025-06-18 and showing only the tools `only` allows | `ruby_llm_mcp_live_test` |
 | RubyLLM's usage ledger off (no `ruby_llm_usages`) | No per-call database check; Sure's own `LlmUsage` | The ledger is where RubyLLM's history finds a message's producer | "What the owner watches on upgrade" |
 | Auto-upload of large files off | A statement never stays in a provider's Files API | Anthropic over 24 MB then can't take the file at all | `extract_statement_stubbed_test` |
 | Chat storage redesign out of scope (§20) | The plumbing needs one additive column | RubyLLM's persistence pays off if RubyLLM runs the loop | "Switching providers" |
@@ -1068,3 +1070,13 @@ measurement.
 - The `auto` fallback chain against a live server that rejects strict schemas: none of the three
   local servers does any more.
 - Gemini thought signatures through other gateways, such as LiteLLM.
+- `RubyLLM.ocr`, which needs a Mistral or Cohere key.
+- Web search, provider batches and explicit prompt caching, which Gemini's free tier refuses.
+- Video: RubyLLM 2.1.1's registry model is retired, and Google's replacement isn't served for
+  the call RubyLLM makes.
+- Provider switches involving Nemotron on OpenRouter (the key's 50 free requests a day were used
+  up).
+- OCR: WeVisOne's two scan transcriptions, its `vips` direct extraction, 300 dpi, and Qwen's
+  extraction from the `--special` transcriptions.
+- One full-suite run had a single failure that six reruns with other seeds didn't reproduce,
+  most likely a timing check in `page_images_test` under heavy CPU load.
