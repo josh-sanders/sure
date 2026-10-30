@@ -6,6 +6,16 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Spike: fiber job workers (test/models/ai/async). Engines have to load before
+# the app initializes, so the tests that try them set SPIKE_ASYNC=1. The
+# Async::Job railtie sets isolation_level = :fiber for the whole app when it
+# loads; SPIKE_ISOLATION, below, overrides it.
+if ENV["SPIKE_ASYNC"] == "1"
+  require "solid_queue"
+  require "async/job/adapter/active_job"
+  require "async/job/processor/redis"
+end
+
 module Sure
   # Matches Rails::Application::Finisher#setup_default_session_store for Sure::Application
   # ("_#{railtie_name.chomp("_application")}_session" → "_sure_session").
@@ -76,5 +86,10 @@ module Sure
     # Handle OmniAuth/OIDC errors gracefully (must be before OmniAuth middleware)
     require_relative "../app/middleware/omniauth_error_handler"
     config.middleware.use OmniauthErrorHandler
+
+    # Spike: SPIKE_ISOLATION=fiber puts the whole app on fiber isolation, as
+    # Solid Queue's fiber workers and Async::Job require; =thread keeps
+    # Rails' default even after the Async::Job railtie has loaded.
+    config.active_support.isolation_level = ENV["SPIKE_ISOLATION"].to_sym if ENV["SPIKE_ISOLATION"].present?
   end
 end

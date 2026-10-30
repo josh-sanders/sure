@@ -27,6 +27,10 @@ module Ai::Transport::RubyLlmAdapter
   GEMINI_PLACEHOLDER_SIGNATURE = "skip_thought_signature_validator".freeze
   singleton_class.attr_accessor :restore_producers, :gemini_placeholder
 
+  # Spike knob for the async spike: RubyLLM's Faraday adapter (:net_http by
+  # default; :async_http reuses connections inside a fiber reactor).
+  singleton_class.attr_accessor :faraday_adapter
+
   private
     def ruby_llm_context
       @ruby_llm_context ||= RubyLLM.context do |config|
@@ -38,6 +42,7 @@ module Ai::Transport::RubyLlmAdapter
         # (Anthropic over 24 MB, the :openai provider over 50 MB), where it
         # stays until deleted, and posts to /v1/files on local servers too.
         config.auto_upload_large_files = false
+        config.faraday_adapter = Ai::Transport::RubyLlmAdapter.faraday_adapter if Ai::Transport::RubyLlmAdapter.faraday_adapter
       end
     end
 

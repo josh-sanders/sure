@@ -166,3 +166,12 @@ group :test do
   gem "ruby_llm-turbovec", "0.1.0", require: false
   gem "ruby_llm-red_candle", "0.2.1", require: false
 end
+
+# Spike: fiber-based job workers (rubyllm.com/async) against Sidekiq threads.
+group :test do
+  gem "solid_queue", "1.7.0", require: false
+  gem "async", "2.46.0", require: false
+  gem "async-job-adapter-active_job", "0.21.0", require: false
+  gem "async-job-processor-redis", "0.3.1", require: false
+  gem "async-http-faraday", "0.24.0", require: false
+end
