@@ -54,6 +54,26 @@ module AsyncSpikeHelper
     Ai::Spike::Route.new(model: Ai::Spike::Model.new(endpoint:, name: "stub-model", max_output_tokens: 512))
   end
 
+  # qwen3.6 on llama.cpp (SPIKE_LLAMA_CPP_URL), reasoning off.
+  def llama_route
+    endpoint = Ai::Spike::Presets.llama_cpp(timeout_seconds: 600, json_mode: "strict")
+    Ai::Spike::Route.new(model: Ai::Spike::Model.new(endpoint:, name: AiSpikeHelper::LLAMA_MODEL, max_output_tokens: 1024), reasoning_effort: "none")
+  end
+
+  # One streamed chat answer, noting when the first chunk arrived.
+  def stream_chat(record)
+    route = llama_route
+    request = Ai::Transport::Base::ConverseRequest.new(
+      model: route.model, instructions: "Answer in one short sentence.", reasoning_effort: "none", max_tokens: 200,
+      messages: [ Ai::Transport::Base::Message.new(role: :user, content: "What does a monthly Netflix bill of 15.49 cost over a year?") ]
+    )
+    record[:called] = clock
+    turn = Ai::Transport.for(route.endpoint).converse(request) { record[:first_chunk] ||= clock }
+    record[:text] = turn.text.to_s.truncate(80)
+  rescue => e
+    record[:error] = "#{e.class}: #{e.message.truncate(120)}"
+  end
+
   # The stub provider (stub_provider.rb), in its own process.
   def with_stub_provider(delay: 2, limit: nil)
     script = File.expand_path("stub_provider.rb", __dir__)

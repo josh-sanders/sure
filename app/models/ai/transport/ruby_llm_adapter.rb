@@ -43,6 +43,7 @@ module Ai::Transport::RubyLlmAdapter
         # stays until deleted, and posts to /v1/files on local servers too.
         config.auto_upload_large_files = false
         config.faraday_adapter = Ai::Transport::RubyLlmAdapter.faraday_adapter if Ai::Transport::RubyLlmAdapter.faraday_adapter
+        config.instrumenter = Ai::Transport::SlotInstrumenter.for(endpoint, config.instrumenter)
       end
     end
 
