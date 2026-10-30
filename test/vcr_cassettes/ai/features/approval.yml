@@ -1,0 +1,180 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Delete my tag called
+        Ski trip."}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"delete_tag","description":"Deletes
+        one of the user''s tags by name.","parametersJsonSchema":{"type":"object","properties":{"name":{"type":"string","description":"The
+        tag''s name"}},"required":["name"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      X-Goog-Api-Key:
+      - "<SPIKE_GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Gemini-Service-Tier:
+      - standard
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:43:17 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=642
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "functionCall": {
+                      "name": "delete_tag",
+                      "args": {
+                        "name": "Ski trip"
+                      },
+                      "id": "call_109335"
+                    },
+                    "thoughtSignature": "EmAKXgFpFH0TrBQEOHa/IQZ+JliZYYIsNzQ3WIIPdCNy1aFI7XCJaXkrYp5ixhhm0Im1ex5+mAk0nmZBq43kVzXkNOdjX8g2Lw7q0wJEQasQDdGDYitzlYPUAq87a8t5kdY="
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0,
+              "finishMessage": "Model generated function call(s)."
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 67,
+            "candidatesTokenCount": 17,
+            "totalTokenCount": 84,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 67
+              }
+            ],
+            "serviceTier": "standard"
+          },
+          "modelVersion": "gemini-3.5-flash-lite",
+          "responseId": "BczjasyCHqPV9tMPjeKYuAs"
+        }
+  recorded_at: Thu, 29 Oct 2026 22:43:17 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Delete my tag called
+        Ski trip."}]},{"role":"model","parts":[{"functionCall":{"name":"delete_tag","args":{"name":"Ski
+        trip"}},"thoughtSignature":"EmAKXgFpFH0TrBQEOHa/IQZ+JliZYYIsNzQ3WIIPdCNy1aFI7XCJaXkrYp5ixhhm0Im1ex5+mAk0nmZBq43kVzXkNOdjX8g2Lw7q0wJEQasQDdGDYitzlYPUAq87a8t5kdY="}]},{"role":"user","parts":[{"functionResponse":{"name":"delete_tag","response":{"name":"delete_tag","content":[{"text":"{\"deleted\":\"Ski
+        trip\"}"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"delete_tag","description":"Deletes
+        one of the user''s tags by name.","parametersJsonSchema":{"type":"object","properties":{"name":{"type":"string","description":"The
+        tag''s name"}},"required":["name"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      X-Goog-Api-Key:
+      - "<SPIKE_GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Gemini-Service-Tier:
+      - standard
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 29 Oct 2026 22:43:18 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=616
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "I've deleted your tag \"Ski trip\".",
+                    "thoughtSignature": "EmAKXgFpFH0T0biDiKqJdXydOKkUKz/M2Fh8Z4eN1hngwRL873kdxaMqqE6LCPtc2bUgdPRCmAnUUVreX4JVAyW/kuUgEdv/fIx5Zigu237EvYJd+twCtlw+Q9z7vbwf6SE="
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 114,
+            "candidatesTokenCount": 10,
+            "totalTokenCount": 124,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 114
+              }
+            ],
+            "serviceTier": "standard"
+          },
+          "modelVersion": "gemini-3.5-flash-lite",
+          "responseId": "BszjaovuE9_A1e8Pl4DX-Ac"
+        }
+  recorded_at: Thu, 29 Oct 2026 22:43:18 GMT
+recorded_with: VCR 6.3.1

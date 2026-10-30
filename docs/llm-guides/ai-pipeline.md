@@ -27,7 +27,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (264 runs, 12 skips:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (289 runs, 12 skips:
 the live-only timeout test and OCR combinations not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -114,11 +114,48 @@ here is final, and that includes scope: an "out of scope" line is a product deci
 - Five ecosystem gems pin RubyLLM 1.x: `ruby_llm-skills`, `-tribunal`, `-top_secret`, `-mcp`,
   `-instrumentation`.
 
-**RubyLLM features still to test** (each against the decision it bears on): MCP client, tool
-approval in `ask`, batches, prompt caching, provider tools and web search with citations, RAG,
-cost tracking in Rails, text to speech, OCR, video, moderation, Rails persistence with two
-application models, generators, AI coding assistant support, evaluations, and the ecosystem
-gems. Results go into the tables above as they land.
+**RubyLLM 2.1.1 features tested** (`ruby_llm_features_live_test`, `ruby_llm_features2_live_test`,
+`ruby_llm_mcp_live_test`, `ruby_llm_persistence_live_test`, `ruby_llm_generators_test`;
+cassettes under `features/`; Gemini's free tier through Sure's RubyLLM context unless noted)
+
+| Feature | Result | Bears on |
+|---|---|---|
+| Ask, then ask again | The second request carries the first exchange; the history lives in the `Chat` object, so it ends with the job | Sure stores history |
+| Streaming | A block gets the answer in chunks, on any provider | Streaming everywhere (BC4) |
+| Files with `with:` | A local image goes as a data URI; an image URL goes to the provider, and Gemini's compatible API refused to fetch it ("Cannot fetch content from the provided URL"); two files at once work; a PDF URL is downloaded by the Rails process (`Attachment#fetch_content`) | Where files may come from (product); provider fetching (limit) |
+| Tools, in RubyLLM's loop | `ask` runs them with no code, and with no round cap: 12 calls in 12 requests until the spike's guard | Sure owns the loop |
+| Tool approval | `ask` stops before a `requires_approval` tool; `approve`, then `complete` runs it once | Write tools run at once today |
+| MCP client | RubyLLM's client reached Sure's own `/mcp` in process (a custom transport), fell back from revision 2026-07-28 to Sure's 2025-06-18, showed only the two tools `only` allows, and Gemini answered with them | Sure is never a client; shared tool catalog out of scope (§20) |
+| Structured output | A Schematist class and `response.parsed`; strict `json_schema` only, no fallback chain | The `auto` chain |
+| Agents | A `RubyLLM::Agent` class runs in Sure's context; it needs `protocol: :chat_completions` too, or `:openai` calls the Responses API (a bare 404 on Gemini) | One declarative class per feature |
+| Fallbacks | A refused `:openai` endpoint fell back to native Gemini inside one chat | Failover policy |
+| Cost | Tokens always; a price only for models in RubyLLM's registry (none through the compatible API, $0.0000062 native); a missing price is `nil` | `LlmUsage` and Sure's prices |
+| Web search with citations | Refused for quota on every try: not on this free tier | Chat's tools reach only the family's data |
+| Batches | 400 "Precondition check failed": Gemini batches need billing; RubyLLM's batches also skip `with_headers` | Interactive fan-out for categorizing |
+| Prompt caching | Gemini's explicit cache is capped at 0 tokens on the free tier; Sure's tool descriptions alone were 10,783; Gemini refuses a cache combined with request-level tools | Nothing planned; 12k-token tool list |
+| Text to speech | Gemini read a sentence aloud, as 24 kHz PCM | No voice planned |
+| Moderation | OpenAI's endpoint answered on the key with no credits (`flagged: false`) | No input moderation planned |
+| OCR | `RubyLLM.ocr` is Mistral's or Cohere's; no key | Local OCR route |
+| Video | The registry's Veo model is retired; Google's suggested replacement isn't served for `predictLongRunning`, which RubyLLM 2.1.1 calls | None |
+| Rails persistence (two models) | RubyLLM's install templates, run in a rolled-back transaction: eight tables; Sure's `messages` would need 11 columns (`role`, `thinking_signature`, `raw_reasoning`, …) and `chats` a model reference. A two-turn chat continued from the database, and each message knew its producer. Once `ruby_llm_usages` exists, a plain chat through Sure's transport writes a usage row | Chat storage; the ledger off |
+| Durable agents (docs) | One `step` per job, or one job with Rails 8.1 continuations; `cancel` is stored; execution is at least once, so tools must be safe to run twice | Sure owns the loop; Sure's write tools aren't idempotent |
+| Generators | The agent generator binds to an `acts_as_chat` `Chat` and writes ERB instructions under `app/prompts`; the tool generator writes partials with raw Tailwind palette classes (against Sure's design-system rules) that render a `messages/error` partial Sure lacks | Prompts as `.md`; design-system rules |
+| AI coding assistants | The gem ships a 106-line `rubyllm` skill that routes an assistant to the guide for each task | Contributor tooling |
+
+**Product decisions these add** (for and against, as above): accept URLs as attachments or not;
+web search in chat; input moderation; voice; provider batches for categorizing; prompt caching
+of the tool list; approvals for write tools; RubyLLM's durable loop against idempotent tools;
+RubyLLM's generators and skill for contributors.
+
+**Technical limits these add:** Gemini's free tier refuses web search, batches and explicit
+caching; RubyLLM's registry can list retired models; Gemini's compatible API won't always fetch
+an image URL; `:openai` defaults to the Responses API; RubyLLM's usage ledger records every call
+once its table exists.
+
+**Still to test:** evaluations, and the ecosystem gems (`ruby_llm-contract`, `-test`,
+`-monitoring`, `-instructor`, `-registry`, `-tokenizer`, `-turbovec`, `-red_candle`; the five
+pinned to 1.x judged from source against their 2.x equivalents). OCR needs a Mistral or Cohere
+key; web search, batches and caching need a paid tier.
 
 ### The external assistant (agent mode), outside the criteria
 
