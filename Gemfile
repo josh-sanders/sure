@@ -152,3 +152,17 @@ group :test do
   gem "climate_control"
   gem "simplecov", require: false
 end
+
+# Spike: RubyLLM's ecosystem gems that install beside 2.1.1, pinned, and
+# loaded only by the tests that try them. ruby_llm-tokenizer isn't here: its
+# sentencepiece dependency needs the system libsentencepiece, which openSUSE
+# doesn't package; it was tried in a Debian container instead.
+group :test do
+  gem "ruby_llm-contract", "1.5.0", require: false
+  gem "ruby_llm-test", "0.3.0", require: false
+  gem "ruby_llm-monitoring", "0.4.0", require: false
+  gem "ruby_llm-instructor", "0.2.0", require: false
+  gem "ruby_llm-registry", "0.1.3", require: false
+  gem "ruby_llm-turbovec", "0.1.0", require: false
+  gem "ruby_llm-red_candle", "0.2.1", require: false
+end
