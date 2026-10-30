@@ -27,8 +27,8 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (289 runs, 12 skips:
-the live-only timeout test and OCR combinations not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (298 runs, 13 skips:
+the live-only timeout and Red Candle tests, and OCR combinations not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
 is in RubyLLM's registry. Cassettes are under `test/vcr_cassettes/ai/llama_cpp/`.
@@ -152,10 +152,34 @@ caching; RubyLLM's registry can list retired models; Gemini's compatible API won
 an image URL; `:openai` defaults to the Responses API; RubyLLM's usage ledger records every call
 once its table exists.
 
-**Still to test:** evaluations, and the ecosystem gems (`ruby_llm-contract`, `-test`,
-`-monitoring`, `-instructor`, `-registry`, `-tokenizer`, `-turbovec`, `-red_candle`; the five
-pinned to 1.x judged from source against their 2.x equivalents). OCR needs a Mistral or Cohere
-key; web search, batches and caching need a paid tier.
+**Evaluations and the ecosystem gems** (`ruby_llm_evaluation_live_test`,
+`ruby_llm_ecosystem_test`, `ruby_llm_red_candle_live_test`; tokenizer and `top_secret` in a
+Debian container like Sure's image)
+
+| Gem or feature | Result | Bears on |
+|---|---|---|
+| `RubyLLM::Evaluation` (2.1) | Graded `ExtractBankStatement` on both text layers with Gemini, plus a Ruby reconciliation assertion. BAC passed. The scan failed although the extraction was right: "0 transactions; opening balance nil…" didn't "agree with" the reference wording. A JSON report with tokens and cost | Sure's own evals (about 3,700 lines, `evals:ci_regression`, recorded samples) and the prompt-change gate (O-B3) |
+| `ruby_llm-contract` 1.5.0 | A step that validates by reconciling escalated from Lightning's real wrong extraction to the next model, with a trace of both attempts. Its test adapter needs no global hook | Sure's checks plus its JSON-mode chain and router |
+| `ruby_llm-test` 0.3.0 | Stubs at the provider, but wraps every provider in the process, so a call with no stub left raises; it can't share a process with recorded tests, so it ran in a child process | Sure's VCR and WebMock tests |
+| `ruby_llm-instructor` 0.2.0 | Installs, but reads 1.x's parsed content: every 2.x reply fails "got String" | Structured output |
+| `ruby_llm-registry` 0.1.3 | Versions, required variables, ERB rendering; labels resolve through `manifest.yml`, not the front matter its README shows; variable values aren't evaluated, the template body is | Prompts as `.md` with `%{}`, family overrides, locales (§8.3) |
+| `ruby_llm-turbovec` 0.1.0 | An index inside the Ruby process, saved to and loaded from a file; needed Rust, `libclang` and OpenBLAS to build | pgvector, Qdrant (§5.5) |
+| `ruby_llm-monitoring` 0.4.0 | Its events hold no prompt or answer text (model, tokens, cost, the request URL, provider options). Mounted normally, its initializer deletes RubyLLM's `RubyLLM` acronym and adds `LLM` app-wide, so Zeitwerk would expect `LLMUsage`, `Provider::LLMConcept` and `Settings::LLMUsagesController`, and Sure's `Llm…` classes would stop loading | Tracing modes, `LlmUsage` |
+| `ruby_llm-red_candle` 0.2.1 | Installs (`< 3.0`) but fails to load: `RubyLLM::Model::Info` is gone in 2.x. Red Candle itself ran Qwen2.5-1.5B inside the test process: +2,017 MB memory, 38 s for a wrong bill setup on CPU (load 321 s with download) | Local inference as a server (§4.2) |
+| `ruby_llm-tokenizer` 0.1.2 | Needs the system `libsentencepiece` (Debian has it, openSUSE doesn't). Sure's 34 tools: 10,737 tokens (Qwen), 10,691 (GPT-4o), against `TokenEstimator`'s 15,085 and llama.cpp's 12,418 with the chat template. Its bundled Gemini model fails to load | History budget from the model's window (§8.4) |
+| `top_secret` 1.0.1 (under `ruby_llm-top_secret`) | Regex filters masked a card, an email, a phone number and an SSN, and restored exactly; the account number, name, towns and amounts passed through. With MITIE's 345 MB NER model it also masked the name ("JohnSmith", 1.4 s) but not the towns in the OCR'd text, nor the account number. NER configured after a first filter in the same process is ignored: the configuration is fixed at first use | What family data reaches a provider |
+| `ruby_llm-skills`, `-tribunal`, `-top_secret`, `-mcp`, `-instrumentation` | Pinned to 1.x. MCP and instrumentation are built into 2.1 (tested above); skills (`SKILL.md` as a tool) has no 2.x equivalent; tribunal's evals overlap `RubyLLM::Evaluation`; top_secret's filter is tested directly | Ecosystem churn after 2.0 |
+
+**Product decisions these add:** adopt RubyLLM's evaluations beside or instead of Sure's;
+runtime contracts with escalation; provider-level test stubs; a prompt registry with versions
+and labels; an in-process vector index; a monitoring dashboard; in-process inference; exact
+token counting for the history budget; masking sensitive values before they leave.
+
+**Technical limits these add:** two gems install beside 2.1.1 and fail on 2.x
+(`instructor`, `red_candle`); `ruby_llm-test` wraps every provider in the process;
+`ruby_llm-monitoring` rewrites app-wide inflections; native gems need Rust, `libclang`,
+OpenBLAS and `libsentencepiece` in Sure's image; RubyLLM 2.x registers `RubyLLM` as an
+acronym itself.
 
 ### The external assistant (agent mode), outside the criteria
 
