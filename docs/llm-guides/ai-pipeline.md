@@ -1158,6 +1158,44 @@ queue into the server's slots and llama-server's own queue stays empty. One run 
   or preemption, so the only way is to cancel a call and send it again later.
 - **The merchant answers didn't change:** 200 of 200 answered and 167-169 named in every run.
 
+**Sidekiq against Solid Queue, and two workers** (same test, same load, one run each). Every
+setup keeps one of llama.cpp's four slots for chat; "peak" is the most requests at llama.cpp at
+once.
+
+| Setup | Chat sent after | Chat's first word | Merchants done | Peak at llama.cpp |
+|---|---|---|---|---|
+| Solid Queue, 1 worker, 50 fibers, slot in RubyLLM (above) | 0.1 s | 48.2 s | 489 s | 4 |
+| Sidekiq, one capsule of 4 threads, strict queue order, same slot | 136.1 s | 184.1 s | 494 s | 4 |
+| Sidekiq, 3 threads for the prompt lane and a 1-thread chat capsule, same slot | 0.0 s | 48.3 s | 543 s | 4 |
+| Solid Queue, 2 workers, each with its own in-process slot | 0.1 s | 200.1 s | 416 s | 7 (6 merchant) |
+| Solid Queue, 2 workers, `limits_concurrency` (merchants to 3, chat to 1), no slot | 0.2 s | 48.2 s | 547 s | 4 |
+
+- **On threads, the kept slot needs a kept thread.** With one capsule all four threads took
+  merchant jobs, three at llama.cpp and one waiting at the slot, so the chat job sat in Sidekiq's
+  queue for 136 s until a thread came free. Strict queue order only decides what a free thread
+  takes next. A one-thread chat capsule (Sidekiq's per-capsule thread pools) matched the fiber
+  worker exactly. Fibers don't have the problem while there are more fibers than queued jobs.
+- **In-process slots don't add up across workers.** Two workers, each keeping one of four places
+  for chat, let six merchant calls through to a four-slot server; the chat was sent at once and
+  queued inside llama-server behind them. The plan's slot (§11) has the same limit with two
+  Sidekiq processes, whatever the capsules.
+- **Solid Queue's `limits_concurrency` holds across workers.** Its semaphore is a database row,
+  so two workers never had more than three merchant jobs running, and chat's own key kept its
+  place: 48.2 s, the same as one worker. The two workers ran in one process; the semaphore is the
+  same row from separate processes, but that wasn't run. Blocked jobs are released in priority,
+  then arrival, order (`BlockedExecution.ordered`). The limits:
+  - it counts jobs, not requests: a job holds its place for its whole run, including work
+    before and after the call;
+  - the key is computed from the job's arguments at enqueue, but the router picks the route,
+    and fails over, when the job runs, so a job that fails over to a cloud route still holds the
+    local host's place, and the key can't follow a route change without re-enqueueing;
+  - the semaphore expires after `duration` (3 minutes by default) so that a dead worker can't
+    hold it forever; merchant calls took up to 216 s here, so the default would have let a
+    fourth merchant job in;
+  - the size is fixed in code at class load, not read from the server's `/props`.
+- **Sidekiq has no cross-process equivalent without a paid tier** (Sidekiq Enterprise's
+  concurrent rate limiter). A Redis semaphore in Sure would be new code; not tested.
+
 **For the plan:** fiber workers don't replace the lanes. They replace the AI thread count, and
 for cloud work Sidekiq threads did as well at this scale. What decides chat's wait on one machine
 is the per-host slot, wherever it lives, and whether the server's parallel slots are used, with

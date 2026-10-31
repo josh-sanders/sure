@@ -53,6 +53,40 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
     end
   end
 
+  class SidekiqMerchantChatJob < MerchantChatJob
+    self.queue_adapter = :sidekiq
+  end
+
+  # Two Solid Queue workers sharing llama.cpp through Solid Queue's own
+  # concurrency control: a semaphore row per key in the database, so it holds
+  # across workers and processes. Merchant jobs share one key with room for
+  # all but one of llama.cpp's slots; chat has its own key, so its place is
+  # kept. Blocked jobs are released in priority, then arrival, order. The
+  # semaphore expires after `duration` (3 minutes by default) so a crashed
+  # worker can't hold it forever, so it has to outlast the longest call.
+  class LimitedMerchantJob < MerchantChatJob
+    limits_concurrency key: ->(*) { "llama-merchants" }, to: 3, duration: 30.minutes if respond_to?(:limits_concurrency)
+  end
+
+  class LimitedChatJob < MerchantChatJob
+    limits_concurrency key: ->(*) { "llama-chat" }, to: 1, duration: 30.minutes if respond_to?(:limits_concurrency)
+  end
+
+  # Two worker processes, each with its own in-process slot (the plan's §11):
+  # the job's worker is stood in for by its index, chat in the first.
+  class SlotPerWorker
+    def initialize(*slots) = @slots = slots
+    def hold(lane, &) = @slots.fetch(ActiveSupport::IsolatedExecutionState[:spike_worker] || 0).hold(lane, &)
+    def stats = @slots.map(&:stats)
+  end
+
+  class TwoWorkerJob < MerchantChatJob
+    def perform(kind, index, nonce)
+      ActiveSupport::IsolatedExecutionState[:spike_worker] = kind == "chat" ? 0 : index % 2
+      super
+    end
+  end
+
   def self.detect(record, index)
     transactions = MERCHANT_BATCH.times.map { { id: "txn_#{index}_#{_1}", name: DESCRIPTIONS[(index * 7 + _1) % DESCRIPTIONS.size] } }
     record[:called] = AsyncSpikeHelper.clock
@@ -121,7 +155,58 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
     run_scenario("drain_pause", slot: Ai::Spike::LaneSlot.new(llama_slots, pause: true))
   end
 
+  # Sidekiq, the plan's runner: the slot in RubyLLM as above, and strict
+  # queue order (chat's queue first). Threads, not fibers, so a job waiting
+  # at the slot holds a thread.
+  test "sidekiq_one_capsule: 4 AI threads, strict queue order, slot with one kept for chat" do
+    slot = Ai::Spike::LaneSlot.new(llama_slots, reserved: 1)
+    with_sidekiq(prompt: { threads: llama_slots, queues: %w[spike_ai_interactive spike_ai_prompt] }) do
+      run_scenario("sidekiq_one_capsule", slot:, runner: :none) { |kind| SidekiqMerchantChatJob.set(queue: kind == "chat" ? "spike_ai_interactive" : "spike_ai_prompt") }
+    end
+  end
+
+  test "sidekiq_chat_capsule: a 1-thread capsule for chat, 3 threads for the prompt lane, same slot" do
+    slot = Ai::Spike::LaneSlot.new(llama_slots, reserved: 1)
+    with_sidekiq(prompt: { threads: llama_slots - 1, queues: %w[spike_ai_prompt] }, chat: { threads: 1, queues: %w[spike_ai_interactive] }) do
+      run_scenario("sidekiq_chat_capsule", slot:, runner: :none) { |kind| SidekiqMerchantChatJob.set(queue: kind == "chat" ? "spike_ai_interactive" : "spike_ai_prompt") }
+    end
+  end
+
+  test "two_workers_slot_each: two workers, each with its own in-process slot (4, one kept for chat)" do
+    slot = SlotPerWorker.new(Ai::Spike::LaneSlot.new(llama_slots, reserved: 1), Ai::Spike::LaneSlot.new(llama_slots, reserved: 1))
+    run_scenario("two_workers_slot_each", slot:, workers: 2) { TwoWorkerJob.set(queue: QUEUE) }
+  end
+
+  test "two_workers_limits_concurrency: two workers, Solid Queue's database semaphore instead of a slot" do
+    LimitedMerchantJob.concurrency_limit = llama_slots - 1
+    run_scenario("two_workers_limits_concurrency", workers: 2) do |kind|
+      kind == "chat" ? LimitedChatJob.set(queue: QUEUE, priority: 0) : LimitedMerchantJob.set(queue: QUEUE, priority: 10)
+    end
+  end
+
   private
+    # Sidekiq inside this process: one capsule per entry, each with its own
+    # threads and strictly ordered queues.
+    def with_sidekiq(prompt:, chat: nil)
+      require "sidekiq/api"
+      [ *prompt[:queues], *chat&.dig(:queues) ].each { Sidekiq::Queue.new(_1).clear }
+      instance = Sidekiq.configure_embed do |config|
+        config.queues = prompt[:queues]
+        config.concurrency = prompt[:threads]
+        config.logger.level = Logger::WARN
+        if chat
+          config.capsule("chat") do |capsule|
+            capsule.queues = chat[:queues]
+            capsule.concurrency = chat[:threads]
+          end
+        end
+      end
+      instance.run
+      yield
+    ensure
+      instance&.stop
+    end
+
     # total_slots from llama-server's /props: how many requests it decodes at once.
     def llama_slots
       uri = URI(ENV.fetch("SPIKE_LLAMA_CPP_URL").delete_suffix("/v1") + "/props")
@@ -131,20 +216,33 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
       JSON.parse(response.body).fetch("total_slots")
     end
 
-    def run_scenario(name, merchant_jobs: MERCHANT_JOBS, chat: true, slot: nil)
+    # Most requests at llama.cpp at once, from their start and finish times.
+    def peak(intervals)
+      intervals.flat_map { [ [ _1[:start], 1 ], [ _1[:finish], -1 ] ] }.sort.reduce([ 0, 0 ]) { |(now, most), (_, step)| [ now + step, [ most, now + step ].max ] }.last
+    end
+
+    def with_runner(runner, workers, &)
+      return yield if runner == :none
+
+      with_solid_queue(fibers: 50, workers:, &)
+    end
+
+    # The block returns the configured job for a kind ("chat" or "merchants").
+    def run_scenario(name, merchant_jobs: MERCHANT_JOBS, chat: true, slot: nil, runner: :solid_queue, workers: 1, &job_for)
+      job_for ||= ->(_kind) { MerchantChatJob.set(queue: QUEUE) }
       Ai::Transport::SlotInstrumenter.slots = { URI(ENV.fetch("SPIKE_LLAMA_CPP_URL")).host => slot } if slot
       nonce = SecureRandom.hex(4)
       requests = Thread::Queue.new   # each HTTP request RubyLLM sent: lane, start, finish (after any wait for the slot)
       subscriber = ActiveSupport::Notifications.monotonic_subscribe("request.ruby_llm") do |_name, start, finish, _id, _payload|
         requests << { lane: Ai::Transport::SlotInstrumenter.lane, start:, finish: }
       end
-      with_solid_queue(fibers: 50) do
+      with_runner(runner, workers) do
         started = clock
-        merchant_jobs.times { MerchantChatJob.set(queue: QUEUE).perform_later("merchants", _1, nonce) }
+        merchant_jobs.times { job_for.call("merchants").perform_later("merchants", _1, nonce) }
         if chat
           sleep CHAT_AFTER if merchant_jobs.positive?
           chat_enqueued = clock
-          MerchantChatJob.set(queue: QUEUE).perform_later("chat", 0, nonce)
+          job_for.call("chat").perform_later("chat", 0, nonce)
         end
         results = (merchant_jobs + (chat ? 1 : 0)).times.filter_map { RESULTS.pop(timeout: 3600) }
 
@@ -153,10 +251,11 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
         chat_request = sent.find { _1[:lane] == :interactive }
         chat_record = results.find { _1[:kind] == "chat" }
         merchants = results.select { _1[:kind] == "merchants" }
-        summary = { setup: name, llama_slots: llama_slots, slot: slot && "#{slot.class.name.demodulize}" }
+        summary = { setup: name, llama_slots: llama_slots, slot: slot && slot.class.name.demodulize, workers: }
         if merchants.any?
           summary[:merchants_done_s] = (merchants.map { _1[:finished] }.max - started).round(1)
           summary[:merchant_request_s] = sent.reject { _1[:lane] == :interactive }.map { (_1[:finish] - _1[:start]).round(1) }.minmax
+          summary[:peak_at_llama] = { merchants: peak(sent.reject { _1[:lane] == :interactive }), all: peak(sent) }
           summary[:merchant_answers] = "#{merchants.sum { _1[:answers].to_i }}/#{merchants.size * MERCHANT_BATCH}, named #{merchants.sum { _1[:named].to_i }}"
           summary[:merchant_output_tokens] = merchants.sum { _1[:output_tokens].to_i }
         end

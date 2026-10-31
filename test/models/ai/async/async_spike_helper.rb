@@ -87,18 +87,17 @@ module AsyncSpikeHelper
     end
   end
 
-  # A Solid Queue worker inside this process, on Solid Queue's tables in the
+  # Solid Queue workers inside this process, on Solid Queue's tables in the
   # test database for the length of one test.
-  def with_solid_queue(**pool)
+  def with_solid_queue(workers: 1, **pool)
     schema = Gem.loaded_specs["solid_queue"].full_gem_path + "/lib/generators/solid_queue/install/templates/db/queue_schema.rb"
     ActiveRecord::Migration.suppress_messages do
       eval(File.read(schema).sub(/define\(version: [\d_]+\)/, "define"), TOPLEVEL_BINDING, schema) # rubocop:disable Security/Eval
     end
-    worker = SolidQueue::Worker.new(queues: QUEUE, polling_interval: 0.05, **pool)
-    worker.start
+    started = workers.times.map { SolidQueue::Worker.new(queues: QUEUE, polling_interval: 0.05, **pool).tap(&:start) }
     yield
   ensure
-    worker&.stop
+    started&.each(&:stop)
     connection = ActiveRecord::Base.connection
     connection.tables.grep(/\Asolid_queue_/).each { connection.drop_table(_1, force: :cascade) }
   end
