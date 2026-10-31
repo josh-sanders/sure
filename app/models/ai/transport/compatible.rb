@@ -58,8 +58,18 @@ class Ai::Transport::Compatible < Ai::Transport::Base
       chat.with_thinking(effort:) if effort
       chat.add_message(role: :user, content: request.input, attachments: ruby_llm_attachments(request.attachments))
 
-      message = mapping_errors { chat.generate }
+      message = mapping_errors { interruptible_generate(chat) }
       [ message.content, usage_of(message), raw_id(message) ]
+    end
+
+    # Spike (async): a call made inside Ai::Spike::LaneSlot.with_interrupt is
+    # streamed, so the slot can stop it between chunks from another thread or
+    # fiber; raising from the chunk block abandons the HTTP request.
+    def interruptible_generate(chat)
+      interrupt = Ai::Spike::LaneSlot.interrupt
+      return chat.generate unless interrupt
+
+      chat.generate { raise Ai::Spike::LaneSlot::Preempted, "preempted by an interactive call" if interrupt.true? }
     end
 
     # The external assistant (section 5.6): its routing headers from agent_settings.

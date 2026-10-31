@@ -1218,6 +1218,7 @@ RubyLLM:
 | A. Chat next, 25 per call | 45.1 s (20 s into a 65 s call) | 94.4 s | 111.9 s | 13.5 tok/s | 352 s |
 | B. Chat next, 5 per call | 8.3 s (7 s into a 15 s call) | 57.7 s | 70.5 s | 13.7 tok/s | 373 s |
 | C. Chat interrupts the call, 25 per call | 0.1 s | 50.6 s | 71.7 s | 14.2 tok/s | 353 s |
+| C on Sidekiq: 3 prompt threads, a 1-thread chat capsule, merchant calls streamed | 0.1 s | 48.3 s | 69.2 s | 14.3 tok/s | 382 s |
 
 - **On one slot, batch size is nearly free.** Throughput moved 6% between 25 and 5 transactions
   per call, while the longest call, and so chat's longest wait, fell from 72 s to 15 s. The
@@ -1233,11 +1234,19 @@ RubyLLM:
   48.2 s), finished sooner (71.7 s against 103.2 s, since it had the CPU to itself), and needed no
   context split; merchant throughput was 17 transactions per minute against 24.5 there, because
   four slots without MTP outrun one with it on this CPU.
-- **What interrupting needs:** the spike's version is fiber only. On Sidekiq threads,
-  `Thread#raise` isn't safe; RubyLLM's own `Chat#cancel` is (a flag that a streamed request checks
-  before and after every chunk, `raise_if_cancelled!`), so background calls would have to stream
-  for the slot to cancel them. Not tested. Work an interrupted call already did is lost: with a
-  long call interrupted near its end, up to one whole call.
+- **Interrupting works on Sidekiq threads too, through streaming.** `Thread#raise` isn't safe,
+  so a call made inside `LaneSlot.with_interrupt` is streamed, and the slot sets that call's flag;
+  the transport's chunk block raises `Preempted` at the next chunk, which abandons the request
+  (`Compatible#interruptible_generate`, public RubyLLM API only). The chat waited 0.09 s for the
+  slot and its first word came at its time alone (48.3 s against 48.7 s). The merchants' total
+  was 382 s against 353 s on fibers, one run each; streaming's cost isn't separated from noise.
+  RubyLLM's own `Chat#cancel` is the same kind of flag (checked before and after every chunk,
+  `raise_if_cancelled!`), but the slot would need each call's chat object.
+- **Limits of interrupting:** a flag is only seen when a chunk arrives, so a call still reading a
+  long prompt (a PDF's page images) stops when its output starts, not before. Work an interrupted
+  call already did is lost: up to one whole call when it's interrupted near its end. Embeddings
+  aren't streamed and can't be interrupted this way; they're short (the contention test's
+  longest wait behind one was 0.17 s).
 
 **For the plan:** fiber workers don't replace the lanes. They replace the AI thread count, and
 for cloud work Sidekiq threads did as well at this scale. What decides chat's wait on one machine

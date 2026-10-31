@@ -87,7 +87,17 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
     end
   end
 
+  # Set by a test: merchant calls are streamed and stop when the slot sets
+  # their interrupt flag (Ai::Spike::LaneSlot.with_interrupt), on any runner.
+  singleton_class.attr_accessor :interruptible
+
   def self.detect(record, index)
+    return detect_once(record, index) unless interruptible
+
+    Ai::Spike::LaneSlot.with_interrupt { detect_once(record, index) }
+  end
+
+  def self.detect_once(record, index)
     transactions = MERCHANT_BATCH.times.map { { id: "txn_#{index}_#{_1}", name: DESCRIPTIONS[(index * 7 + _1) % DESCRIPTIONS.size] } }
     record[:called] = AsyncSpikeHelper.clock
     begin
@@ -129,6 +139,7 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
   end
 
   teardown do
+    self.class.interruptible = nil
     WebMock.enable!
     Ai::Transport::SlotInstrumenter.slots = nil
   end
@@ -165,6 +176,18 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
   # interrupt the merchant call, which waits behind the chat and is sent again.
   test "preempt: one slot, a chat interrupts the running merchant call" do
     run_scenario("preempt", slot: Ai::Spike::LaneSlot.new(llama_slots, preempt: true))
+  end
+
+  # The same on Sidekiq threads: merchant calls are streamed and stop at the
+  # next chunk once the slot sets their flag. 3 threads for the prompt lane
+  # (one call at llama.cpp, two waiting at the slot) and a 1-thread chat
+  # capsule.
+  test "sidekiq_preempt: one slot, Sidekiq threads, a chat interrupts the streamed merchant call" do
+    self.class.interruptible = true
+    slot = Ai::Spike::LaneSlot.new(llama_slots, preempt: true)
+    with_sidekiq(prompt: { threads: 3, queues: %w[spike_ai_prompt] }, chat: { threads: 1, queues: %w[spike_ai_interactive] }) do
+      run_scenario("sidekiq_preempt", slot:, runner: :none) { |kind| SidekiqMerchantChatJob.set(queue: kind == "chat" ? "spike_ai_interactive" : "spike_ai_prompt") }
+    end
   end
 
   # How long one merchant call takes at each batch size, nothing else

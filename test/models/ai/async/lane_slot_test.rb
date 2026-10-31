@@ -66,6 +66,30 @@ class Ai::Spike::LaneSlotTest < ActiveSupport::TestCase
     assert_equal 1, slot.stats[:preempted]
   end
 
+  test "with preempt on threads, a chat sets the running call's interrupt flag" do
+    slot = Ai::Spike::LaneSlot.new(1, preempt: true)
+    events = Thread::Queue.new
+    holder = Thread.new do
+      Ai::Spike::LaneSlot.with_interrupt do
+        slot.hold(:prompt) do
+          events << :p1_start
+          200.times do   # a streamed call checking the flag at each chunk
+            raise Ai::Spike::LaneSlot::Preempted if Ai::Spike::LaneSlot.interrupt.true?
+            sleep 0.01
+          end
+          events << :p1_finished
+        end
+      rescue Ai::Spike::LaneSlot::Preempted
+        events << :p1_preempted
+      end
+    end
+    sleep 0.05
+    Thread.new { slot.hold(:interactive) { events << :chat } }.join
+    holder.join
+    assert_equal %i[p1_start p1_preempted chat], 3.times.map { events.pop }
+    assert_equal 1, slot.stats[:preempted]
+  end
+
   test "the instrumenter holds the slot around requests only, and forwards every event" do
     lanes = []
     slot = Class.new { define_method(:hold) { |lane, &block| lanes << lane; block.call } }.new
