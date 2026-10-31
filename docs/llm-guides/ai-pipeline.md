@@ -29,7 +29,7 @@ case for it is everything else:
 Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
-Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (345 runs, 54 skips:
+Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (348 runs, 57 skips:
 the live-only timeout, Red Candle and job-runner tests, and OCR combinations not recorded), and for Jev `bin/rails test test/models/provider/jev_test.rb
 test/models/provider/jev_gem_test.rb test/models/provider/jev_gem_live_test.rb` (62 runs). Live server: llama.cpp on venus, `qwen3.6-35b-a3b-mtp` (64k context,
 `--jinja`, tool calls on) and `granite-embedding-small-english-r2` (384 dimensions). Neither model
@@ -75,7 +75,7 @@ here is final, and that includes scope: an "out of scope" line is a product deci
 | Decision (plan section) | For | Against | Evidence |
 |---|---|---|---|
 | Adopt RubyLLM for the transports (§19) | One streaming parser for every protocol; an explicit proxy for every client; unknown models; Gemini signatures and `reasoning_details` kept | `generate` is 26 lines longer; fast releases; some fixes lean on private API (`usage_entries:`); five ecosystem gems still pin 1.x | Criteria; "What the owner watches on upgrade"; feature tests |
-| Sure owns the tool loop (§5.5, §8.4) | Round cap, final round without tools, turn deadline, cancel; RubyLLM's `ask` has no round cap (12 rounds until the spike's guard) | `ask` needs no loop code; `run_tools` brings approvals, parallel tools and resume for about 40 lines | "RubyLLM running Sure's tools"; `features/tool_loop` |
+| Sure owns the tool loop (§5.5, §8.4) | Round cap, final round without tools, turn deadline, cancel; RubyLLM's `ask` has no round cap (12 rounds until the spike's guard) | `ask` needs no loop code; `run_tools` brings approvals, parallel tools and resume for about 40 lines; a `RubyLLM::Agent` stepped by Sure keeps the bounds and worked behind the gate, interrupted and resent without running a tool twice | "RubyLLM running Sure's tools"; "RubyLLM agents behind the gate"; `features/tool_loop` |
 | Sure stores chat history, not RubyLLM (§8.4, proposal 04) | Mobile API and broadcasts unchanged; model picked per turn; no usage ledger | RubyLLM's history knows each message's producer and strips other providers' leftovers; approvals that survive restarts | "Switching providers"; RubyLLM install templates |
 | Failover only at the start of a turn (§5.5) | No half-written answer from two models | Provider state can move (Google's placeholder signature); RubyLLM falls back even after chunks have streamed and reports it | `switch/placeholder_round_llama_gemini`; `fallback.rb` |
 | Gemini through Google's OpenAI-compatible API (§4.2) | One more compatible server, one code path | Native provider continues other models' tool rounds, prices calls, and has Gemini-only features (search grounding, batches) | `switch/round_llama_gemini_native`; `features/cost` |
@@ -1268,6 +1268,37 @@ the gate sits in RubyLLM's instrumenter, sized from the server, and background a
 on a local host stream so it can stop them. Lane order alone leaves chat behind one whole call; a
 kept slot gives up MTP and slows chat's finish. Several workers on one local host need the AI
 capsules on one of them, or a limit they share.
+
+### RubyLLM agents behind the gate, outside the criteria
+
+`agent_gate_live_test`, llama.cpp on venus (`--parallel 1`, MTP), one run each. The agents are
+`RubyLLM::Agent` subclasses built on Sure's RubyLLM context for the endpoint (the agent's
+`context`), so their requests pass the instrumenter and the host's gate (`LaneSlot`, one place,
+interrupting on). Sure drives each one with `Agent#step` in a bounded loop instead of `ask`.
+
+- **A chat interrupts a background agent, and the agent carries on.** A merchant agent with a
+  `lookup_merchant` tool and six transactions: one round of six tool calls, then its answer. A
+  chat arrived while it was writing the answer; the gate interrupted it (the chunk block raised
+  `Preempted`), the chat waited 0.1 s for the gate, and Sure's loop called `step` again. The tools
+  ran six times in all, not twelve: `generate` adds the reply to the history only once it's
+  complete, so the interrupted round left the tool results in place and the resent round started
+  from them. The answer named all six merchants. Agent 39.8 s in all; the interrupted request had
+  run 2.2 s, the resent one 13.2 s.
+- **With RubyLLM's Rails persistence (`chat_model`), the same.** At the interrupt the tables held a
+  blank assistant row, the placeholder RubyLLM creates when a reply starts. The resent round
+  replaced it (`persist_new_message` destroys a blank placeholder), leaving no blank row. Had the
+  worker died between the two, the blank row would have stayed until the next step. `Preempted`
+  isn't one of the errors RubyLLM's persistence cleans up after (`COMPLETION_ERRORS`);
+  `RubyLLM::CancelledError`, which `Agent#cancel` raises, is. `Agent.create!` returns the chat
+  record; `Agent.new(chat: record)` wraps it.
+- **Tools in parallel threads lose the job's lane.** An interactive agent with two tools that each
+  embed a text, `tool_options concurrency: :threads`: both embedding requests ran in the
+  background lane, because RubyLLM starts each tool thread with fresh execution state (it runs
+  them under the Rails executor, `ToolConcurrency#isolated`). Behind a gate that makes background
+  calls re-enqueue (§11, rule 3), a chat's tool would fail or wait. Prepending a module that keeps
+  the lane captured when the tool is built (`CarriesLane`, 4 lines) ran both in the interactive
+  lane. RubyLLM's own way to carry context into tool threads, `Support::Instrumentation`
+  subscribers with `capture_context`, is `:nodoc:`.
 
 ### Lines of code for bill setup
 
