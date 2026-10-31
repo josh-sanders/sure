@@ -1125,10 +1125,44 @@ other. Sixty embedding jobs (64 texts each, the prompt lane) are queued, then a 
   and it can't see Jev's or the hand-written transports' requests, which don't go through
   RubyLLM.
 
+**Merchant detection and chat on the same model** (`gpu_merchants_live_test`): both go to
+qwen3.6 on llama.cpp, `--parallel 4`, MTP off. Eight `detect_merchants` jobs (the prompt lane, 25
+transactions each, today's custom-provider instructions as `Ai::Generations::DetectMerchants`)
+are queued, then, 20 s later, one chat turn with 3.3k tokens of transactions as context, as after
+a tool round. Solid Queue, 50 fibers, so every job is picked up at once. The slot sits in
+RubyLLM's instrumenter, sized from llama-server's `/props` `total_slots`, so Sure drains its
+queue into the server's slots and llama-server's own queue stays empty. One run each.
+
+| Setup | Chat's first word | Chat done | Chat's output | Merchants done |
+|---|---|---|---|---|
+| Chat alone | 44.4 s | 65.5 s | 11.6 tok/s | |
+| Merchants alone | | | | 410 s |
+| Every call sent at once (llama-server queues the rest) | 369.4 s | 396.1 s | 11.2 tok/s | 391 s |
+| Drain: at most 4 calls at the server, chat first in Sure's queue | 197.8 s | 237.2 s | 5.5 tok/s | 412 s |
+| Drain, 1 of the 4 kept for chat | 48.2 s | 103.2 s | 5.5 tok/s | 489 s |
+| Drain, 1 kept, no merchant call starts while chat runs | 48.6 s | 103.4 s | 5.5 tok/s | 489 s |
+| Drain, none kept, no merchant call starts once chat waits | 234.0 s | 276.5 s | 5.7 tok/s | 632 s |
+
+- **llama-server's queue is where chat gets lost.** Sent at once, the chat queued behind four
+  merchant calls inside the server, where nothing in Sure can reorder it: 369 s to the first word.
+- **Draining halves that, and no more.** Holding the calls in Sure, chat first, the chat still
+  waited 149 s for a running merchant call to end (each takes 115-215 s at four at a time).
+  With calls this long, priority in a queue can't help; the chat needs a free slot.
+- **A slot kept for chat is what makes it interactive:** 48 s to the first word, against 44 s
+  alone (the time to read 3.3k tokens of context on this CPU). The chat's output runs at half
+  speed (5.5 tok/s against 11.6) while it shares the CPU with three merchant calls, so it
+  finished at 103 s instead of 66 s. Merchants took 19% longer, with only three slots.
+- **Pausing other calls didn't help.** Every merchant call outlasted the chat, so none was due
+  to start while it ran; with none kept, pausing only left slots empty (merchants 632 s). A
+  pause that stops running calls isn't possible from Sure: llama-server has no request priority
+  or preemption, so the only way is to cancel a call and send it again later.
+- **The merchant answers didn't change:** 200 of 200 answered and 167-169 named in every run.
+
 **For the plan:** fiber workers don't replace the lanes. They replace the AI thread count, and
 for cloud work Sidekiq threads did as well at this scale. What decides chat's wait on one machine
 is the per-host slot, wherever it lives, and whether the server's parallel slots are used, with
-one kept for chat.
+one kept for chat. With long calls (merchant detection on CPU), only the kept slot gives chat an
+interactive wait; lane order alone still leaves it behind one whole call.
 
 ### Lines of code for bill setup
 
