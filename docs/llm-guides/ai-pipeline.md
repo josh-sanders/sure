@@ -26,7 +26,8 @@ case for it is everything else:
   can't take one (see the proxy row).
 - **Unknown models:** `assume_model_exists` handles models missing from the registry.
 
-Sure keeps the tool loop, the JSON-mode policy, error mapping, instrumentation and the routing
+Sure keeps the turn's bounds (it steps the tool loop; RubyLLM can run the tools, see "RubyLLM
+agents behind the gate"), the JSON-mode policy, error mapping, instrumentation and the routing
 around it.
 
 Branch: `spike/ruby-llm` (not merged). Tests: `bin/rails test test/models/ai test/models/pdf test/models/vector_store/openai_live_test.rb` (348 runs, 57 skips:
