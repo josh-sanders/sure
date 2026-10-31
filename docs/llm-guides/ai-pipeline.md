@@ -1299,6 +1299,14 @@ interrupting on). Sure drives each one with `Agent#step` in a bounded loop inste
   the lane captured when the tool is built (`CarriesLane`, 4 lines) ran both in the interactive
   lane. RubyLLM's own way to carry context into tool threads, `Support::Instrumentation`
   subscribers with `capture_context`, is `:nodoc:`.
+- **That's RubyLLM's design, not a bug in it.** `ToolConcurrency#isolated` says why: a tool
+  thread runs as its own unit of work so its database connections return to the pool, and a
+  fiber that shared the caller's state would reset the caller's `Current` when it finished. The
+  gap was in the spike, which kept the lane in per-thread state; the fix uses public API only.
+  No RubyLLM issue asks for a public way to carry an app's own context (a lane, a tenant, a
+  trace) into tool workers, and its recent work in that code (#1326, "Propagate cancellation
+  checkpoints to child fibers") carries only its own state. Asking for one is optional and not
+  filed: Sure doesn't need it.
 
 ### Lines of code for bill setup
 
