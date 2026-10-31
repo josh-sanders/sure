@@ -35,6 +35,20 @@ class Ai::Spike::LaneSlotTest < ActiveSupport::TestCase
     assert_operator started["bg2"] - started["bg1"], :>=, 0.2, "bg2 waited for bg1: only one background place"
   end
 
+  test "with pause, no other call starts while a chat runs" do
+    slot = Ai::Spike::LaneSlot.new(3, reserved: 1, pause: true)
+    started = {}
+    Sync do |task|
+      task.async { slot.hold(:prompt) { started["p1"] = Process.clock_gettime(Process::CLOCK_MONOTONIC); sleep 0.1 } }
+      sleep 0.01
+      task.async { slot.hold(:interactive) { started["chat"] = Process.clock_gettime(Process::CLOCK_MONOTONIC); sleep 0.2 } }
+      sleep 0.01
+      task.async { slot.hold(:prompt) { started["p2"] = Process.clock_gettime(Process::CLOCK_MONOTONIC) } }
+    end
+    assert_operator started["chat"] - started["p1"], :<, 0.05, "chat took the reserved place at once"
+    assert_operator started["p2"] - started["chat"], :>=, 0.2, "p2 waited for the chat, though a place was free"
+  end
+
   test "the instrumenter holds the slot around requests only, and forwards every event" do
     lanes = []
     slot = Class.new { define_method(:hold) { |lane, &block| lanes << lane; block.call } }.new

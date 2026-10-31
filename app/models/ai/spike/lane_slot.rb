@@ -2,14 +2,18 @@
 # one Monitor per host, waiters ordered by lane, then arrival. size > 1 lets a
 # server with parallel slots take that many calls; reserved keeps that many
 # of them for the interactive lane, so a chat never waits for a running call.
+# pause: while an interactive call runs or waits, no other call starts, so the
+# running ones drain and the chat gets the server to itself.
 class Ai::Spike::LaneSlot
   LANES = { interactive: 0, prompt: 1, background: 2 }.freeze
 
-  def initialize(size = 1, reserved: 0)
+  def initialize(size = 1, reserved: 0, pause: false)
     @monitor = Monitor.new
     @size = size
     @reserved = reserved
+    @pause = pause
     @busy = 0
+    @interactive = 0
     @waiters = []
     @arrivals = 0
     @stats = { granted: 0, peak: 0, longest_wait_s: Hash.new(0.0) }
@@ -24,7 +28,7 @@ class Ai::Spike::LaneSlot
     held = true
     yield
   ensure
-    release if held
+    release(lane) if held
   end
 
   private
@@ -41,9 +45,10 @@ class Ai::Spike::LaneSlot
       end
     end
 
-    def release
+    def release(lane)
       @monitor.synchronize do
         @busy -= 1
+        @interactive -= 1 if LANES.fetch(lane.to_sym).zero?
         grant
       end
     end
@@ -55,6 +60,7 @@ class Ai::Spike::LaneSlot
       while (waiter = @waiters.first) && room_for?(waiter)
         @waiters.shift
         @busy += 1
+        @interactive += 1 if waiter[:lane].zero?
         @stats[:granted] += 1
         @stats[:peak] = [ @stats[:peak], @busy ].max
         waiter[:granted] = true
@@ -63,7 +69,9 @@ class Ai::Spike::LaneSlot
     end
 
     def room_for?(waiter)
-      limit = waiter[:lane].zero? ? @size : @size - @reserved
-      @busy < limit
+      return @busy < @size if waiter[:lane].zero?
+      return false if @pause && @interactive.positive?
+
+      @busy < @size - @reserved
     end
 end
