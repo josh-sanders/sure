@@ -90,7 +90,13 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
   def self.detect(record, index)
     transactions = MERCHANT_BATCH.times.map { { id: "txn_#{index}_#{_1}", name: DESCRIPTIONS[(index * 7 + _1) % DESCRIPTIONS.size] } }
     record[:called] = AsyncSpikeHelper.clock
-    result = Ai::Generations::DetectMerchants.new(transactions:, user_merchants: [ "Blue Bottle" ]).call(route: AsyncSpikeHelper.llama_route)
+    begin
+      result = Ai::Generations::DetectMerchants.new(transactions:, user_merchants: [ "Blue Bottle" ]).call(route: AsyncSpikeHelper.llama_route)
+    rescue Ai::Spike::LaneSlot::Preempted
+      # A chat took the slot: wait for it again (chat first), then resend.
+      record[:preempted] = record[:preempted].to_i + 1
+      retry
+    end
     merchants = Array(result.value[:merchants])
     record[:answers] = merchants.size
     record[:named] = merchants.count { _1["business_name"].present? }
@@ -153,6 +159,34 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
 
   test "drain_pause: no slot kept, but no merchant call starts once the chat waits" do
     run_scenario("drain_pause", slot: Ai::Spike::LaneSlot.new(llama_slots, pause: true))
+  end
+
+  # One slot, MTP on (the default): a chat that finds the slot taken can
+  # interrupt the merchant call, which waits behind the chat and is sent again.
+  test "preempt: one slot, a chat interrupts the running merchant call" do
+    run_scenario("preempt", slot: Ai::Spike::LaneSlot.new(llama_slots, preempt: true))
+  end
+
+  # How long one merchant call takes at each batch size, nothing else
+  # running: on one slot, the longest a chat can wait behind it.
+  test "call_length: merchant calls of 25, 10 and 5 transactions, one at a time" do
+    total = Integer(ENV.fetch("SPIKE_CALL_TOTAL", "50"))
+    ENV.fetch("SPIKE_CALL_SIZES", "25,10,5").split(",").map(&:to_i).each do |size|
+      calls = (total / size).times.map do |index|
+        record = {}
+        transactions = size.times.map { { id: "txn_#{index}_#{_1}", name: DESCRIPTIONS[(index * size + _1) % DESCRIPTIONS.size] } }
+        started = clock
+        result = Ai::Generations::DetectMerchants.new(transactions:, user_merchants: [ "Blue Bottle" ]).call(route: AsyncSpikeHelper.llama_route)
+        merchants = Array(result.value[:merchants])
+        record.merge(s: (clock - started).round(1), out: result.usage&.output_tokens, in: result.usage&.input_tokens,
+                     answered: merchants.size, named: merchants.count { _1["business_name"].present? })
+      end
+      seconds = calls.map { _1[:s] }
+      puts "\n  #{{ batch: size, calls: calls.size, call_s: { min: seconds.min, median: seconds.sort[seconds.size / 2], max: seconds.max },
+                    total_s: seconds.sum.round(1), transactions_per_min: (size * calls.size * 60 / seconds.sum).round(1),
+                    tokens: { in: calls.sum { _1[:in].to_i }, out: calls.sum { _1[:out].to_i } },
+                    answered: "#{calls.sum { _1[:answered] }}/#{size * calls.size}", named: calls.sum { _1[:named] } }.inspect}"
+    end
   end
 
   # Sidekiq, the plan's runner: the slot in RubyLLM as above, and strict
@@ -258,6 +292,7 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
           summary[:peak_at_llama] = { merchants: peak(sent.reject { _1[:lane] == :interactive }), all: peak(sent) }
           summary[:merchant_answers] = "#{merchants.sum { _1[:answers].to_i }}/#{merchants.size * MERCHANT_BATCH}, named #{merchants.sum { _1[:named].to_i }}"
           summary[:merchant_output_tokens] = merchants.sum { _1[:output_tokens].to_i }
+          summary[:merchant_preempted] = merchants.sum { _1[:preempted].to_i }
         end
         if chat_record
           first = chat_record[:first_chunk]
@@ -265,6 +300,8 @@ class Ai::AsyncGpuMerchantsLiveTest < ActiveSupport::TestCase
           summary[:chat_done_s] = (chat_record[:finished] - chat_enqueued).round(1)
           summary[:chat_tokens] = "#{chat_record[:input_tokens]} in, #{chat_record[:output_tokens]} out"
           summary[:chat_decode_tok_s] = (chat_record[:output_tokens].to_f / (chat_record[:finished] - first)).round(1) if first && chat_record[:output_tokens].to_i.positive?
+          in_flight = sent.find { _1[:lane] != :interactive && _1[:start] <= chat_enqueued && _1[:finish] >= chat_enqueued }
+          summary[:call_in_flight_at_chat] = "had run #{(chat_enqueued - in_flight[:start]).round(1)} of #{(in_flight[:finish] - in_flight[:start]).round(1)} s" if in_flight
           if chat_request
             summary[:chat_sent_after_s] = (chat_request[:start] - chat_enqueued).round(1)
             summary[:merchant_requests_at_llama_during_chat] = sent.count { _1[:lane] != :interactive && _1[:finish] > chat_request[:start] && _1[:start] < chat_request[:finish] }

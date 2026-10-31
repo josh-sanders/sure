@@ -1196,11 +1196,54 @@ once.
 - **Sidekiq has no cross-process equivalent without a paid tier** (Sidekiq Enterprise's
   concurrent rate limiter). A Redis semaphore in Sure would be new code; not tested.
 
+**One slot with MTP: keeping chat first without a kept slot.** A slot kept for chat needs
+`--parallel` of 2 or more, which on this llama.cpp build turns MTP off (and splits the context
+unless `--kv-unified` is set; the build has it, off by default when `--parallel` is explicit).
+The server back at `--parallel 1`, MTP on, 64k context. One run each.
+
+Merchant calls alone, 50 transactions at each batch size (`call_length`):
+
+| Transactions per call | One call | Transactions per minute | Named |
+|---|---|---|---|
+| 25 | 72 s | 20.8 | 41/50 |
+| 10 | 29 s | 20.6 | 41/50 |
+| 5 | 15 s | 19.6 | 40/50 |
+
+Chat arriving 20 s after the merchant jobs (100 transactions), Solid Queue fibers, slot of 1 in
+RubyLLM:
+
+| Setup | Chat sent after | Chat's first word | Chat done | Chat's output | Merchants done |
+|---|---|---|---|---|---|
+| Chat alone | 0.1 s | 48.7 s | 69.7 s | 14.2 tok/s | |
+| A. Chat next, 25 per call | 45.1 s (20 s into a 65 s call) | 94.4 s | 111.9 s | 13.5 tok/s | 352 s |
+| B. Chat next, 5 per call | 8.3 s (7 s into a 15 s call) | 57.7 s | 70.5 s | 13.7 tok/s | 373 s |
+| C. Chat interrupts the call, 25 per call | 0.1 s | 50.6 s | 71.7 s | 14.2 tok/s | 353 s |
+
+- **On one slot, batch size is nearly free.** Throughput moved 6% between 25 and 5 transactions
+  per call, while the longest call, and so chat's longest wait, fell from 72 s to 15 s. The
+  instructions are a cached prefix, so more calls cost little prompt work.
+- **Interrupting works, and llama-server drops the abandoned request.** The slot raised
+  `Preempted` in the merchant call's fiber (`Fiber.scheduler.raise`); Net::HTTP closed the
+  socket, and the chat's first word came 1.9 s after its time alone. Had the server kept
+  generating, the chat would have queued behind the remaining 45 s. The merchant call waited
+  behind the chat and was sent again; the 20 s of discarded work didn't show in the merchants'
+  total (353 s against 352 s) within one run's noise. The chat kept MTP's speed and the full
+  context.
+- **Against the kept slot at `--parallel 4`** (above): C's chat started as fast (50.6 s against
+  48.2 s), finished sooner (71.7 s against 103.2 s, since it had the CPU to itself), and needed no
+  context split; merchant throughput was 17 transactions per minute against 24.5 there, because
+  four slots without MTP outrun one with it on this CPU.
+- **What interrupting needs:** the spike's version is fiber only. On Sidekiq threads,
+  `Thread#raise` isn't safe; RubyLLM's own `Chat#cancel` is (a flag that a streamed request checks
+  before and after every chunk, `raise_if_cancelled!`), so background calls would have to stream
+  for the slot to cancel them. Not tested. Work an interrupted call already did is lost: with a
+  long call interrupted near its end, up to one whole call.
+
 **For the plan:** fiber workers don't replace the lanes. They replace the AI thread count, and
 for cloud work Sidekiq threads did as well at this scale. What decides chat's wait on one machine
-is the per-host slot, wherever it lives, and whether the server's parallel slots are used, with
-one kept for chat. With long calls (merchant detection on CPU), only the kept slot gives chat an
-interactive wait; lane order alone still leaves it behind one whole call.
+is the per-host slot, wherever it lives, and what it does when the slot is taken: wait for the
+call (bounded by batch size), interrupt it, or keep a slot for chat (which needs `--parallel` of
+2 or more). With long calls, lane order alone leaves chat behind one whole call.
 
 ### Lines of code for bill setup
 

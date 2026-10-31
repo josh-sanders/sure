@@ -49,6 +49,23 @@ class Ai::Spike::LaneSlotTest < ActiveSupport::TestCase
     assert_operator started["p2"] - started["chat"], :>=, 0.2, "p2 waited for the chat, though a place was free"
   end
 
+  test "with preempt, a chat interrupts the running call, which can wait and go again" do
+    slot = Ai::Spike::LaneSlot.new(1, preempt: true)
+    events = []
+    Sync do |task|
+      task.async do
+        slot.hold(:prompt) { events << :p1_start; sleep 1; events << :p1_finished }
+      rescue Ai::Spike::LaneSlot::Preempted
+        events << :p1_preempted
+        slot.hold(:prompt) { events << :p1_again }
+      end
+      sleep 0.05
+      task.async { slot.hold(:interactive) { events << :chat; sleep 0.05 } }
+    end
+    assert_equal %i[p1_start p1_preempted chat p1_again], events
+    assert_equal 1, slot.stats[:preempted]
+  end
+
   test "the instrumenter holds the slot around requests only, and forwards every event" do
     lanes = []
     slot = Class.new { define_method(:hold) { |lane, &block| lanes << lane; block.call } }.new
