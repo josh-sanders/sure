@@ -129,6 +129,8 @@ evidence like everything else here.
 
 | Decision (plan section) | What would test it |
 |---|---|
+| PR 2 in five parts (2a to 2e), each its own PR into `main`, merged in order, all in one release (§19). **Call by @josh-sanders, 1 Nov 2026, during development of PR #4440:** yes | Review time per part; `main` green and releasable after each part |
+| PR #4440 holds only the proposal documents and stays a draft until the whole plan is done; the spike branch is never merged, and only its report is in PR #4440 (§19). **Call by @josh-sanders, 1 Nov 2026, during development of PR #4440:** yes | The maintainers' review of PR #4440 and of the first code PR |
 | Two-level consent: the family per feature, then the member (§6) | Admins and members trying the AI features page; whether `:no_family_consent` blocks anything people expect to work |
 | Config source all or nothing: the UI, `AI_CONFIG` or the old ENV, no per-field locks (§4.1) | Operators of compose, Helm and quadlet installs upgrading with each source |
 | One YAML file, `AI_CONFIG`, loaded into the tables at boot (§4.4) | A home-lab and a multi-tenant config written from scratch and exported again |
