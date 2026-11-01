@@ -9,7 +9,7 @@
 #              (Unreachable, which includes a connect timeout); a 401 the
 #              key; a read timeout, 5xx or 429 only that model on that key.
 #              Failover may stay on the same server.
-# - :location  call by @josh-sanders (1 Nov 2026, PR #4440): mark the
+# - :location  call by @josh-sanders during development of PR #4440: mark the
 #              smallest thing the error proves broken. The server when no
 #              response came back, or on
 #              a timeout or 5xx from a local endpoint (one process: when it
@@ -22,7 +22,7 @@
 #
 # A route on a family's own key (family_key) fails over only to other
 # routes on the family's own keys: never to the operator's key or a local
-# server (call by @josh-sanders, 1 Nov 2026, PR #4440). Its last error
+# server (call by @josh-sanders during development of PR #4440). Its last error
 # stands, for the family admin's notice.
 class Ai::Spike::Failover
   RULES = %i[plan response location].freeze
