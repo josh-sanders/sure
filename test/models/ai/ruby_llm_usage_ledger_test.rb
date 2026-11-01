@@ -222,7 +222,7 @@ class Ai::RubyLlmUsageLedgerTest < ActiveSupport::TestCase
     def name = "probe_b"
   end
 
-  test "A: the owner, and a lane in fiber storage, follow RubyLLM's tool threads" do
+  test "A: the usage owner, and a lane in fiber storage, follow RubyLLM's tool threads" do
     ProbeTool::PROBES.clear
     calls = %w[probe_a probe_b].each_with_index.map { |name, i| { id: "call_#{i}", type: "function", function: { name:, arguments: { text: "x" }.to_json } } }
     stub_request(:post, CHAT_URL).to_return(

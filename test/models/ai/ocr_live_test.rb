@@ -5,7 +5,7 @@ require_relative "statement_scoring"
 # GGUF conversions (AtomicChat's and RX5950XT's), reading the two sample
 # statements' pages rendered by pdftoppm and by ruby-vips at Sure's 150 dpi.
 #
-# Two steps, recorded apart, because the venus server holds one model at a
+# Two steps, recorded apart, because the test host's server holds one model at a
 # time:
 # - "transcribes": the OCR model, loaded on SPIKE_LLAMA_CPP_URL, turns the
 #   pages into text with the model card's prompt, "<PAGE><image>" per page

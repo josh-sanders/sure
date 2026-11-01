@@ -24,7 +24,7 @@ class Ai::ProviderSwitchLiveTest < ActiveSupport::TestCase
                                                                       name: "gemini-3.5-flash-lite", max_output_tokens: 4096), reasoning_effort: "low"),
       nemotron: Ai::Spike::Route.new(model: Ai::Spike::Model.new(endpoint: Ai::Spike::Presets.openrouter(api_key: ENV.fetch("SPIKE_OPENROUTER_API_KEY", "or-key"), max_retries: 0),
                                                                  name: "nvidia/nemotron-3.5-lightning:free", max_output_tokens: 4096)),
-      # The venus llama.cpp had gpt-oss-20b loaded: it always reasons, so its
+      # The test host's llama.cpp had gpt-oss-20b loaded: it always reasons, so its
       # reasoning text is the state that could travel.
       llama: Ai::Spike::Route.new(model: Ai::Spike::Model.new(endpoint: Ai::Spike::Presets.llama_cpp(timeout_seconds: 900), name: "gpt-oss-20b", max_output_tokens: 4096))
     }

@@ -4,7 +4,7 @@ require_relative "async_spike_helper"
 # setups is queued, then, 3 s later, one chat message; what matters is how
 # long the person waits for the first word (time to first chunk, from the
 # moment the chat job is enqueued) and how long the background work takes.
-# All against llama.cpp on venus (SPIKE_LLAMA_CPP_URL), whose --parallel N
+# All against llama.cpp on the test host (SPIKE_LLAMA_CPP_URL), whose --parallel N
 # decides how many requests it decodes at once (SPIKE_LLAMA_PARALLEL records
 # what it was started with).
 #

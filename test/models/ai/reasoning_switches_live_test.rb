@@ -2,7 +2,7 @@ require_relative "spike_helper"
 
 # Each way of turning reasoning down or off, live on the local servers, in
 # strict mode so a refusal surfaces instead of the auto fallback hiding it.
-# The venus llama.cpp server has thinking off by default, so its rows force
+# The test host's llama.cpp server has thinking off by default, so its rows force
 # it on with chat_template_kwargs first. Ollama 0.40.13 runs in a temporary
 # container with Qwen3.6-35B-A3B and gpt-oss-20b imported from local GGUFs.
 #

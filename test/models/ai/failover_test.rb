@@ -132,7 +132,7 @@ class Ai::FailoverTest < ActiveSupport::TestCase
     end
   end
 
-  # --- the owner's calls (1 Nov) ---
+  # --- calls by @josh-sanders (1 Nov 2026, PR #4440) ---
 
   test "location with no move limit: a four-entry list is tried in order, skipping what's down" do
     gateway_answers("vendor-a/model-a", error(429, "Rate limit exceeded"))
