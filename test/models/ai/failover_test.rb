@@ -132,6 +132,49 @@ class Ai::FailoverTest < ActiveSupport::TestCase
     end
   end
 
+  # --- the owner's calls (1 Nov) ---
+
+  test "location with no move limit: a four-entry list is tried in order, skipping what's down" do
+    gateway_answers("vendor-a/model-a", error(429, "Rate limit exceeded"))
+    gateway_answers("vendor-b/model-b", error(429, "Rate limit exceeded"))
+    stub_request(:post, LOCAL).to_raise(Errno::ECONNREFUSED)
+    other = route(Ai::Spike::Endpoint.new(name: "other", protocol: :compatible, preset: :gateway, base_url: "https://other.test/v1",
+                                          api_key: "other-key", json_mode: "strict"), "vendor-c/model-c")
+    stub_request(:post, "https://other.test/v1/chat/completions").to_return(completion)
+    failover = Ai::Spike::Failover.new(rule: :location, max_moves: nil)
+
+    outcome = failover.run([ @gw_a, @gw_b, @local_small, other ]) { call(_1) }
+
+    assert_equal "other/vendor-c/model-c", route_label(outcome.route)
+    assert_equal [ %w[RateLimited model], %w[RateLimited model], %w[Unreachable server] ], outcome.attempts.map { [ _1.error, _1.mark.to_s ] }
+    # Next time the three marked entries are skipped without a call.
+    assert_equal "other/vendor-c/model-c", run_or_reason(failover, [ @gw_a, @gw_b, @local_big, other ])
+    assert_equal [ 2, 1 ], [ gateway_requests, local_requests ]
+  end
+
+  test "a family's own key fails over only to its own keys, never the operator's key or a local server" do
+    own_a, own_b = @gw_a.with(family_key: true), @gw_b.with(family_key: true)
+    gateway_answers("vendor-a/model-a", error(503, "Provider returned error"))
+    gateway_answers("vendor-b/model-b", completion)
+    local_answers(completion)
+    failover = Ai::Spike::Failover.new(rule: :location, max_moves: nil)
+
+    # One model fails: the family's other model on its own key answers.
+    assert_equal "gateway/vendor-b/model-b", run_or_reason(failover, [ own_a, own_b, @local_small ])
+
+    # Its key fails: the error stands for the family admin's notice, and
+    # neither the local server nor the operator's key on another gateway is tried.
+    WebMock.reset!
+    gateway_answers("vendor-a/model-a", error(401, "Invalid API key"))
+    local_answers(completion)
+    failover = Ai::Spike::Failover.new(rule: :location, max_moves: nil)
+    operators = route(Ai::Spike::Endpoint.new(name: "other", protocol: :compatible, preset: :gateway, base_url: "https://other.test/v1",
+                                              api_key: "operator-key", json_mode: "strict"), "vendor-c/model-c")
+
+    assert_equal "Unauthorized", run_or_reason(failover, [ own_a, own_b, @local_small, operators ])
+    assert_equal [ 1, 0 ], [ gateway_requests, local_requests ]
+  end
+
   # --- RubyLLM's fallbacks inside one entry, for contrast ---
 
   test "RubyLLM fallback by model ID: a model outside the registry replaces the 503 with ModelNotFound" do

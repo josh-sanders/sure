@@ -9,12 +9,20 @@
 #              (Unreachable, which includes a connect timeout); a 401 the
 #              key; a read timeout, 5xx or 429 only that model on that key.
 #              Failover may stay on the same server.
-# - :location  :plan for a local endpoint (one process: when it fails, all
-#              of it fails) and :response for a cloud one.
+# - :location  the owner's call (1 Nov): mark the smallest thing the error
+#              proves broken. The server when no response came back, or on
+#              a timeout or 5xx from a local endpoint (one process: when it
+#              fails, all of it fails); the key on a 401; otherwise the
+#              model. The next route is simply the next one not down.
 #
 # Escalation (InvalidOutput, ContextTooLong) is the same under every rule:
 # no mark, next route on any server. max_moves is section 5.4's "at most
-# once".
+# once"; nil tries the whole list.
+#
+# A route on a family's own key (family_key) fails over only to other
+# routes on the family's own keys: never to the operator's key or a local
+# server (the owner, 1 Nov). Its last error stands, for the family admin's
+# notice.
 class Ai::Spike::Failover
   RULES = %i[plan response location].freeze
   DOWN_FOR = 60.seconds
@@ -43,7 +51,7 @@ class Ai::Spike::Failover
       return Outcome.new(route:, result: yield(route), attempts:, skipped:)
     rescue *FAIL_OVER, *ESCALATE => e
       attempts << Attempt.new(route:, error: e.class.name.demodulize, mark: mark(route, e))
-      raise if attempts.size > @max_moves
+      raise if @max_moves && attempts.size > @max_moves
 
       route = next_route(candidates, after: route, error: e) or raise
     end
@@ -54,7 +62,8 @@ class Ai::Spike::Failover
   private
     def next_route(candidates, after:, error:)
       rest = candidates.drop(candidates.index(after) + 1).reject { down?(_1) }
-      return rest.first if escalation?(error) || !whole_server?(after)
+      rest = rest.select(&:family_key) if after.family_key
+      return rest.first if escalation?(error) || @rule != :plan
 
       rest.find { server(_1) != server(after) }
     end
@@ -65,7 +74,7 @@ class Ai::Spike::Failover
       scope = case error
       when Ai::Error::Unreachable then :server
       when Ai::Error::Unauthorized then :key
-      when Ai::Error::RateLimited then whole_server?(route) ? :key : :model
+      when Ai::Error::RateLimited then @rule == :plan ? :key : :model
       else whole_server?(route) ? :server : :model   # Timeout, Upstream
       end
       @marks.write(mark_key(scope, route), error.class.name.demodulize, expires_in: DOWN_FOR)
