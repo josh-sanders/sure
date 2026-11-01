@@ -142,7 +142,7 @@ evidence like everything else here.
 | Shadow runs for any feature, as their own job (§8.2) | A shadow run of `detect_merchants`, with the comparison page |
 | Smart-fill and smart-configure become asynchronous (§11) | Users on a slow local model: a skeleton and a broadcast against today's wait |
 | Small batches that re-enqueue at the back of the queue, so families take turns (§11) | Two families' imports on one AI thread: each family's first result time |
-| Prompts and models unchanged by this work (§20) | Sure's recorded evals before and after each PR |
+| Prompts and models unchanged by this work (§20). **Call by @josh-sanders during development of PR #4440:** every one of today's prompts becomes its own file, word for word (OpenAI's, the simplified one for custom servers, Anthropic's), and the presets name the right one | Sure's recorded evals before and after each PR |
 | Ruby ML engines and the classifier settings page left alone (§20) | Nothing in the plumbing; a separate proposal |
 | Suggestions instead of AI locks, and rule ordering (§20) | A user review of corrections, and evals of how often AI's answer is overridden |
 | Rules that run only after an AI rule (§20) | A prototype on the generation completion hook (§8.1) |
