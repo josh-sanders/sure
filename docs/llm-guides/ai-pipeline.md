@@ -129,6 +129,8 @@ evidence like everything else here.
 | Decision (plan section) | What would test it |
 |---|---|
 | `Ai::Usage` named `Ai::Tokens`, after `RubyLLM::Tokens`, beside v0.7.6's `Usage` (installation telemetry) and `LlmUsage` (§10). **Call by @josh-sanders during development of PR #4440:** yes | Nothing to test: a name |
+| The user switch in PR 2b: today's checks (chat and bills need `ai_enabled`); a "No" on chat's consent prompt, or AI turned off, stops AI on that user's PDF imports and documents at once and is kept for PR 7's migration (§6). **Call by @josh-sanders during development of PR #4440:** yes, with chat's existing prompt only | Users who decline and then import a PDF; how many users PR 7's migration finds answered and unanswered |
+| Configuration built per process until PR 7, as today, so the web and the workers can disagree (§19). **Call by @josh-sanders during development of PR #4440:** accept it; the upgrade guide says to give both the same AI variables | Installs whose web and worker AI variables differ |
 | PR 2 in five parts (2a to 2e), each its own PR into `main`, merged in order, all in one release (§19). **Call by @josh-sanders during development of PR #4440:** yes | Review time per part; `main` green and releasable after each part |
 | PR #4440 holds only the proposal documents and stays a draft until the whole plan is done; the spike branch is never merged, and only its report is in PR #4440 (§19). **Call by @josh-sanders during development of PR #4440:** yes | The maintainers' review of PR #4440 and of the first code PR |
 | Two-level consent: the family per feature, then the member (§6) | Admins and members trying the AI features page; whether `:no_family_consent` blocks anything people expect to work |
