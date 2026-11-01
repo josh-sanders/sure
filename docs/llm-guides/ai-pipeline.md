@@ -141,7 +141,7 @@ evidence like everything else here.
 | Three protocols: `compatible`, `anthropic`, `jev` (§4.2); a native Bedrock or Vertex AI endpoint (region, IAM or a service account) has none | Bedrock through RubyLLM's native provider and through an OpenAI-compatible proxy, against `AiEndpoint`'s columns |
 | Shadow runs for any feature, as their own job (§8.2) | A shadow run of `detect_merchants`, with the comparison page |
 | Smart-fill and smart-configure become asynchronous (§11) | Users on a slow local model: a skeleton and a broadcast against today's wait |
-| Small batches that re-enqueue at the back of the queue, so families take turns (§11) | Two families' imports on one AI thread: each family's first result time |
+| Small batches that re-enqueue at the back of the queue, so families take turns (§11). **Call by @josh-sanders during development of PR #4440:** one batch per job for every install; local presets 10 per call, cloud presets today's 25; local models generally serve one family and cloud models many, so fairness is tested on cloud | Two families' imports on one AI thread: each family's first result time |
 | Prompts and models unchanged by this work (§20). **Call by @josh-sanders during development of PR #4440:** every one of today's prompts becomes its own file, word for word (OpenAI's, the simplified one for custom servers, Anthropic's), and the presets name the right one | Sure's recorded evals before and after each PR |
 | Ruby ML engines and the classifier settings page left alone (§20) | Nothing in the plumbing; a separate proposal |
 | Suggestions instead of AI locks, and rule ordering (§20) | A user review of corrections, and evals of how often AI's answer is overridden |
