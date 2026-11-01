@@ -1346,6 +1346,44 @@ on a local host stream so it can stop them. Lane order alone leaves chat behind 
 kept slot gives up MTP and slows chat's finish. Several workers on one local host need the AI
 capsules on one of them, or a limit they share.
 
+### Prompt cache and prompt reads on one slot, outside the criteria
+
+`test/models/ai/live/cache_prefill_check.rb`, llama.cpp on the test host (build `b1-d812350`,
+`--parallel 1`, MTP, no cache flags set), one request at a time, the server otherwise idle. Every
+prompt carries a nonce. #4237 measured 4–15 minute re-reads when background calls ran between a
+chat's rounds on one slot; #4444 held background work while someone typed.
+
+**A. A chat's cache survives other calls between its rounds.** Round 1 is a chat of about 2,640
+prompt tokens; round 2 is round 1 plus its answer and a follow-up.
+
+| Between the rounds | Round 2 read again (`prompt_n`) | Round 2 from cache (`cache_n`) | Round 2's first word |
+|---|---|---|---|
+| Nothing | 40 tokens | 2,640 | 0.9 s |
+| A 25-transaction merchant call (567 prompt tokens, 200 out) | 40 | 2,640 | 0.9 s |
+| A statement's text (11,575 prompt tokens, 195 s to read) | 40 | 2,639 | 1.0 s |
+
+Round 1 took 37–39 s to its first word each time. This build keeps a slot's evicted prompt and
+restores it, so on one slot a background call between rounds didn't cost the chat its cache.
+Other servers (Ollama, LM Studio) and older llama.cpp builds weren't tested.
+
+**B. A chat sent while a long prompt is being read.** The statement prompt starts; a chat (about
+2,640 tokens, 39 s to read alone) is sent 10 s later.
+
+| Background call | Chat's first word after sending | Of which waiting behind the background call |
+|---|---|---|
+| Left running (llama.cpp queues the chat) | 247.7 s | about 209 s: the rest of the 195 s read plus 300 tokens of output |
+| Its connection closed when the chat was sent | 59.5 s | about 20 s |
+
+- **Closing the connection stops a prompt read**, which an interrupt raised from the chunk block
+  can't do, since no chunk arrives until the read ends. It took about 20 s, not at once: the read
+  stops between prompt batches (llama.cpp's default `--batch-size` is 2,048 tokens, about 35 s on
+  this CPU), so a closed read can still run up to one batch.
+- **A merchant call reads its prompt in about 8.5 s** (567 tokens), so a chat sent during it
+  waits at most that long with the connection closed.
+- **Not tested:** a smaller `--batch-size` or `--ubatch-size`, which should shorten the stop, and
+  closing the connection through RubyLLM and Faraday from the gate's thread (the check closed
+  `Net::HTTP` directly).
+
 ### RubyLLM agents behind the gate, outside the criteria
 
 `agent_gate_live_test`, llama.cpp on the test host (`--parallel 1`, MTP), one run each. The agents are
