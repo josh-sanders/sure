@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_000100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -725,6 +725,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.string "name", null: false
     t.text "notes"
     t.uuid "parent_entry_id"
+    t.string "reconciled_status", default: "unreconciled", null: false
     t.string "plaid_id"
     t.datetime "reconciled_at"
     t.uuid "reconciled_by_statement_id"
@@ -736,6 +737,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.index ["account_id", "date"], name: "index_entries_on_account_id_and_date"
     t.index ["account_id", "idempotency_key"], name: "index_entries_on_account_and_idempotency_key", unique: true, where: "(idempotency_key IS NOT NULL)"
     t.index ["account_id", "reconciled_at"], name: "index_entries_on_account_and_reconciled_at", where: "(reconciled_at IS NOT NULL)"
+    t.index ["account_id", "reconciled_status"], name: "index_entries_on_account_id_and_reconciled_status"
     t.index ["account_id", "source", "external_id"], name: "index_entries_on_account_source_and_external_id", unique: true, where: "((external_id IS NOT NULL) AND (source IS NOT NULL))"
     t.index ["account_id"], name: "index_entries_on_account_id"
     t.index ["currency", "amount", "date", "account_id"], name: "index_entries_on_transfer_match_lookup", where: "(((entryable_type)::text = 'Transaction'::text) AND (excluded = false))"
@@ -747,6 +749,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.index ["reconciled_by_statement_id"], name: "index_entries_on_reconciled_by_statement", where: "(reconciled_by_statement_id IS NOT NULL)"
     t.index ["user_modified"], name: "index_entries_on_user_modified_true", where: "(user_modified = true)"
     t.check_constraint "reconciled_by_statement_id IS NULL OR reconciled_at IS NOT NULL", name: "chk_entries_reconciled_at_present_when_statement_set"
+    t.check_constraint "reconciled_status::text = ANY (ARRAY['unreconciled'::character varying::text, 'cleared'::character varying::text, 'reconciled'::character varying::text])", name: "chk_entries_reconciled_status"
   end
 
   create_table "eval_datasets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -871,6 +874,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.datetime "latest_sync_activity_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "latest_sync_completed_at", default: -> { "CURRENT_TIMESTAMP" }
     t.string "locale", default: "en"
+    t.boolean "manual_reconciliation", default: false, null: false
     t.string "moniker", default: "Family", null: false
     t.integer "month_start_day", default: 1, null: false
     t.string "name"
@@ -1599,7 +1603,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.index ["family_id"], name: "index_llm_usages_on_family_id"
     t.check_constraint "cache_creation_tokens IS NULL OR cache_creation_tokens >= 0", name: "chk_llm_usages_cache_creation_tokens_non_negative"
     t.check_constraint "cache_read_tokens IS NULL OR cache_read_tokens >= 0", name: "chk_llm_usages_cache_read_tokens_non_negative"
-    t.check_constraint "status::text = ANY (ARRAY['succeeded'::character varying, 'failed'::character varying, 'cancelled'::character varying]::text[])", name: "chk_llm_usages_status"
+    t.check_constraint "status::text = ANY (ARRAY['succeeded'::character varying::text, 'failed'::character varying::text, 'cancelled'::character varying::text])", name: "chk_llm_usages_status"
   end
 
   create_table "loans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1617,7 +1621,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.integer "term_months"
     t.datetime "updated_at", null: false
     t.jsonb "variable_rate_schedule", default: {}, null: false
-    t.check_constraint "day_count_convention::text = ANY (ARRAY['thirty_360'::character varying, 'actual_365'::character varying, 'actual_actual'::character varying]::text[])", name: "chk_loans_day_count_convention"
+    t.check_constraint "day_count_convention::text = ANY (ARRAY['thirty_360'::character varying::text, 'actual_365'::character varying::text, 'actual_actual'::character varying::text])", name: "chk_loans_day_count_convention"
     t.check_constraint "down_payment IS NULL OR down_payment >= 0::numeric", name: "chk_loans_down_payment_non_negative"
     t.check_constraint "insurance_rate IS NULL OR insurance_rate >= 0::numeric", name: "chk_loans_insurance_rate_non_negative"
     t.check_constraint "insurance_rate_type IS NULL OR (insurance_rate_type::text = ANY (ARRAY['level_term'::character varying::text, 'decreasing_life'::character varying::text]))", name: "chk_loans_insurance_rate_type"
@@ -1986,7 +1990,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.datetime "updated_at", null: false
     t.integer "year_built"
     t.index ["avm_last_synced_on"], name: "index_properties_on_avm_provider_sync", order: "NULLS FIRST", where: "(avm_provider IS NOT NULL)"
-    t.check_constraint "avm_provider IS NULL OR (avm_provider::text = ANY (ARRAY['rentcast'::character varying, 'realie'::character varying, 'chimnie'::character varying]::text[]))", name: "properties_avm_provider_check"
+    t.check_constraint "avm_provider IS NULL OR (avm_provider::text = ANY (ARRAY['rentcast'::character varying::text, 'realie'::character varying::text, 'chimnie'::character varying::text]))", name: "properties_avm_provider_check"
   end
 
   create_table "provider_request_counts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2263,6 +2267,106 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.index ["inflow_transaction_id", "outflow_transaction_id"], name: "idx_on_inflow_transaction_id_outflow_transaction_id_412f8e7e26", unique: true
     t.index ["inflow_transaction_id"], name: "index_rejected_transfers_on_inflow_transaction_id"
     t.index ["outflow_transaction_id"], name: "index_rejected_transfers_on_outflow_transaction_id"
+  end
+
+  create_table "ruby_llm_models", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "model_id", null: false
+    t.string "name", null: false
+    t.string "provider", null: false
+    t.string "family"
+    t.datetime "model_created_at"
+    t.integer "context_window"
+    t.integer "max_output_tokens"
+    t.date "knowledge_cutoff"
+    t.datetime "unlisted_at"
+    t.jsonb "modalities", default: {}
+    t.jsonb "capabilities", default: []
+    t.jsonb "pricing", default: {}
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["capabilities"], name: "index_ruby_llm_models_on_capabilities", using: :gin
+    t.index ["family"], name: "index_ruby_llm_models_on_family"
+    t.index ["modalities"], name: "index_ruby_llm_models_on_modalities", using: :gin
+    t.index ["provider", "model_id"], name: "index_ruby_llm_models_on_provider_and_model_id", unique: true
+    t.index ["provider"], name: "index_ruby_llm_models_on_provider"
+  end
+
+  create_table "ruby_llm_queued_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "chat_type", null: false
+    t.uuid "chat_id", null: false
+    t.string "sender_type"
+    t.uuid "sender_id"
+    t.text "content"
+    t.boolean "steer", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_type", "chat_id"], name: "index_ruby_llm_queued_messages_on_chat_type_and_chat_id"
+    t.index ["sender_type", "sender_id"], name: "index_ruby_llm_queued_messages_on_sender_type_and_sender_id"
+  end
+
+  create_table "ruby_llm_tool_calls", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "message_type", null: false
+    t.uuid "message_id", null: false
+    t.string "result_type"
+    t.uuid "result_id"
+    t.string "tool_call_id", null: false
+    t.string "provider_call_id"
+    t.string "namespace"
+    t.string "name", null: false
+    t.text "thought_signature"
+    t.string "approval"
+    t.boolean "remote", default: false, null: false
+    t.datetime "claimed_until"
+    t.jsonb "arguments", default: {}
+    t.jsonb "mcp_state"
+    t.jsonb "mcp_result"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_type", "message_id"], name: "index_ruby_llm_tool_calls_on_message_type_and_message_id"
+    t.index ["name"], name: "index_ruby_llm_tool_calls_on_name"
+    t.index ["result_type", "result_id"], name: "index_ruby_llm_tool_calls_on_result_type_and_result_id"
+    t.index ["tool_call_id"], name: "index_ruby_llm_tool_calls_on_tool_call_id", unique: true
+  end
+
+  create_table "ruby_llm_usages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "chat_type"
+    t.uuid "chat_id"
+    t.string "message_type"
+    t.uuid "message_id"
+    t.string "owner_type"
+    t.uuid "owner_id"
+    t.string "operation", null: false
+    t.string "provider", null: false
+    t.string "model", null: false
+    t.string "status", null: false
+    t.integer "input_tokens"
+    t.integer "output_tokens"
+    t.integer "cache_read_tokens"
+    t.integer "cache_write_tokens"
+    t.integer "thinking_tokens"
+    t.integer "characters"
+    t.jsonb "server_tool_use"
+    t.decimal "input_cost", precision: 16, scale: 10
+    t.decimal "output_cost", precision: 16, scale: 10
+    t.decimal "cache_read_cost", precision: 16, scale: 10
+    t.decimal "cache_write_cost", precision: 16, scale: 10
+    t.decimal "thinking_cost", precision: 16, scale: 10
+    t.decimal "characters_cost", precision: 16, scale: 10
+    t.decimal "total_cost", precision: 16, scale: 10
+    t.string "workflow_id"
+    t.string "workflow_name"
+    t.string "workflow_step_id"
+    t.string "workflow_step_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_type", "chat_id"], name: "index_ruby_llm_usages_on_chat_type_and_chat_id"
+    t.index ["message_type", "message_id"], name: "index_ruby_llm_usages_on_message_type_and_message_id"
+    t.index ["owner_type", "owner_id"], name: "index_ruby_llm_usages_on_owner_type_and_owner_id"
+    t.index ["status"], name: "index_ruby_llm_usages_on_status"
+    t.index ["workflow_id"], name: "index_ruby_llm_usages_on_workflow_id"
+    t.check_constraint "operation::text = ANY (ARRAY['chat'::character varying, 'embedding'::character varying, 'judgment'::character varying, 'audio_transcription'::character varying, 'speech'::character varying, 'rerank'::character varying, 'ocr'::character varying, 'moderation'::character varying, 'video'::character varying, 'batch'::character varying]::text[])", name: "ruby_llm_usages_operation_check"
+    t.check_constraint "status::text = ANY (ARRAY['succeeded'::character varying, 'failed'::character varying, 'cancelled'::character varying]::text[])", name: "ruby_llm_usages_status_check"
   end
 
   create_table "rule_actions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2602,6 +2706,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.string "customer_id"
     t.jsonb "institution_metadata"
     t.datetime "last_updated"
+    t.boolean "lender_signed"
     t.boolean "manual_sync", default: false, null: false
     t.string "member_id"
     t.string "name", null: false
@@ -2649,6 +2754,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
     t.index ["family_id"], name: "index_sophtron_items_on_family_id"
     t.index ["status"], name: "index_sophtron_items_on_status"
     t.index ["user_institution_id"], name: "index_sophtron_items_on_user_institution_id"
+  end
+
+  create_table "spike_chats", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "ruby_llm_model_id", null: false
+    t.boolean "cancelled", default: false, null: false
+    t.string "claim_token"
+    t.datetime "claimed_until"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["claimed_until"], name: "index_spike_chats_on_claimed_until", where: "(claim_token IS NOT NULL)"
+    t.index ["ruby_llm_model_id"], name: "index_spike_chats_on_ruby_llm_model_id"
+  end
+
+  create_table "spike_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "spike_chat_id", null: false
+    t.string "role", null: false
+    t.text "content"
+    t.boolean "cache_until_here", default: false, null: false
+    t.string "cache_ttl"
+    t.text "thinking_text"
+    t.text "thinking_signature"
+    t.jsonb "citations"
+    t.jsonb "server_tool_calls"
+    t.jsonb "raw_content"
+    t.jsonb "raw_reasoning"
+    t.string "phase"
+    t.text "continuation"
+    t.string "finish_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["spike_chat_id"], name: "index_spike_messages_on_spike_chat_id"
+  end
+
+  create_table "spike_writes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sso_audit_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -3282,6 +3424,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
   add_foreign_key "snaptrade_items", "families"
   add_foreign_key "sophtron_accounts", "sophtron_items"
   add_foreign_key "sophtron_items", "families"
+  add_foreign_key "spike_chats", "ruby_llm_models"
+  add_foreign_key "spike_messages", "spike_chats"
   add_foreign_key "sso_audit_logs", "users"
   add_foreign_key "subscriptions", "families"
   add_foreign_key "syncs", "syncs", column: "parent_id"
